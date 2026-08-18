@@ -22,7 +22,7 @@ export default async function handler(req,res){
     const response=await client.responses.create({
       model:MODEL,
       store:false,
-      reasoning:{effort:"minimal"},
+      reasoning:{effort:"none"},
       max_output_tokens:550,
       input:[
         {role:"developer",content:`Bir YKS öğrencisi için TEK bir yeni çoktan seçmeli soru üret.\n- Ders kesinlikle: ${s.exam||''} ${s.subject}\n- Konu kesinlikle: ${s.topic}\n- Kazanım kesinlikle: ${s.curriculum_outcome||s.topic}\n- Zorluk: ${s.difficulty||'Orta'}\n- Başka derse veya konuya geçme.\n- Orijinal soruyu kopyalama; aynı kazanımı farklı örnek, sayı, olay veya bağlamla ölç.\n- Tam 5 seçenek üret. Seçenek metinlerinin başına A/B/C/D/E harfi koyma; arayüz harfleri kendisi ekleyecek.\n- answer alanı choices dizisindeki doğru seçeneğin TAM metni olsun.\n- hint kısa olsun ve cevabı doğrudan söylemesin.\n- Türkçe ve YKS düzeyinde yaz.`},

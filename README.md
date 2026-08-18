@@ -1,28 +1,27 @@
-# YKS Uzman Hoca V4.8
+# YKS Uzman Hoca V5.0.1
 
-Kişisel YKS soru çözme, YKS Koçu ve Rehber Öğretmen web uygulaması.
+Kişisel YKS soru çözme, Kişisel Öğretmen, YKS Koçu ve Rehber Öğretmen web uygulaması.
 
-## Canlı özellikler
+## Güncel mimari
+- StudyEvent V5 merkezi çalışma kaydı
 - Fotoğraf veya metin ile YKS sorusu gönderme
-- GPT-5.6 + `skill/SKILL.md` ile soru çözümü
-- MEB/ÖSYM resmi alanlarıyla sınırlı web doğrulaması
-- `skill/REHBER_OGRETMEN.md` ile motivasyon ve çalışma desteği
-- Günlük soru hedefi: 10–100
-- Günlük çalışma süresi: 30 dk–5 saat
+- Mini Test sonuçlarının kalıcı StudyEvent kaydı
+- Kişisel Öğretmen + YKS Koçu ortak strateji motoru
+- V5 tabanlı İstatistikler ve konu performansı
+- SAY / EA alan filtresi
+- GPT-4.1-mini + GPT-5.6 Luna düşük maliyetli model ayrımı
+- API kullanım / maliyet sayacı
 - Açık / koyu tema
 - PWA / ana ekrana kurulum
-- Yerel çalışma sayacı ve sohbet geçmişi
 
-## Vercel environment variable
-Vercel Project Settings > Environment Variables bölümüne ekleyin:
-
+## Vercel environment variables
 - `OPENAI_API_KEY`
 - `OPENAI_MODEL` = `gpt-5.6`
+- isteğe bağlı `OPENAI_ECONOMY_MODEL` = `gpt-5.6-luna`
+- isteğe bağlı `OPENAI_SOLVE_MODEL` = `gpt-4.1-mini`
+- Supabase senkronizasyonu kullanılacaksa `SUPABASE_URL` ve `SUPABASE_PUBLISHABLE_KEY`
 
-API anahtarı hiçbir zaman `index.html` içine yazılmaz.
+API anahtarı istemci koduna yazılmaz. OpenAI Responses API çağrılarında `store:false` kullanılır.
 
-## Gizlilik
-OpenAI Responses API çağrılarında `store:false` kullanılır.
-
-## Sonraki aşama
-Supabase ile telefon + tablet veri senkronizasyonunun canlı sürüme yeniden bağlanması.
+## Veri ve senkronizasyon
+Yerel çalışma verisi tarayıcıda saklanır. StudyEvent V5, Mini Test, Soru Çöz, Kişisel Öğretmen ve deneme verilerini ortak modele taşır. Çok cihazlı Supabase senkronizasyonu yalnız gerekli V5 veritabanı migration'ı kurulduktan sonra etkinleştirilmelidir.

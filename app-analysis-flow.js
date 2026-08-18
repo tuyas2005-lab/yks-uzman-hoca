@@ -23,6 +23,17 @@
   `;
   document.head.appendChild(style);
 
+  let activeQuestion={text:'',image:''};
+
+  function resetQuestionForm(){
+    try{fileInput.value=''}catch{}
+    selectedImageData='';
+    try{preview.removeAttribute('src');preview.classList.add('hidden')}catch{}
+    try{drop.classList.remove('hidden')}catch{}
+    try{uploadActions.classList.add('hidden')}catch{}
+    try{questionText.value=''}catch{}
+  }
+
   function resetAnalysisView(){
     const wrap=document.querySelector('#analyze .analysis-wrap');
     if(!wrap)return;
@@ -106,24 +117,25 @@
     const shot=document.querySelector('#solution .question-shot');
     if(shot){
       shot.innerHTML='';
-      if(selectedImageData){
-        const img=document.createElement('img');img.src=selectedImageData;img.alt='Yüklenen soru';img.style.maxWidth='100%';img.style.maxHeight='360px';img.style.borderRadius='12px';shot.appendChild(img);
+      if(activeQuestion.image){
+        const img=document.createElement('img');img.src=activeQuestion.image;img.alt='Yüklenen soru';img.style.maxWidth='100%';img.style.maxHeight='360px';img.style.borderRadius='12px';shot.appendChild(img);
       }else{
-        const p=document.createElement('p');p.textContent=(questionText?.value||'Metin sorusu').trim();p.style.whiteSpace='pre-wrap';p.style.textAlign='left';p.style.width='100%';shot.appendChild(p);
+        const p=document.createElement('p');p.textContent=activeQuestion.text||'Metin sorusu';p.style.whiteSpace='pre-wrap';p.style.textAlign='left';p.style.width='100%';shot.appendChild(p);
       }
     }
     populateTips();
   };
 
   liveSolve=async function({text='',image=''}){
+    activeQuestion={text:String(text||'').trim(),image:String(image||'')};
     resetAnalysisView();go('analyze');
     const wrap=document.querySelector('#analyze .analysis-wrap');
     try{
       if(!liveApi)throw new Error('Canlı bağlantı hazır değil.');
       const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),35000);
-      const r=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({text,image,student:{name:state.profile.name,tone:state.profile.tone}})});
+      const r=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({text:activeQuestion.text,image:activeQuestion.image,student:{name:state.profile.name,tone:state.profile.tone}})});
       clearTimeout(timer);const j=await r.json();if(!r.ok)throw new Error(j.error||'API hatası');
-      applyLiveResult(j);wrap?.classList.remove('ai-working','ai-loading');go('solution');return true;
+      applyLiveResult(j);wrap?.classList.remove('ai-working','ai-loading');resetQuestionForm();go('solution');return true;
     }catch(e){
       wrap?.classList.remove('ai-working','ai-loading');
       if(e?.name==='AbortError')alert('Çözüm beklenenden uzun sürdü. Lütfen tekrar deneyin.');else alert('Canlı çözüm alınamadı: '+e.message);return false;

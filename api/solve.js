@@ -1,14 +1,16 @@
-import {SOLVE_MODEL,getClient,readSkill,officialDomains} from "./_common.js";
+import {SOLVE_MODEL,getClient} from "./_common.js";
 
 const schema={
   type:"object",
   additionalProperties:false,
-  required:["subject","exam","topic","curriculum_outcome","difficulty","answer","short_solution","steps","why","tip","distractor","exam_note","sources"],
+  required:["subject","exam","topic","difficulty","answer","short_solution"],
   properties:{
-    subject:{type:"string"}, exam:{type:"string"}, topic:{type:"string"}, curriculum_outcome:{type:"string"},
-    difficulty:{type:"string",enum:["Kolay","Orta","Zor"]}, answer:{type:"string"}, short_solution:{type:"string"},
-    steps:{type:"array",maxItems:5,items:{type:"string"}}, why:{type:"string"}, tip:{type:"string"}, distractor:{type:"string"},
-    exam_note:{type:"string"}, sources:{type:"array",items:{type:"string"}}
+    subject:{type:"string"},
+    exam:{type:"string"},
+    topic:{type:"string"},
+    difficulty:{type:"string",enum:["Kolay","Orta","Zor"]},
+    answer:{type:"string"},
+    short_solution:{type:"string"}
   }
 };
 
@@ -21,33 +23,25 @@ export default async function handler(req,res){
     const body=req.body||{};
     const text=String(body.text||"").trim();
     const image=typeof body.image==="string"?body.image:"";
-    const verifySources=body.verifySources===true;
     if(!text&&!image) return res.status(400).json({error:"Soru metni veya görseli gerekli."});
 
-    const content=[{type:"input_text",text:text||"Görseldeki YKS sorusunu dikkatle oku, dersini ve konusunu belirle, doğru cevabı bul ve kısa çözüm üret."}];
+    const content=[{type:"input_text",text:text||"Görseldeki YKS sorusunu dikkatle oku. Önce doğru cevabı bul, sonra dersini, sınav türünü ve konusunu belirle; çok kısa bir çözüm yaz."}];
     if(image) content.push({type:"input_image",image_url:image,detail:"auto"});
 
-    const skill=readSkill("SKILL.md");
-    const request={
+    const response=await client.responses.create({
       model:SOLVE_MODEL,
       store:false,
-      max_output_tokens:850,
+      max_output_tokens:360,
       input:[
-        {role:"developer",content:`YKS Uzman Hoca yaklaşımını uygula. Aşağıdaki skill ana kurallardır.\n\n${skill}\n\nBu çağrı için hız ve doğruluk kuralları:\n- Soruyu yalnızca bu istekteki metin/görselden sınıflandır; önceki sorudan hiçbir bilgi taşıma.\n- Ders, TYT/AYT, konu ve kazanımı sorunun içeriğinden belirle.\n- Önce doğru cevabı bul; ardından kısa ve anlaşılır çözüm ver.\n- steps en fazla 5 kısa adımdır.\n- tip, distractor ve exam_note birer kısa cümle olsun.\n- Resmî kaynak doğrulaması açıkça istenmediyse web araması yapma ve sources boş dizi olsun.\n- Görüntü okunamıyorsa tahmin etme.\n- Öğrenci tonu: ${JSON.stringify(body.student||{})}`},
+        {role:"developer",content:`YKS soru çözücüsüsün. Hızlı ama doğru cevap ver.\n- Yalnızca bu istekteki soruyu kullan; önceki sorulardan bilgi taşıma.\n- answer alanında sorunun gerçek doğru cevabını ver; şıklıysa mümkünse şık harfi + içerik.\n- short_solution en fazla 2-3 kısa cümle olsun ve cevabın neden doğru olduğunu açıklasın.\n- subject, exam (TYT/AYT) ve topic sorunun içeriğinden çıkarılsın.\n- difficulty yalnızca Kolay, Orta veya Zor olsun.\n- Görsel okunamıyorsa tahmin etme; short_solution içinde okunamadığını belirt.\n- Öğrenci tonu: ${JSON.stringify(body.student||{})}`},
         {role:"user",content}
       ],
-      text:{format:{type:"json_schema",name:"yks_solution",strict:true,schema}}
-    };
-    if(verifySources){
-      request.tools=[{type:"web_search",filters:{allowed_domains:officialDomains},search_context_size:"low"}];
-      request.tool_choice="auto";
-      request.max_tool_calls=1;
-    }
+      text:{format:{type:"json_schema",name:"yks_fast_solution",strict:true,schema}}
+    });
 
-    const response=await client.responses.create(request);
     const result=JSON.parse(response.output_text);
     const ms=Date.now()-started;
-    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,verified:verifySources});
+    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,stage:"fast"});
     res.setHeader("Cache-Control","no-store");
     res.setHeader("Server-Timing",`solve;dur=${ms}`);
     return res.status(200).json(result);

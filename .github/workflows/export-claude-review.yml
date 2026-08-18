@@ -50,6 +50,7 @@ jobs:
             project: 'YKS Uzman Hoca',
             repository: 'tuyas2005-lab/yks-uzman-hoca',
             commit: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
             generatedAt: new Date().toISOString(),
             purpose: 'Claude code review snapshot. Exact text of the current main-branch source files.',
             notes: [
@@ -85,5 +86,5 @@ jobs:
           git rm -rf .
           cp /tmp/yks-uzman-hoca-latest-review.mjs ./yks-uzman-hoca-latest-review.mjs
           git add yks-uzman-hoca-latest-review.mjs
-          git commit -m "Update Claude review bundle from ${GITHUB_SHA}"
+          git commit -m "Update Claude review bundle run ${GITHUB_RUN_ID} from ${GITHUB_SHA}"
           git push --force origin HEAD:claude-review

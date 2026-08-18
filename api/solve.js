@@ -1,4 +1,4 @@
-import {MODEL,FAST_MODEL,getClient,readSkill,officialDomains} from "./_common.js";
+import {SOLVE_MODEL,getClient,readSkill,officialDomains} from "./_common.js";
 
 const schema={
   type:"object",
@@ -28,15 +28,12 @@ export default async function handler(req,res){
     if(image) content.push({type:"input_image",image_url:image,detail:"auto"});
 
     const skill=readSkill("SKILL.md");
-    const selectedModel=image?FAST_MODEL:MODEL;
-    const reasoningEffort=image?"low":"none";
     const request={
-      model:selectedModel,
+      model:SOLVE_MODEL,
       store:false,
-      reasoning:{effort:reasoningEffort},
-      max_output_tokens:1000,
+      max_output_tokens:850,
       input:[
-        {role:"developer",content:`YKS Uzman Hoca yaklaşımını uygula. Aşağıdaki skill ana kurallardır.\n\n${skill}\n\nBu çağrı için hız kuralları:\n- Önce soruyu doğru sınıflandır: ders, TYT/AYT, konu ve kazanım yalnızca bu sorudan çıkarılsın.\n- Önceki soru, örnek veya ekran varsayımlarını kullanma.\n- Doğru cevabı ve gerekli çözümü kısa üret. Gereksiz açıklama yapma.\n- steps en fazla 5 kısa adımdır.\n- tip, distractor ve exam_note birer kısa cümle olsun.\n- Resmî kaynak doğrulaması açıkça istenmediyse web araması yapma ve sources boş dizi olsun.\n- Görüntü okunamıyorsa tahmin etme.\n- Öğrenci tonu: ${JSON.stringify(body.student||{})}`},
+        {role:"developer",content:`YKS Uzman Hoca yaklaşımını uygula. Aşağıdaki skill ana kurallardır.\n\n${skill}\n\nBu çağrı için hız ve doğruluk kuralları:\n- Soruyu yalnızca bu istekteki metin/görselden sınıflandır; önceki sorudan hiçbir bilgi taşıma.\n- Ders, TYT/AYT, konu ve kazanımı sorunun içeriğinden belirle.\n- Önce doğru cevabı bul; ardından kısa ve anlaşılır çözüm ver.\n- steps en fazla 5 kısa adımdır.\n- tip, distractor ve exam_note birer kısa cümle olsun.\n- Resmî kaynak doğrulaması açıkça istenmediyse web araması yapma ve sources boş dizi olsun.\n- Görüntü okunamıyorsa tahmin etme.\n- Öğrenci tonu: ${JSON.stringify(body.student||{})}`},
         {role:"user",content}
       ],
       text:{format:{type:"json_schema",name:"yks_solution",strict:true,schema}}
@@ -50,7 +47,7 @@ export default async function handler(req,res){
     const response=await client.responses.create(request);
     const result=JSON.parse(response.output_text);
     const ms=Date.now()-started;
-    console.log("solve ok",{ms,model:selectedModel,hasImage:!!image,verified:verifySources});
+    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,verified:verifySources});
     res.setHeader("Cache-Control","no-store");
     res.setHeader("Server-Timing",`solve;dur=${ms}`);
     return res.status(200).json(result);

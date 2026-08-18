@@ -1,0 +1,10 @@
+{
+  "name": "yks-uzman-hoca",
+  "version": "4.7.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "openai": "latest"
+  }
+}

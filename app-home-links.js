@@ -40,3 +40,4 @@
 const fieldTrackScript=document.createElement('script');fieldTrackScript.src='/app-field-track.js?v=1';fieldTrackScript.onload=()=>{const low=document.createElement('script');low.src='/app-low-cost.js?v=1';low.onload=()=>{const fix=document.createElement('script');fix.src='/app-low-cost-fix.js?v=1';document.body.appendChild(fix)};document.body.appendChild(low)};document.body.appendChild(fieldTrackScript);
 const homeHintsFixScript=document.createElement('script');homeHintsFixScript.src='/app-home-hints-fix.js?v=1';document.body.appendChild(homeHintsFixScript);
 const teacherPerformanceScript=document.createElement('script');teacherPerformanceScript.src='/app-teacher-performance.js?v=1';document.body.appendChild(teacherPerformanceScript);
+const statsV2Script=document.createElement('script');statsV2Script.src='/app-stats-v2.js?v=1';document.body.appendChild(statsV2Script);

@@ -1,4 +1,4 @@
-import {SOLVE_MODEL,getClient,readSkill} from "./_common.js";
+import {SOLVE_MODEL,getClient,readSkill,setUsageHeaders} from "./_common.js";
 
 const questionSchema={
   type:"object",additionalProperties:false,
@@ -84,7 +84,8 @@ export default async function handler(req,res){
       return res.status(502).json({error:"Mini test alan filtresine uymayan AYT sorusu üretti. Lütfen yeniden deneyin."});
     }
     const ms=Date.now()-started;
-    console.log("mini-test ok",{ms,model:SOLVE_MODEL,mode,count,difficulty,track:track||"unset"});
+    const usage=setUsageHeaders(res,response,SOLVE_MODEL,"mini-test");
+    console.log("mini-test ok",{ms,model:SOLVE_MODEL,mode,count,difficulty,track:track||"unset",costUsd:usage.costUsd});
     res.setHeader("Cache-Control","no-store");
     res.setHeader("Server-Timing",`miniTest;dur=${ms}`);
     return res.status(200).json(result);

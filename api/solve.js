@@ -1,26 +1,14 @@
 import {MODEL,getClient,readSkill,officialDomains} from "./_common.js";
 
-const similarSchema={
-  type:"object",
-  additionalProperties:false,
-  required:["question","choices","answer","hint"],
-  properties:{
-    question:{type:"string"},
-    choices:{type:"array",minItems:4,maxItems:5,items:{type:"string"}},
-    answer:{type:"string"},
-    hint:{type:"string"}
-  }
-};
-
 const schema={
   type:"object",
   additionalProperties:false,
-  required:["subject","exam","topic","curriculum_outcome","difficulty","answer","short_solution","steps","why","tip","distractor","exam_note","similar_question","sources"],
+  required:["subject","exam","topic","curriculum_outcome","difficulty","answer","short_solution","steps","why","tip","distractor","exam_note","sources"],
   properties:{
     subject:{type:"string"}, exam:{type:"string"}, topic:{type:"string"}, curriculum_outcome:{type:"string"},
     difficulty:{type:"string",enum:["Kolay","Orta","Zor"]}, answer:{type:"string"}, short_solution:{type:"string"},
     steps:{type:"array",maxItems:6,items:{type:"string"}}, why:{type:"string"}, tip:{type:"string"}, distractor:{type:"string"},
-    exam_note:{type:"string"}, similar_question:similarSchema, sources:{type:"array",items:{type:"string"}}
+    exam_note:{type:"string"}, sources:{type:"array",items:{type:"string"}}
   }
 };
 
@@ -43,9 +31,9 @@ export default async function handler(req,res){
       model:MODEL,
       store:false,
       reasoning:{effort:"low"},
-      max_output_tokens:1800,
+      max_output_tokens:1400,
       input:[
-        {role:"developer",content:`Aşağıdaki YKS Uzman Hoca skill talimatlarını eksiksiz uygula.\n\n${skill}\n\nEk kurallar:\n- Soruyu önce doğru oku; görüntü belirsizse uydurma.\n- Öncelik hızlı ve doğru çözümdür. Gereksiz uzun açıklama yapma.\n- Çözüm Türkçe, öğrenci dostu ve kısa olsun; steps en fazla 6 kısa adımdan oluşsun.\n- Kullanıcının gönderdiği soruyu çözebilirsin; resmi kaynaklardan telifli soru metinlerini uzun biçimde kopyalama.\n- similar_question MUTLAKA çözülen soruyla AYNI ders, AYNI konu ve AYNI kazanımı ölçsün. Sadece sayılar, örnek, bağlam veya soru kurgusu değişsin. Başka bir derse ya da konuya geçme. Zorluk mümkün olduğunca aynı olsun.\n- similar_question.answer doğru cevabı, hint cevabı açık etmeyen kısa ipucunu içersin.\n- Resmî kaynak doğrulaması istenmediyse web araması yapma ve sources boş dizi olsun.\n- Öğrenci bağlamı: ${JSON.stringify(body.student||{})}`},
+        {role:"developer",content:`Aşağıdaki YKS Uzman Hoca skill talimatlarını uygula.\n\n${skill}\n\nEk kurallar:\n- Soruyu önce doğru oku; görüntü belirsizse uydurma.\n- Öncelik hızlı ve doğru çözümdür. Gereksiz uzun açıklama yapma.\n- Ders ve sınav türünü sorudan belirle; önceki sorudan veya örneklerden varsayım yapma.\n- Konu ve kazanım, çözülen soruyla tutarlı olsun.\n- Çözüm Türkçe, öğrenci dostu ve kısa olsun; steps en fazla 6 kısa adımdan oluşsun.\n- Kullanıcının gönderdiği soruyu çözebilirsin; resmi kaynaklardan telifli soru metinlerini uzun biçimde kopyalama.\n- Resmî kaynak doğrulaması istenmediyse web araması yapma ve sources boş dizi olsun.\n- Öğrenci bağlamı: ${JSON.stringify(body.student||{})}`},
         {role:"user",content}
       ],
       text:{format:{type:"json_schema",name:"yks_solution",strict:true,schema}}

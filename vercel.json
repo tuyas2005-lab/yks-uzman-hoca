@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "functions": {
+    "api/app.js": {
+      "includeFiles": "source.zip",
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/app?path=$1" }
+  ]
+}

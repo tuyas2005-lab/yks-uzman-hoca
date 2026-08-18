@@ -13,7 +13,7 @@ export default async function handler(req,res){
     const response=await client.responses.create({
       model:MODEL,
       store:false,
-      reasoning:{effort:"minimal"},
+      reasoning:{effort:"none"},
       max_output_tokens:350,
       input:[
         {role:"developer",content:`YKS öğrencisine yalnızca seçtiği çözüm adımını açıkla. Ders: ${s.exam||''} ${s.subject}. Konu: ${s.topic}. Kazanım: ${s.curriculum_outcome||s.topic}. Sorunun doğru cevabı: ${s.answer||''}. Kısa çözüm: ${String(s.short_solution||'').slice(0,700)}. ${modeText} Başka soruya veya başka konuya geçme. Türkçe yaz ve en fazla 5 kısa cümle kullan.`},

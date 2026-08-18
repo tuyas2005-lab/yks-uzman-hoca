@@ -1,4 +1,4 @@
-import {SOLVE_MODEL,getClient} from "./_common.js";
+import {SOLVE_MODEL,getClient,setUsageHeaders} from "./_common.js";
 
 const schema={
   type:"object",
@@ -41,7 +41,8 @@ export default async function handler(req,res){
 
     const result=JSON.parse(response.output_text);
     const ms=Date.now()-started;
-    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,stage:"fast"});
+    const usage=setUsageHeaders(res,response,SOLVE_MODEL,"solve");
+    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,stage:"fast",costUsd:usage.costUsd});
     res.setHeader("Cache-Control","no-store");
     res.setHeader("Server-Timing",`solve;dur=${ms}`);
     return res.status(200).json(result);

@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v4.8.9-shell';
+const CACHE = 'yks-uzman-hoca-v4.8.10-shell';
 const SHELL = [
   '/',
   '/index.html',
@@ -13,7 +13,8 @@ const SHELL = [
   '/app-mini-tests.js',
   '/app-favorites-page.js',
   '/app-personal-teacher.js',
-  '/app-yks-coach.js'
+  '/app-yks-coach.js',
+  '/app-yks-coach-fix.js'
 ];
 
 self.addEventListener('install', event => {

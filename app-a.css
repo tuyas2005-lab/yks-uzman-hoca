@@ -12,3 +12,10 @@
 .net-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:14px;position:relative;z-index:1}
 .net-card small{color:#dcd9ff}.net-card b{display:block;font-size:24px;margin-top:5px}
 .roadmap{display:grid;gap:12px}.road-item{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:15px;background:#fff}
+/* V4.8.1 — yeni soru analiz edilirken eski sonuçları gizle */
+.analysis-wrap.ai-loading .analysis-card,.analysis-wrap.ai-loading .checklist,.analysis-wrap.ai-loading #showSolution{display:none!important}
+.analysis-wrap.ai-loading .ring{animation:analyzePulse 1.15s ease-in-out infinite;background:conic-gradient(var(--violet) 0 35%,#e9e7f6 35% 100%)}
+.analysis-wrap.ai-loading .ring strong{font-size:0}
+.analysis-wrap.ai-loading .ring strong:after{content:'AI';font-size:26px}
+.analysis-wrap.ai-loading:after{content:'Yeni soru okunuyor • Ders, konu ve kazanım belirleniyor • Çözüm hazırlanıyor';display:block;max-width:520px;margin:20px auto;padding:15px 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--muted);font-weight:700;line-height:1.5}
+@keyframes analyzePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.96);opacity:.72}}

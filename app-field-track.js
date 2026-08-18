@@ -34,7 +34,7 @@
   function sessionRelevant(x,t=track()){
     if(!t)return true;
     const s=String(x?.subject||'').trim();
-    if(!/^AYT\b/i.test(s))return true; // TYT ve alan etiketi olmayan eski kayıtlar ortak kalır.
+    if(!/^AYT\b/i.test(s))return true;
     return aytSubjectAllowed(s,t);
   }
   function trialRelevant(x,t=track()){
@@ -66,7 +66,10 @@
     if(!c)return '<b>YKS alanı henüz seçilmedi.</b> TYT bütün alanlarda ortaktır. Alan seçildiğinde yalnız AYT çalışma öncelikleri filtrelenir.';
     return `<b>${c.label}</b> • TYT ortak kalır.<br><b>AYT odak:</b> ${c.focus}.<br><b>YKS alan dışı:</b> ${c.outside}. Alan dışı AYT kayıtları silinmez; arşivlenir.`;
   }
-
+  function fieldHelpHtmlPreview(v){
+    const c=policy[v];if(!c)return 'TYT bütün alanlarda ortaktır. AYT filtresi için alanını seç.';
+    return `${c.label}: TYT ortak • AYT odak: ${c.focus} • Alan dışı: ${c.outside}`;
+  }
   function installSettings(){
     const settings=document.querySelector('#profile .settings');if(!settings)return;
     if(!document.getElementById('yksTrack')){
@@ -74,12 +77,8 @@
       const target=document.getElementById('targetNetSetting')?.closest('label');settings.insertBefore(label,target||settings.firstChild);
       document.getElementById('yksTrack').value=track();
       document.querySelector('#yksTrackHelp small').innerHTML=fieldHelpHtml();
-      document.getElementById('yksTrack').onchange=()=>{document.querySelector('#yksTrackHelp small').innerHTML=fieldHelpHtmlPreview(document.getElementById('yksTrack').value)};
+      document.getElementById('yksTrack').onchange=()=>{document.querySelector('#yksTrackHelp small').textContent=fieldHelpHtmlPreview(document.getElementById('yksTrack').value)};
     }else document.getElementById('yksTrack').value=track();
-  }
-  function fieldHelpHtmlPreview(v){
-    const c=policy[v];if(!c)return 'TYT bütün alanlarda ortaktır. AYT filtresi için alanını seç.';
-    return `${c.label}: TYT ortak • AYT odak: ${c.focus} • Alan dışı: ${c.outside}`;
   }
 
   function wrapSettingsSave(){
@@ -100,7 +99,7 @@
   function renderFieldBanner(){
     const root=document.getElementById('coach');if(!root)return;
     let b=root.querySelector('.field-coach-banner');if(!b){b=document.createElement('div');b.className='field-coach-banner';const head=root.querySelector('.yc-head,.screen-head');head?.insertAdjacentElement('afterend',b)}
-    const c=cfg();b.innerHTML=c?`<b>🎯 Alan: ${c.label}</b><span>TYT ortak • ${c.aytLabel}</span>`:`<b>⚠️ YKS alanı seçilmedi</b><span>Ayarlar → YKS alanı bölümünden Sayısal veya Eşit Ağırlık seç.</span>`;
+    if(!b)return;const c=cfg();const html=c?`<b>🎯 Alan: ${c.label}</b><span>TYT ortak • ${c.aytLabel}</span>`:`<b>⚠️ YKS alanı seçilmedi</b><span>Ayarlar → YKS alanı bölümünden Sayısal veya Eşit Ağırlık seç.</span>`;if(b.innerHTML!==html)b.innerHTML=html;
   }
 
   function patchCoachForm(){
@@ -123,7 +122,7 @@
   }
 
   function refreshAll(){
-    reconcileFieldData();installSettings();renderFieldBanner();patchCoachForm();patchMiniSubjects();patchHomeBadge();
+    reconcileFieldData();installSettings();patchHomeBadge();
     try{window.renderHome?.()}catch{}try{window.renderTopics?.()}catch{}try{window.renderStats?.()}catch{}try{window.renderTeacher?.()}catch{}try{window.renderCoach?.()}catch{}
     setTimeout(()=>{renderFieldBanner();patchCoachForm();patchMiniSubjects();patchHomeBadge()},30);
   }
@@ -135,7 +134,6 @@
     @media(max-width:650px){.field-coach-banner{align-items:flex-start;flex-direction:column}}
   `;document.head.appendChild(css);
 
-  // Koç raporu ve Mini Test API çağrılarına alan bilgisini ekle.
   if(!window.__fieldFetchWrapped){
     const baseFetch=window.fetch.bind(window);window.fetch=(input,init={})=>{
       try{
@@ -151,7 +149,10 @@
   }
 
   document.addEventListener('change',e=>{if(e.target?.id==='mtExam'||e.target?.id==='mtSubject')setTimeout(patchMiniSubjects,0);if(e.target?.id==='ycType')setTimeout(patchCoachForm,0)},true);
-  const observer=new MutationObserver(()=>{installSettings();patchCoachForm();patchMiniSubjects();patchHomeBadge()});observer.observe(document.body,{subtree:true,childList:true});
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#ycAdd,#ycAdd2,#ycFirst,[data-edit]'))setTimeout(patchCoachForm,20);
+    if(e.target.closest('#tests [data-mt-mode],#ptStartTest,#ptFlowTest'))setTimeout(patchMiniSubjects,40);
+  },true);
 
   if(typeof go==='function'&&!window.__fieldGoWrapped){const baseGo=go;go=function(id){const r=baseGo(id);setTimeout(()=>{if(id==='profile'){installSettings();wrapSettingsSave()}if(id==='coach')patchCoachForm();if(id==='tests')patchMiniSubjects();if(id==='home')patchHomeBadge()},0);return r};window.go=go;window.__fieldGoWrapped=true}
 

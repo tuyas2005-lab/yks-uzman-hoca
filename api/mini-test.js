@@ -1,4 +1,4 @@
-import {SOLVE_MODEL,getClient,readSkill,setUsageHeaders} from "./_common.js";
+import {SOLVE_MODEL,getClient,readSkill,setUsageHeaders,normalizeTrack} from "./_common.js";
 
 const questionSchema={
   type:"object",additionalProperties:false,
@@ -38,7 +38,10 @@ export default async function handler(req,res){
   const started=Date.now();
   try{
     const body=req.body||{};
-    const track=["SAY","EA"].includes(body.track||body.profile?.track)?(body.track||body.profile?.track):"";
+    const track=normalizeTrack(body);
+    if(body.track&&body.profile?.track&&!track){
+      return res.status(400).json({error:"Alan bilgisi tutarsız. SAY/EA seçimini yeniden kaydedin."});
+    }
     const mode=["smart","topic","wrong"].includes(body.mode)?body.mode:"smart";
     const count=[3,5,10].includes(Number(body.count))?Number(body.count):5;
     const difficulty=String(body.difficulty||"Dengeli");

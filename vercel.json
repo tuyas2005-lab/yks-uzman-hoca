@@ -1,12 +1,10 @@
 {
-  "version": 2,
-  "functions": {
-    "api/app.js": {
-      "includeFiles": "source.zip",
-      "maxDuration": 60
-    }
+  "version":2,
+  "functions":{
+    "api/solve.js":{"maxDuration":60},
+    "api/counselor.js":{"maxDuration":60}
   },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/app?path=$1" }
+  "headers":[
+    {"source":"/service-worker.js","headers":[{"key":"Cache-Control","value":"public, max-age=0, must-revalidate"}]}
   ]
 }

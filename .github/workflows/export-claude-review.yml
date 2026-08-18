@@ -1,0 +1,78 @@
+name: Export Claude Review Bundle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build single-file MJS review bundle
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const root = process.cwd();
+          const allowed = new Set(['.js','.mjs','.json','.html','.css','.md','.sql','.svg','.txt','.webmanifest','.example','.gitignore']);
+          const skipDirs = new Set(['.git','node_modules','.vercel','.github']);
+          const skipFiles = new Set(['yks-uzman-hoca-latest-review.mjs']);
+          const files = {};
+
+          function walk(dir){
+            for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+              if(entry.isDirectory() && skipDirs.has(entry.name)) continue;
+              const full = path.join(dir,entry.name);
+              const rel = path.relative(root,full).replaceAll('\\','/');
+              if(entry.isDirectory()) walk(full);
+              else {
+                const ext = path.extname(entry.name);
+                if(skipFiles.has(entry.name)) continue;
+                if(entry.name === '.gitignore' || allowed.has(ext)){
+                  files[rel] = fs.readFileSync(full,'utf8');
+                }
+              }
+            }
+          }
+          walk(root);
+
+          const meta = {
+            project: 'YKS Uzman Hoca',
+            repository: 'tuyas2005-lab/yks-uzman-hoca',
+            commit: process.env.GITHUB_SHA,
+            generatedAt: new Date().toISOString(),
+            purpose: 'Claude code review snapshot. This module embeds the exact text of the current main-branch source files.',
+            notes: [
+              'Vercel production may lag behind GitHub main when build-rate-limit is active.',
+              'Do not treat .env.example placeholders as live secrets.',
+              'PROJECT_FILES keys are original repository paths; values are exact file text.'
+            ]
+          };
+
+          const out = `// AUTO-GENERATED REVIEW BUNDLE — DO NOT EDIT BY HAND\n` +
+            `export const SNAPSHOT_META = ${JSON.stringify(meta,null,2)};\n\n` +
+            `export const PROJECT_FILES = ${JSON.stringify(files,null,2)};\n\n` +
+            `export const FILE_LIST = Object.freeze(Object.keys(PROJECT_FILES).sort());\n` +
+            `export function getFile(path){ return PROJECT_FILES[path] ?? null; }\n` +
+            `export function searchProject(term){ const q=String(term).toLowerCase(); return FILE_LIST.filter(p => p.toLowerCase().includes(q) || PROJECT_FILES[p].toLowerCase().includes(q)); }\n` +
+            `export default PROJECT_FILES;\n`;
+
+          fs.writeFileSync('yks-uzman-hoca-latest-review.mjs',out,'utf8');
+          console.log(`Bundled ${Object.keys(files).length} source files.`);
+          NODE
+      - name: Upload MJS bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: yks-uzman-hoca-latest-review
+          path: yks-uzman-hoca-latest-review.mjs
+          retention-days: 7

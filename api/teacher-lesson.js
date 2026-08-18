@@ -1,4 +1,4 @@
-import {SOLVE_MODEL,getClient,readSkill} from "./_common.js";
+import {ECONOMY_MODEL,getClient,readSkill,setUsageHeaders} from "./_common.js";
 
 const schema={
   type:"object",
@@ -31,9 +31,10 @@ export default async function handler(req,res){
   try{
     const skill=readSkill("SKILL.md");
     const response=await client.responses.create({
-      model:SOLVE_MODEL,
+      model:ECONOMY_MODEL,
       store:false,
-      max_output_tokens:900,
+      reasoning:{effort:"none"},
+      max_output_tokens:760,
       input:[
         {role:"developer",content:`Sen YKS Uzman Hoca içindeki Kişisel Öğretmensin. Öğrenciyi 5 dakikada konuya geri döndüren çok kısa, öğretici bir tekrar hazırlarsın.\n\n${skill}\n\nKurallar:\n- Türkçe yaz.\n- Güncel MEB kazanım mantığına uygun ol.\n- Uzun ders anlatımı yapma; yalnız sınavda işe yarayan öz bilgi ver.\n- key_points tam 3 kısa madde olsun.\n- common_mistake tek ve somut bir hata olsun.\n- example_question kısa olsun, example_solution 2-4 cümleyi geçmesin.\n- check_question özgün ve 5 seçenekli olsun. Seçenekleri A), B) diye etiketleme; yalnız seçenek metinlerini döndür.\n- check_answer yalnız A, B, C, D veya E olsun.\n- Kullanıcıya ait başarı yüzdesini akademik tanı gibi yorumlama; yalnız çalışma önceliği olarak kullan.`},
         {role:"user",content:JSON.stringify({exam,subject,topic,mastery:body.mastery,recentWrongCount:body.recentWrongCount})}
@@ -41,7 +42,8 @@ export default async function handler(req,res){
       text:{format:{type:"json_schema",name:"personal_teacher_lesson",strict:true,schema}}
     });
     const result=JSON.parse(response.output_text);
-    console.log("teacher lesson ok",{ms:Date.now()-started,model:SOLVE_MODEL,topic});
+    const usage=setUsageHeaders(res,response,ECONOMY_MODEL,"teacher");
+    console.log("teacher lesson ok",{ms:Date.now()-started,model:ECONOMY_MODEL,topic,costUsd:usage.costUsd});
     res.setHeader("Cache-Control","no-store");
     return res.status(200).json(result);
   }catch(e){

@@ -37,3 +37,4 @@
     };window.go=go;window.__connectedGo=true;
   }
 })();
+const fieldTrackScript=document.createElement('script');fieldTrackScript.src='/app-field-track.js?v=1';document.body.appendChild(fieldTrackScript);

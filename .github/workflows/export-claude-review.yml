@@ -6,13 +6,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   export:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -38,9 +40,7 @@ jobs:
               else {
                 const ext = path.extname(entry.name);
                 if(skipFiles.has(entry.name)) continue;
-                if(entry.name === '.gitignore' || allowed.has(ext)){
-                  files[rel] = fs.readFileSync(full,'utf8');
-                }
+                if(entry.name === '.gitignore' || allowed.has(ext)) files[rel] = fs.readFileSync(full,'utf8');
               }
             }
           }
@@ -51,9 +51,9 @@ jobs:
             repository: 'tuyas2005-lab/yks-uzman-hoca',
             commit: process.env.GITHUB_SHA,
             generatedAt: new Date().toISOString(),
-            purpose: 'Claude code review snapshot. This module embeds the exact text of the current main-branch source files.',
+            purpose: 'Claude code review snapshot. Exact text of the current main-branch source files.',
             notes: [
-              'Vercel production may lag behind GitHub main when build-rate-limit is active.',
+              'Vercel production may lag behind GitHub main while build-rate-limit is active.',
               'Do not treat .env.example placeholders as live secrets.',
               'PROJECT_FILES keys are original repository paths; values are exact file text.'
             ]
@@ -66,7 +66,6 @@ jobs:
             `export function getFile(path){ return PROJECT_FILES[path] ?? null; }\n` +
             `export function searchProject(term){ const q=String(term).toLowerCase(); return FILE_LIST.filter(p => p.toLowerCase().includes(q) || PROJECT_FILES[p].toLowerCase().includes(q)); }\n` +
             `export default PROJECT_FILES;\n`;
-
           fs.writeFileSync('yks-uzman-hoca-latest-review.mjs',out,'utf8');
           console.log(`Bundled ${Object.keys(files).length} source files.`);
           NODE
@@ -76,3 +75,15 @@ jobs:
           name: yks-uzman-hoca-latest-review
           path: yks-uzman-hoca-latest-review.mjs
           retention-days: 7
+      - name: Publish bundle to claude-review branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp yks-uzman-hoca-latest-review.mjs /tmp/yks-uzman-hoca-latest-review.mjs
+          git checkout --orphan claude-review-work
+          git rm -rf .
+          cp /tmp/yks-uzman-hoca-latest-review.mjs ./yks-uzman-hoca-latest-review.mjs
+          git add yks-uzman-hoca-latest-review.mjs
+          git commit -m "Update Claude review bundle from ${GITHUB_SHA}"
+          git push --force origin HEAD:claude-review

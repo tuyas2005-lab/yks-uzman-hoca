@@ -1,15 +1,22 @@
 {
-  "name":"YKS Uzman Hoca",
-  "short_name":"YKS Hoca",
-  "description":"Kişisel YKS Uzman Hoca, YKS Koçu ve Rehber Öğretmen uygulaması.",
-  "id":"/",
-  "start_url":"/",
-  "scope":"/",
-  "display":"standalone",
-  "orientation":"any",
-  "background_color":"#f5f7fb",
-  "theme_color":"#111633",
-  "lang":"tr",
-  "categories":["education","productivity"],
-  "icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "name": "YKS Uzman Hoca",
+  "short_name": "YKS Hoca",
+  "description": "Kişisel YKS Uzman Hoca, YKS Koçu ve Rehber Öğretmen uygulaması.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#f6f7fb",
+  "theme_color": "#101633",
+  "lang": "tr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Soru Yükle","short_name":"Soru","url":"/?screen=upload","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Rehber Öğretmen","short_name":"Rehber","url":"/?screen=counselor","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]}
+  ]
 }

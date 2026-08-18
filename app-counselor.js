@@ -8,3 +8,4 @@ function renderAll(){name.value=state.profile.name;goal.value=state.profile.goal
 renderAll();detectLive();initCloud();initPwa();applyStartupScreen();
 const analysisFlowScript=document.createElement('script');analysisFlowScript.src='/app-analysis-flow.js?v=1';document.body.appendChild(analysisFlowScript);
 const miniTestScript=document.createElement('script');miniTestScript.src='/app-mini-tests.js?v=1';document.body.appendChild(miniTestScript);
+const favoritesPageScript=document.createElement('script');favoritesPageScript.src='/app-favorites-page.js?v=1';document.body.appendChild(favoritesPageScript);

@@ -1,0 +1,43 @@
+name: V5 code check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=()
+          while IFS= read -r -d '' f; do files+=("$f"); done < <(find . -maxdepth 2 -type f \( -name '*.js' -o -name '*.mjs' \) -not -path './node_modules/*' -print0)
+          printf 'Checking %s JavaScript files\n' "${#files[@]}"
+          for f in "${files[@]}"; do
+            echo "node --check $f"
+            node --check "$f"
+          done
+      - name: V5 architecture assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "StudyEvent-v5" app-data-v5.js
+          grep -q "getLearningModel" app-data-v5.js
+          grep -q "YKSDataV5" app-mini-tests.js
+          grep -q "YKSDataV5" app-personal-teacher.js
+          grep -q "YKSDataV5" app-stats-v2.js
+          grep -q "mergeCloudStates" app-cloud.js
+          if grep -R "GEMINI_API_KEY" . --exclude-dir=.git; then
+            echo 'Unexpected GEMINI_API_KEY reference found' >&2
+            exit 1
+          fi

@@ -18,6 +18,14 @@ const PRICING={
   "gpt-5-mini":{input:0.25,cached:0.025,output:2.00}
 };
 
+export function normalizeTrack(body={}){
+  const direct=String(body?.track||"").toUpperCase();
+  const profile=String(body?.profile?.track||"").toUpperCase();
+  if(direct&&profile&&direct!==profile) return "";
+  const candidate=direct||profile;
+  return candidate==="SAY"||candidate==="EA"?candidate:"";
+}
+
 export function getClient(){
   return process.env.OPENAI_API_KEY ? new OpenAI({apiKey:process.env.OPENAI_API_KEY}) : null;
 }

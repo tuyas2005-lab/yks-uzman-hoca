@@ -41,3 +41,4 @@ const fieldTrackScript=document.createElement('script');fieldTrackScript.src='/a
 const homeHintsFixScript=document.createElement('script');homeHintsFixScript.src='/app-home-hints-fix.js?v=1';document.body.appendChild(homeHintsFixScript);
 const teacherPerformanceScript=document.createElement('script');teacherPerformanceScript.src='/app-teacher-performance.js?v=1';document.body.appendChild(teacherPerformanceScript);
 const statsV2Script=document.createElement('script');statsV2Script.src='/app-stats-v2.js?v=1';document.body.appendChild(statsV2Script);
+const strategyScript=document.createElement('script');strategyScript.src='/app-strategy-engine.js?v=1';strategyScript.onload=()=>{const compat=document.createElement('script');compat.src='/app-strategy-compat.js?v=1';document.body.appendChild(compat)};document.body.appendChild(strategyScript);

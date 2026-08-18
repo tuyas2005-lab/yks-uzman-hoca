@@ -7,3 +7,4 @@ fav.onclick=()=>{fav.textContent=fav.textContent.includes('Eklendi')?'⭐ Favori
 function renderAll(){name.value=state.profile.name;goal.value=state.profile.goal;minutes.value=state.profile.minutes;tone.value=state.profile.tone;targetNetSetting.value=state.profile.targetNet||70;appearance.value=state.profile.appearance||'light';applyTheme(state.profile.appearance||'light');renderHome();renderTopics();renderWrong();renderStats();renderTeacher();renderCoach();renderCounselor();renderSyncUI()}
 renderAll();detectLive();initCloud();initPwa();applyStartupScreen();
 const analysisFlowScript=document.createElement('script');analysisFlowScript.src='/app-analysis-flow.js?v=1';document.body.appendChild(analysisFlowScript);
+const miniTestScript=document.createElement('script');miniTestScript.src='/app-mini-tests.js?v=1';document.body.appendChild(miniTestScript);

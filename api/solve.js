@@ -29,6 +29,12 @@ export default async function handler(req,res){
     return res.status(200).json(result);
   }catch(e){
     console.error("solve error",e);
+    if(e?.code==="insufficient_quota"){
+      return res.status(429).json({error:"OpenAI API bakiyesi/kotası yetersiz. Platform faturalandırma bölümünden API kredisi ekleyip birkaç dakika sonra yeniden deneyin."});
+    }
+    if(e?.status===429){
+      return res.status(429).json({error:"OpenAI API geçici kullanım limitine ulaştı. Kısa süre sonra yeniden deneyin."});
+    }
     return res.status(500).json({error:e?.message||"Soru çözümünde sunucu hatası oluştu."});
   }
 }

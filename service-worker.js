@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v4.8.13-shell';
+const CACHE = 'yks-uzman-hoca-v4.8.14-shell';
 const SHELL = [
   '/',
   '/index.html',

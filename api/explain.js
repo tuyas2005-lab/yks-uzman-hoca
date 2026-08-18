@@ -1,4 +1,4 @@
-import {MODEL,getClient} from "./_common.js";
+import {ECONOMY_MODEL,getClient,setUsageHeaders} from "./_common.js";
 
 export default async function handler(req,res){
   if(req.method!=="POST") return res.status(405).json({error:"Method not allowed"});
@@ -11,15 +11,16 @@ export default async function handler(req,res){
     if(!s.subject||!s.topic||!step) return res.status(400).json({error:"Açıklanacak çözüm adımı bulunamadı."});
     const modeText=mode==="example"?"Bu adımı küçük ve somut bir örnekle açıkla.":mode==="other"?"Bu adımı mümkünse başka bir düşünme yolu veya alternatif yöntemle açıkla.":"Bu adımı çok daha basit, kısa ve öğrenci dostu biçimde açıkla.";
     const response=await client.responses.create({
-      model:MODEL,
+      model:ECONOMY_MODEL,
       store:false,
       reasoning:{effort:"none"},
-      max_output_tokens:350,
+      max_output_tokens:280,
       input:[
-        {role:"developer",content:`YKS öğrencisine yalnızca seçtiği çözüm adımını açıkla. Ders: ${s.exam||''} ${s.subject}. Konu: ${s.topic}. Kazanım: ${s.curriculum_outcome||s.topic}. Sorunun doğru cevabı: ${s.answer||''}. Kısa çözüm: ${String(s.short_solution||'').slice(0,700)}. ${modeText} Başka soruya veya başka konuya geçme. Türkçe yaz ve en fazla 5 kısa cümle kullan.`},
+        {role:"developer",content:`YKS öğrencisine yalnızca seçtiği çözüm adımını açıkla. Ders: ${s.exam||''} ${s.subject}. Konu: ${s.topic}. Kazanım: ${s.curriculum_outcome||s.topic}. Sorunun doğru cevabı: ${s.answer||''}. Kısa çözüm: ${String(s.short_solution||'').slice(0,600)}. ${modeText} Başka soruya veya başka konuya geçme. Türkçe yaz ve en fazla 4 kısa cümle kullan.`},
         {role:"user",content:`Takıldığım adım: ${step}`}
       ]
     });
+    setUsageHeaders(res,response,ECONOMY_MODEL,"explain");
     res.setHeader("Cache-Control","no-store");
     return res.status(200).json({explanation:String(response.output_text||"").trim()});
   }catch(e){

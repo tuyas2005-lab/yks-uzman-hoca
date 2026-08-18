@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v4.8.20-shell';
+const CACHE = 'yks-uzman-hoca-v5.0.0-shell';
 const SHELL = [
   '/',
   '/index.html',
@@ -15,30 +15,23 @@ const SHELL = [
   '/app-personal-teacher.js',
   '/app-yks-coach.js',
   '/app-yks-coach-fix.js',
+  '/app-data-v5.js',
   '/app-home-data.js',
   '/app-home-links.js',
   '/app-field-track.js',
   '/app-low-cost.js',
   '/app-low-cost-fix.js',
-  '/app-home-hints-fix.js',
   '/app-teacher-performance.js',
   '/app-stats-v2.js',
-  '/app-strategy-engine.js',
-  '/app-strategy-compat.js'
+  '/app-strategy-engine.js'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())
-  );
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE && k.startsWith('yks-uzman-hoca-')).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && k.startsWith('yks-uzman-hoca-')).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', event => {
@@ -47,24 +40,20 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin === location.origin && url.pathname.startsWith('/api/')) return;
   if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put('/index.html', copy));
-        return res;
-      }).catch(() => caches.match('/index.html'))
-    );
+    event.respondWith(fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put('/index.html', copy));
+      return res;
+    }).catch(() => caches.match('/index.html')));
     return;
   }
   if (url.origin === location.origin) {
-    event.respondWith(
-      caches.match(req).then(cached => {
-        const network = fetch(req).then(res => {
-          if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
-          return res;
-        }).catch(() => cached);
-        return cached || network;
-      })
-    );
+    event.respondWith(caches.match(req).then(cached => {
+      const network = fetch(req).then(res => {
+        if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
+        return res;
+      }).catch(() => cached);
+      return cached || network;
+    }));
   }
 });

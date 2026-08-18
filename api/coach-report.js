@@ -1,4 +1,4 @@
-import {ECONOMY_MODEL,getClient,setUsageHeaders} from "./_common.js";
+import {ECONOMY_MODEL,getClient,setUsageHeaders,normalizeTrack} from "./_common.js";
 
 const schema={
   type:"object",
@@ -33,7 +33,10 @@ export default async function handler(req,res){
   const client=getClient();
   if(!client)return res.status(503).json({error:"OPENAI_API_KEY bulunamadı."});
   const body=req.body||{};
-  const track=["SAY","EA"].includes(body.profile?.track||body.track)?(body.profile?.track||body.track):"";
+  const track=normalizeTrack(body);
+  if(body.track&&body.profile?.track&&!track){
+    return res.status(400).json({error:"Alan bilgisi tutarsız. SAY/EA seçimini yeniden kaydedin."});
+  }
   const trials=(Array.isArray(body.trials)?body.trials:[]).filter(t=>trialRelevant(track,t)).slice(-10);
   if(!trials.length)return res.status(400).json({error:"Koç raporu için seçili alana uygun en az bir deneme girişi gerekli."});
   const recentWrongs=(Array.isArray(body.recentWrongs)?body.recentWrongs:[]).slice(-12).filter(x=>{

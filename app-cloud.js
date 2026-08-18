@@ -1,3 +1,9 @@
+// V5 bootstrap safety: never delete legacy records by hard-coded date/signature matching.
+state.meta??={};
+state.meta.v5DemoCleaned=true;
+state.meta.appVersion='5.0.1';
+document.title='YKS Uzman Hoca V5';
+
 let deferredInstallPrompt=null;
 function applyStartupScreen(){const requested=new URLSearchParams(location.search).get('screen');if(requested&&document.getElementById(requested))setTimeout(()=>go(requested),0)}
 function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}

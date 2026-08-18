@@ -31,7 +31,7 @@ export default async function handler(req,res){
     const request={
       model:MODEL,
       store:false,
-      reasoning:{effort:"minimal"},
+      reasoning:{effort:"none"},
       max_output_tokens:1000,
       input:[
         {role:"developer",content:`YKS Uzman Hoca yaklaşımını uygula. Aşağıdaki skill ana kurallardır.\n\n${skill}\n\nBu çağrı için hız kuralları:\n- Önce soruyu doğru sınıflandır: ders, TYT/AYT, konu ve kazanım yalnızca bu sorudan çıkarılsın.\n- Önceki soru, örnek veya ekran varsayımlarını kullanma.\n- Doğru cevabı ve gerekli çözümü kısa üret. Gereksiz açıklama yapma.\n- steps en fazla 5 kısa adımdır.\n- tip, distractor ve exam_note birer kısa cümle olsun.\n- Resmî kaynak doğrulaması açıkça istenmediyse web araması yapma ve sources boş dizi olsun.\n- Görüntü okunamıyorsa tahmin etme.\n- Öğrenci tonu: ${JSON.stringify(body.student||{})}`},

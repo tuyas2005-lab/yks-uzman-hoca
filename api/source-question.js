@@ -33,7 +33,7 @@ async function proxyPdf(req,res){
       const buf=Buffer.from(await r.arrayBuffer());
       res.status(r.status===206?206:200);
       res.setHeader("Content-Type","application/pdf");
-      res.setHeader("Cache-Control","public, s-maxage=86400, stale-while-revalidate=604800");
+      res.setHeader("Cache-Control","public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800");
       res.setHeader("Accept-Ranges",r.headers.get("accept-ranges")||"bytes");
       const cr=r.headers.get("content-range");if(cr)res.setHeader("Content-Range",cr);
       const cl=r.headers.get("content-length");if(cl)res.setHeader("Content-Length",cl);
@@ -68,7 +68,7 @@ export default async function handler(req,res){
     if(req.method==="GET"||req.method==="HEAD"){
       if(req.method==="HEAD"){
         const key=String(req.query?.key||"");if(!SOURCES[key])return res.status(404).end();
-        res.setHeader("Content-Type","application/pdf");res.setHeader("Accept-Ranges","bytes");res.setHeader("Cache-Control","public, s-maxage=86400");return res.status(200).end();
+        res.setHeader("Content-Type","application/pdf");res.setHeader("Accept-Ranges","bytes");res.setHeader("Cache-Control","public, max-age=86400, s-maxage=86400");return res.status(200).end();
       }
       return await proxyPdf(req,res);
     }

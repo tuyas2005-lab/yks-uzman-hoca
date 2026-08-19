@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r4-fast-shell';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r5-fast-shell';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -9,7 +9,8 @@ const SHELL = [
   '/app-b.css',
   '/app-core.js',
   '/app-cloud.js',
-  '/app-counselor.js'
+  '/app-counselor.js',
+  '/app-personal-teacher-source-launch-v3.js'
 ];
 
 async function cacheOptionalExternal(cache) {

@@ -14,10 +14,12 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
   loadScript('/data/question-catalog-v1.js?v=2',()=>{
     loadScript('/data/catalog/catalog-manifest.js?v=1',()=>{
       loadSeries(window.YKSQuestionCatalogFiles||[],()=>{
-        loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
-          loadScript('/app-question-index.js?v=1');
-          loadScript('/app-official-question-pilot.js?v=3');
-          loadScript('/app-mini-tests-source.js?v=1');
+        loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
+          loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
+            loadScript('/app-question-index.js?v=1');
+            loadScript('/app-official-question-pilot.js?v=3');
+            loadScript('/app-mini-tests-source.js?v=1',()=>loadScript('/app-mini-tests-prefill.js?v=1'));
+          });
         });
       });
     });

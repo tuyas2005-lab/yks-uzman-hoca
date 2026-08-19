@@ -21,24 +21,11 @@
     .stuck-step-btn.active{border-color:#bdb2ff;background:#f7f5ff}
     .stuck-current{margin:12px 0}
     .detail-loading{opacity:.7;font-style:italic}
-    .fav-modal-backdrop{position:fixed;inset:0;background:rgba(8,12,32,.52);backdrop-filter:blur(4px);z-index:9998;display:none;align-items:center;justify-content:center;padding:18px}
-    .fav-modal-backdrop.open{display:flex}
-    .fav-modal{width:min(920px,100%);max-height:86vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.25);padding:22px}
-    .fav-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-    .fav-modal-head h2{margin:0}
-    .fav-list{display:grid;gap:12px}
-    .fav-item{display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;border:1px solid var(--line);border-radius:17px;padding:12px;background:var(--surface)}
-    .fav-thumb{width:120px;height:88px;border-radius:12px;background:#f6f5fb;display:grid;place-items:center;overflow:hidden;padding:8px;font-size:12px;color:var(--muted);white-space:pre-wrap}
-    .fav-thumb img{width:100%;height:100%;object-fit:contain}
-    .fav-actions{display:grid;gap:7px}
-    .fav-empty{text-align:center;padding:36px 16px;color:var(--muted)}
-    @media(max-width:700px){.fav-item{grid-template-columns:82px 1fr}.fav-thumb{width:82px;height:72px}.fav-actions{grid-column:1/-1;grid-template-columns:1fr 1fr}}
   `;
   document.head.appendChild(style);
 
   let activeQuestion={text:'',image:''};
   let solveSerial=0;
-  state.favorites ??=[];
 
   function resetQuestionForm(){
     try{fileInput.value=''}catch{}
@@ -203,62 +190,5 @@
         hint.disabled=false;hint.onclick=()=>{feedback.className='tip blue';feedback.textContent='💡 '+(j.hint||'Aynı kazanımın temel kuralını düşün.');feedback.classList.remove('hidden')};
       }catch(err){similarQuestion.textContent='Benzer soru oluşturulamadı.';similarChoices.innerHTML=`<div class="tip red">${esc(err.message)}</div>`;hint.disabled=true}
     };
-  }
-
-  const favBackdrop=document.createElement('div');
-  favBackdrop.className='fav-modal-backdrop';
-  favBackdrop.innerHTML=`<div class="fav-modal"><div class="fav-modal-head"><div><h2>⭐ Favorilerim</h2><div class="muted">Tekrar bakmak istediğin çözümler</div></div><button id="favClose" class="ghost">✕ Kapat</button></div><div id="favList" class="fav-list"></div></div>`;
-  document.body.appendChild(favBackdrop);
-  favBackdrop.querySelector('#favClose').onclick=()=>favBackdrop.classList.remove('open');
-  favBackdrop.onclick=e=>{if(e.target===favBackdrop)favBackdrop.classList.remove('open')};
-
-  async function makeThumb(data){
-    if(!data)return '';
-    return new Promise(resolve=>{
-      const img=new Image();
-      img.onload=()=>{try{const max=640,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.7))}catch{resolve('')}};
-      img.onerror=()=>resolve('');img.src=data;
-    });
-  }
-
-  function renderFavorites(){
-    const list=favBackdrop.querySelector('#favList');
-    const items=(state.favorites||[]).slice().reverse();
-    if(!items.length){list.innerHTML='<div class="fav-empty">Henüz favori soru yok.<br>Çözüm ekranındaki ⭐ Favori düğmesini kullanabilirsin.</div>';return}
-    list.innerHTML='';
-    items.forEach(item=>{
-      const row=document.createElement('div');row.className='fav-item';
-      const media=item.image?`<img src="${item.image}" alt="Favori soru">`:`${esc((item.text||'Metin sorusu').slice(0,180))}`;
-      row.innerHTML=`<div class="fav-thumb">${media}</div><div><b>${esc([item.result?.exam,item.result?.subject].filter(Boolean).join(' ')||'Soru')}</b><div style="margin:4px 0">${esc(item.result?.topic||'')}</div><small class="muted">Cevap: ${esc(item.result?.answer||'—')}</small></div><div class="fav-actions"><button class="secondary" data-open>Çözümü Aç</button><button class="ghost" data-delete>Sil</button></div>`;
-      row.querySelector('[data-open]').onclick=()=>{activeQuestion={text:item.text||'',image:item.image||''};applyLiveResult(item.result||{});favBackdrop.classList.remove('open');go('solution')};
-      row.querySelector('[data-delete]').onclick=()=>{state.favorites=(state.favorites||[]).filter(x=>x.id!==item.id);save();renderFavorites()};
-      list.appendChild(row);
-    });
-  }
-
-  function openFavorites(){renderFavorites();favBackdrop.classList.add('open')}
-
-  const favBtn=document.getElementById('fav');
-  if(favBtn)favBtn.onclick=async()=>{
-    if(!lastLiveResult){alert('Önce bir soru çözmelisin.');return}
-    const text=activeQuestion.text||'';
-    const thumb=await makeThumb(activeQuestion.image||'');
-    const signature=[text.slice(0,120),lastLiveResult.subject,lastLiveResult.topic,lastLiveResult.answer].join('|');
-    const exists=(state.favorites||[]).some(x=>x.signature===signature);
-    if(exists){alert('Bu soru zaten favorilerinde.');return}
-    state.favorites.push({id:Date.now(),signature,text,image:thumb,result:JSON.parse(JSON.stringify(lastLiveResult)),savedAt:new Date().toISOString()});
-    save();
-    favBtn.textContent='⭐ Favorilere Eklendi';
-    setTimeout(()=>favBtn.textContent='⭐ Favori',1600);
-  };
-
-  const nav=document.querySelector('.sidebar .nav');
-  if(nav&&!document.getElementById('favNav')){
-    const b=document.createElement('button');b.id='favNav';b.innerHTML='⭐ <span>Favorilerim</span>';b.onclick=openFavorites;
-    const profileBtn=nav.querySelector('[data-go="profile"]');nav.insertBefore(b,profileBtn||null);
-  }
-  const quick=document.querySelector('#home .quick-grid');
-  if(quick&&!document.getElementById('favHome')){
-    const b=document.createElement('button');b.id='favHome';b.className='quick';b.innerHTML='<div class="ico">⭐</div><div><b>Favorilerim</b><small>Kaydettiğin çözümlere dön</small></div>';b.onclick=openFavorites;quick.appendChild(b);
   }
 })();

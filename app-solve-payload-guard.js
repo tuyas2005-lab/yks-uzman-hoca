@@ -2,6 +2,46 @@
   const TARGET_CHARS=650000;
   const HARD_LIMIT_CHARS=850000;
 
+  async function refreshLiveStatusSafe(){
+    const text=document.getElementById('liveText');
+    const strip=document.getElementById('liveStrip');
+    const skill=document.getElementById('skillStatus');
+
+    try{
+      const r=await fetch(`/api/status?guard=${Date.now()}`,{
+        cache:'no-store',
+        headers:{'Accept':'application/json'}
+      });
+      if(!r.ok)throw new Error(`HTTP ${r.status}`);
+      const s=await r.json();
+      const isLive=!!s?.live;
+
+      try{liveApi=isLive}catch{}
+      window.__yksLiveStatus=s;
+
+      if(strip){
+        strip.classList.toggle('live',isLive);
+        strip.dataset.status=isLive?'live':'offline';
+      }
+
+      if(text){
+        text.textContent=isLive
+          ? `Canlı • Skill + ${s.model||s.solveModel||'AI'}`
+          : 'Sunucu açık • AI yapılandırması eksik';
+      }
+
+      if(skill&&isLive){
+        skill.className='tip blue';
+        skill.innerHTML='<b>Canlı mod:</b> YKS Uzman Hoca skill ve resmî kaynak katmanı aktif.';
+      }
+
+      return isLive;
+    }catch(e){
+      if(text)text.textContent='Canlı durum yeniden deneniyor…';
+      return false;
+    }
+  }
+
   function loadDataImage(data){
     return new Promise((resolve,reject)=>{
       const img=new Image();
@@ -55,6 +95,9 @@
     window.liveSolve=guarded;
     return true;
   }
+
+  void refreshLiveStatusSafe();
+  setTimeout(()=>void refreshLiveStatusSafe(),1800);
 
   if(!installGuard()){
     let tries=0;

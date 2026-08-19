@@ -19,7 +19,7 @@ function loadScript(src,onload){const s=document.createElement('script');s.src=s
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));
     loadScript('/app-teacher-performance.js?v=2');
-    loadScript('/app-stats-v2.js?v=2');
+    loadScript('/app-stats-v2.js?v=2',()=>loadScript('/app-stats-v3.js?v=1'));
     loadScript('/app-strategy-engine.js?v=2');
   });
 })();

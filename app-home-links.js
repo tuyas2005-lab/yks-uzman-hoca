@@ -12,7 +12,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
   loadScript('/app-favorites-nav-fix.js?v=1');
   loadScript('/app-topic-ui.js?v=1');
   loadScript('/data/question-catalog-v1.js?v=2',()=>{
-    loadScript('/data/catalog/catalog-manifest.js?v=1',()=>{
+    loadScript('/data/catalog/catalog-manifest.js?v=2',()=>{
       loadSeries(window.YKSQuestionCatalogFiles||[],()=>{
         loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
           loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
@@ -22,7 +22,8 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
                 '/app-source-map-2026-tyt-math-01-30.js?v=2',
                 '/app-source-map-2026-tyt-fen.js?v=1',
                 '/app-source-map-2026-tyt-social.js?v=1',
-                '/app-source-map-2026-tyt-turkce.js?v=2'
+                '/app-source-map-2026-tyt-turkce.js?v=2',
+                '/app-source-map-2026-ayt.js?v=1'
               ],()=>{
                 loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
                 loadScript('/app-official-question-pilot.js?v=4');

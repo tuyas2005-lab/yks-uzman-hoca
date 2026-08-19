@@ -1,4 +1,5 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r2-fast-shell';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r3-fast-shell';
+const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
   '/index.html',
@@ -11,12 +12,22 @@ const SHELL = [
   '/app-counselor.js'
 ];
 
+async function cacheOptionalExternal(cache) {
+  try {
+    const res = await fetch(SUPABASE_CDN, { cache: 'reload', mode: 'cors' });
+    if (res && (res.ok || res.type === 'opaque')) await cache.put(SUPABASE_CDN, res.clone());
+  } catch {
+    // External dependency is optional for install; app shell must remain installable offline.
+  }
+}
+
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(SHELL);
+    await cacheOptionalExternal(cache);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -34,7 +45,7 @@ self.addEventListener('activate', event => {
 async function refreshIntoCache(req, cacheKey = req) {
   try {
     const res = await fetch(req, { cache: 'no-store' });
-    if (res && res.ok) {
+    if (res && (res.ok || res.type === 'opaque')) {
       const cache = await caches.open(CACHE);
       await cache.put(cacheKey, res.clone());
     }
@@ -49,6 +60,19 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
+
+  if (url.href.startsWith(SUPABASE_CDN)) {
+    event.respondWith((async () => {
+      const cached = await caches.match(SUPABASE_CDN);
+      const refresh = refreshIntoCache(req, SUPABASE_CDN);
+      event.waitUntil(refresh);
+      if (cached) return cached;
+      const fresh = await refresh;
+      return fresh || new Response('', { status: 504 });
+    })());
+    return;
+  }
+
   if (url.origin !== location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
 

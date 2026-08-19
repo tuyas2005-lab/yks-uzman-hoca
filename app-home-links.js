@@ -43,5 +43,6 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
     loadScript('/app-teacher-performance.js?v=2',()=>loadScript('/app-personal-teacher-v2.js?v=1',()=>loadScript('/app-source-set-tracking.js?v=1',()=>loadScript('/app-teacher-wrong-scope.js?v=1',()=>loadScript('/app-home-teacher-flow.js?v=1',()=>loadScript('/app-personal-teacher-policy-v3.js?v=1',()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=1',()=>loadScript('/app-home-teacher-count-fix.js?v=2'))))))));
     loadScript('/app-stats-v2.js?v=2',()=>loadScript('/app-stats-v3.js?v=2'));
     loadScript('/app-strategy-engine.js?v=2');
+    loadScript('/app-profile-consistency.js?v=1');
   });
 })();

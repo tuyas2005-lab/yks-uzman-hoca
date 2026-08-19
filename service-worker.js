@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r10-fast-shell';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r11-fast-shell';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -33,15 +33,31 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(k => k !== CACHE && k.startsWith('yks-uzman-hoca-'))
-          .map(k => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(k => k !== CACHE && k.startsWith('yks-uzman-hoca-'))
+        .map(k => caches.delete(k))
+    );
+
+    await self.clients.claim();
+
+    // An installed iPad/iPhone PWA can keep the page loaded from the previous
+    // worker even after the new worker takes control. Reload each same-origin
+    // app window once on activation so HTML + core scripts come from this
+    // worker's freshly populated shell cache. LocalStorage/IndexedDB are not
+    // cleared by this navigation.
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    await Promise.all(windows.map(async client => {
+      try {
+        const url = new URL(client.url);
+        if (url.origin === self.location.origin) await client.navigate(client.url);
+      } catch {
+        // A client can disappear while the worker activates; ignore it.
+      }
+    }));
+  })());
 });
 
 async function refreshIntoCache(req, cacheKey = req) {

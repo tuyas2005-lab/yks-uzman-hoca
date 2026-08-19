@@ -4,16 +4,16 @@
     scope:{include:['TYT','AYT'],exclude:['YDT']},
     sourcePolicy:'official-first-library-only',
     files:[
-      {path:'/data/catalog/2026-tyt-geometry.js',exam:'TYT',block:'Matematik / Geometri',count:10,status:'verified'},
+      {path:'/data/catalog/2026-tyt-math-01-30.js',exam:'TYT',block:'Temel Matematik 1-30',count:30,status:'verified'},
+      {path:'/data/catalog/2026-tyt-geometry.js',exam:'TYT',block:'Matematik / Geometri 31-40',count:10,status:'verified'},
       {path:'/data/catalog/2026-tyt-fen.js',exam:'TYT',block:'Fen Bilimleri',count:20,status:'verified'},
       {path:'/data/catalog/2026-tyt-social.js',exam:'TYT',block:'Sosyal Bilimler',count:25,status:'verified'},
-      {path:'/data/catalog/2026-ayt-math-geometry.js',exam:'AYT',block:'Matematik / Geometri',count:12,status:'verified'},
+      {path:'/data/catalog/2026-ayt-math-geometry.js',exam:'AYT',block:'Matematik / Geometri 29-40',count:12,status:'verified'},
       {path:'/data/catalog/2026-ayt-fen.js',exam:'AYT',block:'Fen Bilimleri',count:40,status:'verified'}
     ],
-    completedCount:107,
+    completedCount:137,
     pending:[
       {exam:'TYT',block:'Türkçe',expected:40},
-      {exam:'TYT',block:'Temel Matematik 1-30',expected:30},
       {exam:'AYT',block:'Matematik 1-28',expected:28},
       {exam:'AYT',block:'Türk Dili ve Edebiyatı-Sosyal Bilimler-1',expected:40},
       {exam:'AYT',block:'Sosyal Bilimler-2',expected:40}

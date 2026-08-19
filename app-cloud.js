@@ -7,7 +7,7 @@ function cleanExactLegacySeedSnapshot(){
   const sessions=state.sessions||[],trials=state.trials||[];
   const exactSessions=sessions.length===10&&sessions.every(x=>demoSessions.has(`${x?.id}|${x?.date}|${x?.subject}|${x?.topic}|${x?.correct}`));
   const exactTrials=trials.length===3&&trials.every(x=>demoTrials.has(`${x?.date}|${x?.name}|${Number(x?.net)}`));
-  const noRealActivity=!(state.activityLog?.length||state.studyEvents?.length||state.miniTests?.history?.length||state.favorites?.length);
+  const noRealActivity=!(state.activityLog?.length||state.studyEvents?.length||state.miniTests?.history?.length);
   if(exactSessions&&exactTrials&&noRealActivity){state.sessions=[];state.trials=[];state.topicMastery={};state.plan=[];state.todayCount=0;state.meta.legacyDemoSnapshotRemovedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(state))}
 }
 cleanExactLegacySeedSnapshot();
@@ -47,7 +47,6 @@ function mergeCloudStates(localState={},remoteState={},preferRemote=false){
   base.sessions=mergeArrayByKey(local.sessions||[],remote.sessions||[],'session',preferRemote);
   base.activityLog=mergeArrayByKey(local.activityLog||[],remote.activityLog||[],'activity',preferRemote);
   base.trials=mergeArrayByKey(local.trials||[],remote.trials||[],'trial',preferRemote);
-  base.favorites=mergeArrayByKey(local.favorites||[],remote.favorites||[],'favorite',preferRemote);
   base.fieldArchive={...(other.fieldArchive||{}),...(base.fieldArchive||{})};base.fieldArchive.sessions=mergeArrayByKey(local.fieldArchive?.sessions||[],remote.fieldArchive?.sessions||[],'session',preferRemote);base.fieldArchive.trials=mergeArrayByKey(local.fieldArchive?.trials||[],remote.fieldArchive?.trials||[],'trial',preferRemote);
   base.miniTests={...(other.miniTests||{}),...(base.miniTests||{})};base.miniTests.history=mergeArrayByKey(local.miniTests?.history||[],remote.miniTests?.history||[],'mini-history',preferRemote).sort((a,b)=>Number(b.id||0)-Number(a.id||0)).slice(0,40);
   base.costTracker={...(other.costTracker||{}),...(base.costTracker||{})};base.costTracker.records=mergeArrayByKey(local.costTracker?.records||[],remote.costTracker?.records||[],'cost',preferRemote).slice(-1500);

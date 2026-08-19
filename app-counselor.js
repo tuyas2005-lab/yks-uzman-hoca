@@ -7,7 +7,7 @@ fav.onclick=()=>{fav.textContent=fav.textContent.includes('Eklendi')?'⭐ Favori
 function clearAcademicData(){const profile=structuredClone(state.profile||{}),counselor=structuredClone(state.counselorMessages||[]),appearance=profile.appearance||'light';state={profile,counselorMessages:counselor,trials:[],sessions:[],activityLog:[],studyEvents:[],topicMastery:{},plan:[],miniTests:{history:[]},favorites:[],todayCount:0,fieldArchive:{sessions:[],trials:[]},meta:{localUpdatedAt:Date.now(),appVersion:'5.0.1',dataArchitecture:'StudyEvent-v5'},dataV5:{schemaVersion:5,createdAt:Date.now(),activeSolveEventId:''}};applyTheme(appearance);save();renderAll()}
 if(window.reset){reset.textContent='Çalışma verilerini temizle';reset.onclick=()=>{if(!confirm('Bu işlem soru geçmişi, mini testler, denemeler ve istatistikleri kalıcı olarak temizler. Profil ayarların korunur. Devam edilsin mi?'))return;if(!confirm('Son onay: çalışma verileri silinsin mi? Bu işlem geri alınamaz.'))return;clearAcademicData()}}
 function renderAll(){name.value=state.profile.name;goal.value=state.profile.goal;minutes.value=state.profile.minutes;tone.value=state.profile.tone;targetNetSetting.value=state.profile.targetNet||70;appearance.value=state.profile.appearance||'light';applyTheme(state.profile.appearance||'light');renderHome();renderTopics();renderWrong();renderStats();renderTeacher();renderCoach();renderCounselor();renderSyncUI()}
-
+function prepareQuestionInput(){const input=document.getElementById('fileInput'),pickBtn=document.getElementById('pick'),imageBtn=document.getElementById('analyzeImage'),textBtn=document.getElementById('analyzeText');if(input)input.removeAttribute('capture');if(pickBtn&&input)pickBtn.onclick=()=>{input.removeAttribute('capture');void detectLive();input.click()};if(imageBtn)imageBtn.onclick=async()=>{if(!liveApi)await detectLive();return liveSolve({image:selectedImageData})};if(textBtn)textBtn.onclick=async()=>{if(!liveApi)await detectLive();return liveSolve({text:questionText.value.trim()})}}
 function startupIdle(fn,timeout=2500){if('requestIdleCallback'in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,700)}
 function loadStartupScript(src,onload){const s=document.createElement('script');s.src=src;s.async=true;if(onload)s.onload=onload;document.body.appendChild(s);return s}
 function loadStartupModules(){
@@ -17,9 +17,8 @@ function loadStartupModules(){
   const loadCoachChain=()=>loadStartupScript('/app-yks-coach.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-yks-coach-fix.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-home-data.js?v=2',()=>setTimeout(()=>loadStartupScript('/app-home-links.js?v=2'),60)),60)),60));
   next();
 }
-function startBackgroundServices(){detectLive();initCloud()}
-
-renderAll();applyStartupScreen();initPwa();
+function startBackgroundServices(){initCloud()}
+renderAll();applyStartupScreen();initPwa();prepareQuestionInput();void detectLive();
 requestAnimationFrame(()=>requestAnimationFrame(()=>{
   setTimeout(()=>startupIdle(loadStartupModules,3500),1200);
   setTimeout(()=>startupIdle(startBackgroundServices,5000),2200);

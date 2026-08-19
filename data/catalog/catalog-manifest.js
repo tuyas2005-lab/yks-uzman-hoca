@@ -1,0 +1,14 @@
+(()=>{
+  window.YKSQuestionCatalogFiles=[
+    '/data/catalog/2026-tyt-turkce.js',
+    '/data/catalog/2026-tyt-math-01-30.js',
+    '/data/catalog/2026-tyt-geometry.js',
+    '/data/catalog/2026-tyt-social.js',
+    '/data/catalog/2026-tyt-fen.js',
+    '/data/catalog/2026-ayt-math-01-28.js',
+    '/data/catalog/2026-ayt-math-geometry.js',
+    '/data/catalog/2026-ayt-fen.js',
+    '/data/catalog/2026-manifest.js'
+  ];
+  window.YKSQuestionCatalogManifest={version:1,scope:{include:['TYT','AYT'],exclude:['YDT']},policy:'library-only-newest-first',updatedAt:'2026-08-19'};
+})();

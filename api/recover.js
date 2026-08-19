@@ -5,6 +5,7 @@ export default function handler(req,res){
   res.setHeader("Cache-Control","no-store, no-cache, must-revalidate, max-age=0");
   res.setHeader("Pragma","no-cache");
   res.setHeader("Expires","0");
+  res.setHeader("Clear-Site-Data",'"cache"');
 
   return res.status(200).send(`<!doctype html>
 <html lang="tr">
@@ -37,7 +38,7 @@ h1{font-size:24px;margin:0 0 10px}.muted{color:#667085;line-height:1.5}.ok{color
     }
     msg.className='ok';
     msg.textContent='Güncelleme tamamlandı. Uygulama yeniden açılıyor…';
-    setTimeout(()=>location.replace('/?recovered='+Date.now()),700);
+    setTimeout(()=>location.replace('/?recovered='+Date.now()),900);
   }catch(e){
     msg.className='err';
     msg.textContent='Otomatik güncelleme tamamlanamadı. Sayfayı bir kez yenileyip tekrar deneyin.';

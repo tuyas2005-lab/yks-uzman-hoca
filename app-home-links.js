@@ -15,6 +15,7 @@ function loadScript(src,onload){const s=document.createElement('script');s.src=s
   loadScript('/app-live-status.js?v=1');
   loadScript('/app-favorites-nav-fix.js?v=1');
   loadScript('/app-topic-ui.js?v=1');
+  loadScript('/data/question-catalog-v1.js?v=1',()=>loadScript('/app-official-question-pilot.js?v=1'));
   loadScript('/app-wrongs-v2.js?v=1',()=>loadScript('/app-wrong-review-task.js?v=1',()=>loadScript('/app-wrong-review-id-fix.js?v=1')));
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));

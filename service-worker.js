@@ -1,29 +1,11 @@
-const CACHE = 'yks-uzman-hoca-v5.0.1-r2-shell';
+const CACHE = 'yks-uzman-hoca-v5.0.1-r3-shell';
 const SHELL = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/icon.svg',
   '/app-a.css',
-  '/app-b.css',
-  '/app-core.js',
-  '/app-cloud.js',
-  '/app-counselor.js',
-  '/app-analysis-flow.js',
-  '/app-mini-tests.js',
-  '/app-favorites-page.js',
-  '/app-personal-teacher.js',
-  '/app-yks-coach.js',
-  '/app-yks-coach-fix.js',
-  '/app-data-v5.js',
-  '/app-home-data.js',
-  '/app-home-links.js',
-  '/app-field-track.js',
-  '/app-low-cost.js',
-  '/app-low-cost-fix.js',
-  '/app-teacher-performance.js',
-  '/app-stats-v2.js',
-  '/app-strategy-engine.js'
+  '/app-b.css'
 ];
 
 self.addEventListener('install', event => {
@@ -38,22 +20,28 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin === location.origin && url.pathname.startsWith('/api/')) return;
+  if (url.origin !== location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
+
   if (req.mode === 'navigate') {
-    event.respondWith(fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put('/index.html', copy));
+    event.respondWith(fetch(req, {cache:'no-store'}).then(res => {
+      if (res.ok) caches.open(CACHE).then(c => c.put('/index.html', res.clone()));
       return res;
     }).catch(() => caches.match('/index.html')));
     return;
   }
-  if (url.origin === location.origin) {
-    event.respondWith(caches.match(req).then(cached => {
-      const network = fetch(req).then(res => {
-        if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
-        return res;
-      }).catch(() => cached);
-      return cached || network;
-    }));
+
+  const isCode = /\.(?:js|css|mjs)$/.test(url.pathname);
+  if (isCode) {
+    event.respondWith(fetch(req, {cache:'no-store'}).then(res => {
+      if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
+      return res;
+    }).catch(() => caches.match(req)));
+    return;
   }
+
+  event.respondWith(caches.match(req).then(cached => cached || fetch(req).then(res => {
+    if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
+    return res;
+  })));
 });

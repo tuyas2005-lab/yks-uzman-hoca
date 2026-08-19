@@ -11,7 +11,7 @@ function prepareQuestionInput(){const input=document.getElementById('fileInput')
 function startupIdle(fn,timeout=2500){if('requestIdleCallback'in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,700)}
 function loadStartupScript(src,onload){const s=document.createElement('script');s.src=src;s.async=true;if(onload)s.onload=onload;document.body.appendChild(s);return s}
 function loadStartupModules(){
-  const queue=['/app-analysis-flow.js?v=1','/app-mini-tests.js?v=2','/app-favorites-page.js?v=1','/app-personal-teacher.js?v=2'];
+  const queue=['/app-analysis-flow.js?v=1','/app-solve-payload-guard.js?v=1','/app-mini-tests.js?v=2','/app-favorites-page.js?v=1','/app-personal-teacher.js?v=2'];
   let i=0;
   const next=()=>{if(i>=queue.length){loadCoachChain();return}const src=queue[i++];loadStartupScript(src,()=>setTimeout(next,60))};
   const loadCoachChain=()=>loadStartupScript('/app-yks-coach.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-yks-coach-fix.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-home-data.js?v=2',()=>setTimeout(()=>loadStartupScript('/app-home-links.js?v=2'),60)),60)),60));

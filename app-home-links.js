@@ -14,6 +14,7 @@ function loadScript(src,onload){const s=document.createElement('script');s.src=s
   if(!window.YKSDataV5){if(tries<100)setTimeout(()=>bootV5Deps(tries+1),40);return}
   loadScript('/app-live-status.js?v=1');
   loadScript('/app-favorites-nav-fix.js?v=1');
+  loadScript('/app-topic-ui.js?v=1');
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));
     loadScript('/app-teacher-performance.js?v=2');

@@ -7,9 +7,20 @@ fav.onclick=()=>{fav.textContent=fav.textContent.includes('Eklendi')?'⭐ Favori
 function clearAcademicData(){const profile=structuredClone(state.profile||{}),counselor=structuredClone(state.counselorMessages||[]),appearance=profile.appearance||'light';state={profile,counselorMessages:counselor,trials:[],sessions:[],activityLog:[],studyEvents:[],topicMastery:{},plan:[],miniTests:{history:[]},favorites:[],todayCount:0,fieldArchive:{sessions:[],trials:[]},meta:{localUpdatedAt:Date.now(),appVersion:'5.0.1',dataArchitecture:'StudyEvent-v5'},dataV5:{schemaVersion:5,createdAt:Date.now(),activeSolveEventId:''}};applyTheme(appearance);save();renderAll()}
 if(window.reset){reset.textContent='Çalışma verilerini temizle';reset.onclick=()=>{if(!confirm('Bu işlem soru geçmişi, mini testler, denemeler ve istatistikleri kalıcı olarak temizler. Profil ayarların korunur. Devam edilsin mi?'))return;if(!confirm('Son onay: çalışma verileri silinsin mi? Bu işlem geri alınamaz.'))return;clearAcademicData()}}
 function renderAll(){name.value=state.profile.name;goal.value=state.profile.goal;minutes.value=state.profile.minutes;tone.value=state.profile.tone;targetNetSetting.value=state.profile.targetNet||70;appearance.value=state.profile.appearance||'light';applyTheme(state.profile.appearance||'light');renderHome();renderTopics();renderWrong();renderStats();renderTeacher();renderCoach();renderCounselor();renderSyncUI()}
-renderAll();detectLive();initCloud();initPwa();applyStartupScreen();
-const analysisFlowScript=document.createElement('script');analysisFlowScript.src='/app-analysis-flow.js?v=1';document.body.appendChild(analysisFlowScript);
-const miniTestScript=document.createElement('script');miniTestScript.src='/app-mini-tests.js?v=2';document.body.appendChild(miniTestScript);
-const favoritesPageScript=document.createElement('script');favoritesPageScript.src='/app-favorites-page.js?v=1';document.body.appendChild(favoritesPageScript);
-const personalTeacherScript=document.createElement('script');personalTeacherScript.src='/app-personal-teacher.js?v=2';document.body.appendChild(personalTeacherScript);
-const yksCoachScript=document.createElement('script');yksCoachScript.src='/app-yks-coach.js?v=1';yksCoachScript.onload=()=>{const f=document.createElement('script');f.src='/app-yks-coach-fix.js?v=1';f.onload=()=>{const h=document.createElement('script');h.src='/app-home-data.js?v=2';h.onload=()=>{const l=document.createElement('script');l.src='/app-home-links.js?v=2';document.body.appendChild(l)};document.body.appendChild(h)};document.body.appendChild(f)};document.body.appendChild(yksCoachScript);
+
+function startupIdle(fn,timeout=2500){if('requestIdleCallback'in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,700)}
+function loadStartupScript(src,onload){const s=document.createElement('script');s.src=src;s.async=true;if(onload)s.onload=onload;document.body.appendChild(s);return s}
+function loadStartupModules(){
+  const queue=['/app-analysis-flow.js?v=1','/app-mini-tests.js?v=2','/app-favorites-page.js?v=1','/app-personal-teacher.js?v=2'];
+  let i=0;
+  const next=()=>{if(i>=queue.length){loadCoachChain();return}const src=queue[i++];loadStartupScript(src,()=>setTimeout(next,60))};
+  const loadCoachChain=()=>loadStartupScript('/app-yks-coach.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-yks-coach-fix.js?v=1',()=>setTimeout(()=>loadStartupScript('/app-home-data.js?v=2',()=>setTimeout(()=>loadStartupScript('/app-home-links.js?v=2'),60)),60)),60));
+  next();
+}
+function startBackgroundServices(){detectLive();initCloud()}
+
+renderAll();applyStartupScreen();initPwa();
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  startupIdle(loadStartupModules,1800);
+  startupIdle(startBackgroundServices,3200);
+}));

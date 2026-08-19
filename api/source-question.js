@@ -4,6 +4,10 @@ const SOURCES={
   "osym-2026-tyt":[
     "https://ilgaz.meb.gov.tr/meb_iys_dosyalar/2026_06/6a3a22d27eaf0404587806_yks_tyt_2026_kitapcik_d350.pdf",
     "https://dokuman.osym.gov.tr/pdfdokuman/2026/YKS/TSK/yks_tyt_2026_kitapcik_d350.pdf"
+  ],
+  "osym-2026-ayt":[
+    "https://ilgaz.meb.gov.tr/meb_iys_dosyalar/2026_06/6a3a23aadc3ad297424820_yks_ayt_2026_kitapcik_kt12.pdf",
+    "https://dokuman.osym.gov.tr/pdfdokuman/2026/YKS/TSK/yks_ayt_2026_kitapcik_kt12.pdf"
   ]
 };
 

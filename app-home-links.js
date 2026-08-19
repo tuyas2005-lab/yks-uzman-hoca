@@ -17,6 +17,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
         loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
           loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
             loadScript('/app-source-question-viewer.js?v=1',()=>{
+              loadScript('/app-source-question-viewer-fix.js?v=1');
               loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
               loadScript('/app-official-question-pilot.js?v=3');
               loadScript('/app-mini-tests-source.js?v=1',()=>loadScript('/app-mini-tests-prefill.js?v=1'));

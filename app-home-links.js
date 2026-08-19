@@ -40,7 +40,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
   loadScript('/app-wrongs-v2.js?v=1',()=>loadScript('/app-wrong-review-task.js?v=2',()=>loadScript('/app-wrong-review-id-fix.js?v=1',()=>loadScript('/app-wrongs-source-link.js?v=3',()=>loadScript('/app-wrong-priority-order.js?v=1')))));
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));
-    loadScript('/app-teacher-performance.js?v=2',()=>loadScript('/app-personal-teacher-v2.js?v=1',()=>loadScript('/app-source-set-tracking.js?v=1')));
+    loadScript('/app-teacher-performance.js?v=2',()=>loadScript('/app-personal-teacher-v2.js?v=1',()=>loadScript('/app-source-set-tracking.js?v=1',()=>loadScript('/app-teacher-wrong-scope.js?v=1'))));
     loadScript('/app-stats-v2.js?v=2',()=>loadScript('/app-stats-v3.js?v=2'));
     loadScript('/app-strategy-engine.js?v=2');
   });

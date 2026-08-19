@@ -16,8 +16,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
       loadSeries(window.YKSQuestionCatalogFiles||[],()=>{
         loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
           loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
-            loadScript('/app-source-question-viewer.js?v=1',()=>{
-              loadScript('/app-source-question-viewer-fix.js?v=1');
+            loadScript('/app-source-question-viewer.js?v=2',()=>{
               loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
               loadScript('/app-official-question-pilot.js?v=3');
               loadScript('/app-mini-tests-source.js?v=1',()=>loadScript('/app-mini-tests-prefill.js?v=1'));
@@ -27,7 +26,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
       });
     });
   });
-  loadScript('/app-wrongs-v2.js?v=1',()=>loadScript('/app-wrong-review-task.js?v=1',()=>loadScript('/app-wrong-review-id-fix.js?v=1',()=>loadScript('/app-wrongs-source-link.js?v=1'))));
+  loadScript('/app-wrongs-v2.js?v=1',()=>loadScript('/app-wrong-review-task.js?v=1',()=>loadScript('/app-wrong-review-id-fix.js?v=1',()=>loadScript('/app-wrongs-source-link.js?v=2'))));
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));
     loadScript('/app-teacher-performance.js?v=2');

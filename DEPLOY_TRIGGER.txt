@@ -1,3 +1,3 @@
 Trigger Vercel production build for YKS Uzman Hoca V5.0.1
-2026-08-19 01:00 +03:00
-StudyEvent V5 architecture, statistics, strategy engine and production safety fixes
+2026-08-20 00:12 +03:00
+Rollback to the version immediately before Favorites removal. No runtime code changes.

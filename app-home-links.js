@@ -26,11 +26,13 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
                 '/app-source-map-2026-tyt-turkce.js?v=2',
                 '/app-source-map-2026-ayt.js?v=1'
               ],()=>{
-                loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
-                loadScript('/app-official-question-pilot.js?v=4');
-                loadScript('/app-mini-tests-source.js?v=3',()=>{
-                  loadScript('/app-mini-tests-prefill.js?v=1');
-                  loadScript('/app-source-direct-open.js?v=2',()=>loadScript('/app-source-retake-position.js?v=1'));
+                loadScript('/app-source-incomplete-policy.js?v=1',()=>{
+                  loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
+                  loadScript('/app-official-question-pilot.js?v=4');
+                  loadScript('/app-mini-tests-source.js?v=3',()=>{
+                    loadScript('/app-mini-tests-prefill.js?v=1');
+                    loadScript('/app-source-direct-open.js?v=2',()=>loadScript('/app-source-retake-position.js?v=1'));
+                  });
                 });
               });
             });
@@ -42,7 +44,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
   loadScript('/app-wrongs-v2.js?v=1',()=>loadScript('/app-wrong-review-task.js?v=2',()=>loadScript('/app-wrong-review-id-fix.js?v=1',()=>loadScript('/app-wrongs-source-link.js?v=3',()=>loadScript('/app-wrong-priority-order.js?v=1',()=>loadScript('/app-wrong-closure-v2.js?v=1'))))));
   loadScript('/app-field-track.js?v=2',()=>{
     loadScript('/app-low-cost.js?v=2',()=>loadScript('/app-low-cost-fix.js?v=2'));
-    loadScript('/app-teacher-performance.js?v=2',()=>loadScript('/app-personal-teacher-v2.js?v=1',()=>loadScript('/app-source-set-tracking.js?v=1',()=>loadScript('/app-teacher-wrong-scope.js?v=1',()=>loadScript('/app-home-teacher-flow.js?v=1',()=>loadScript('/app-personal-teacher-policy-v3.js?v=1',()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=1',()=>loadScript('/app-home-teacher-count-fix.js?v=2'))))))));
+    loadScript('/app-teacher-performance.js?v=2',()=>loadScript('/app-personal-teacher-v2.js?v=1',()=>loadScript('/app-source-set-tracking.js?v=1',()=>loadScript('/app-teacher-wrong-scope.js?v=1',()=>loadScript('/app-home-teacher-flow.js?v=1',()=>loadScript('/app-personal-teacher-policy-v3.js?v=1',()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=2',()=>loadScript('/app-home-teacher-count-fix.js?v=2'))))))));
     loadScript('/app-stats-v2.js?v=2',()=>loadScript('/app-stats-v3.js?v=2'));
     loadScript('/app-strategy-engine.js?v=2');
     loadScript('/app-profile-consistency.js?v=1');

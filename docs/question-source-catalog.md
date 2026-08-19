@@ -49,7 +49,26 @@ Bkz. `docs/question-taxonomy.md` (konu/topic sözlüğü) ve `data/catalog/**` d
 
 > **Not:** AYT crop'ları `app-source-map-2026-ayt.js` içindeki runtime PDF.js tarayıcısı ile otomatik üretiliyor.
 > Bu "ready" görünse de talimat madde 32 gereği manuel gözle QA'dan geçmeden tam güvenilir sayılmaz.
-> Sıradaki öncelikli iş: 2026 AYT için örnekleme QA + gerekiyorsa manuel source-map override.
+> Sıradaki öncelikli iş: 2026 AYT için örnekleme QA (görsel) + gerekiyorsa manuel source-map override.
+
+### AYT answerKey bağımsız doğrulama (19 Ağustos 2026)
+
+Resmî ÖSYM AYT 2026 kitapçığının tam metni (cdn.osym.gov.tr) + resmî cevap anahtarı ile
+katalogdaki tüm 160 AYT sorusu tek tek karşılaştırıldı (madde 21-22 gereği).
+
+- **159/160 doğrudan eşleşti.**
+- **1 soru** (`osym-2026-ayt-tde1-20`) katalogda doğru şekilde `cancelled` işaretli — bağımsız
+  haber kaynaklarıyla (Cumhuriyet, Karar, Takvim, kisadalga.net) doğrulandı: ÖSYM bu soruyu
+  21 Haziran 2026 sınavı sonrası itiraz sürecinde resmen iptal etti.
+- **`osym-2026-ayt-mat-23`**: katalogdaki `answerKey:'A'` ile PDF'in orijinal metnindeki `C`
+  arasında görünen fark **gerçek bir hata değil** — ÖSYM bu sorunun cevabını 1 Temmuz 2026'da
+  resmen "C"den "A"ya değiştirdi (kurumsal duyuru + aynı 4 haber kaynağı ile doğrulandı).
+  PDF statik arşiv belgesi olduğu için orijinal (düzeltme öncesi) metni gösteriyor; katalog
+  güncel resmî durumu yansıtıyor. Not: karara karşı açılmış bir yargı süreci var (Ağustos 2026
+  itibarıyla sonuçlanmamış); ÖSYM'nin kurumsal kararı değişirse bu kayıt yeniden gözden geçirilmeli.
+- **Sonuç: 160/160 answerKey resmî kaynakla tutarlı, sıfır gerçek hata bulundu.**
+
+Bu doğrulama yalnız **metin/cevap** seviyesindedir; crop'ların görsel QA'sını kapsamaz (yukarıdaki not geçerli).
 
 ## Yeni PDF yayın ekleme
 

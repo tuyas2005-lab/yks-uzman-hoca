@@ -40,6 +40,7 @@
     return rows.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
   }
   function reviewed(){return new Set(state.teacher?.daily?.teacherReviewedWrongIds||[])}
+  const reviewTotalToday=()=> (state.studyEvents||[]).filter(x=>x?.source==='wrong-review'&&x?.dateKey===today()).length;
   function syncDone(scope){
     const d=state.teacher.daily;if(!d)return false;const rows=wrongRows(scope),seen=reviewed(),mistakes=Number(d.testSummary?.mistakes||0);
     if(mistakes===0)d.wrongDone=true;else if(rows.length)d.wrongDone=rows.every(x=>seen.has(x.id));else d.wrongDone=false;
@@ -50,7 +51,7 @@
     if(!d.teacherReviewedWrongIds.includes(x.id))d.teacherReviewedWrongIds.push(x.id);
     const exists=(state.studyEvents||[]).some(e=>e?.source==='wrong-review'&&e?.dateKey===today()&&e?.meta?.reviewOf===x.id);
     if(!exists){try{D()?.record?.({source:'wrong-review',exam:x.exam,subject:x.subject,topic:x.topic,curriculumOutcome:x.curriculumOutcome||x.meta?.solution?.curriculumOutcome||'',result:'unknown',difficulty:x.difficulty,interaction:'reviewed',questionCount:0,signals:['reviewed-wrong'],meta:{reviewOf:x.id,teacherTask:true,teacherTopic:scope?.topic||'',reviewedAt:Date.now()}},{persistNow:true})}catch{}}
-    syncDone(scope);persist();
+    const done=syncDone(scope);if(!done)d.wrongReviewBaseline=reviewTotalToday();persist();
   }
   function openRow(x,scope){
     recordReview(x,scope);renderScope();
@@ -67,10 +68,10 @@
     const rows=wrongRows(scope),seen=reviewed(),done=syncDone(scope),count=rows.filter(x=>seen.has(x.id)).length;
     host.innerHTML=`<div class="teacher-wrong-scope"><div class="tws-head"><div><h3>🧠 Bu Öğretmen Oturumundaki Yanlışlar</h3><p>${esc(`${scope.exam} ${scope.subject} • ${scope.topic}`)}<br>Yalnız bu ölçümde yanlış/yapamadım olan sorular gösteriliyor.</p></div><span class="tws-progress ${done?'done':''}">${done?'Tamamlandı':`${count}/${rows.length} incelendi`}</span></div>${rows.length?`<div class="tws-list">${rows.map((x,i)=>{const r=seen.has(x.id),q=x.meta?.questionNo||x.meta?.catalogId?.match(/(\d+)$/)?.[1]||'';return`<div class="tws-item ${r?'done':''}"><span class="tws-no">${r?'✓':i+1}</span><div><b>${esc(`${x.exam} ${x.subject}`)} • ${esc(x.topic||'Konu')}</b><small>${q?`Soru ${esc(q)} • `:''}${x.meta?.wrongKind==='unable'?'Yapamadım':'Yanlış yaptım'}</small></div><button class="tws-open" data-tws-id="${esc(x.id)}">${r?'Tekrar Aç':'Yanlışı İncele →'}</button></div>`}).join('')}</div>`:`<div class="tws-empty">${Number(state.teacher.daily?.testSummary?.mistakes||0)>0?'Bu oturumdaki yanlış kayıtları eşleştiriliyor. Öğretmene dönüp tekrar açmayı dene.':'Bu ölçümde yanlış yok.'}</div>`}<div class="tws-actions"><button id="twsBackTeacher" class="primary">${done?'✓ Öğretmene Dön':'Öğretmene Dön'}</button></div></div>`;
     host.querySelectorAll('[data-tws-id]').forEach(b=>b.onclick=()=>{const x=rows.find(z=>z.id===b.dataset.twsId);if(x)openRow(x,scope)});
-    host.querySelector('#twsBackTeacher').onclick=()=>{syncDone(scope);state.teacher.teacherWrongScope={active:false,scope};persist();cleanup();go('teacher');setTimeout(()=>window.renderTeacher?.(),30)};
+    host.querySelector('#twsBackTeacher').onclick=()=>{const complete=syncDone(scope);if(!complete&&state.teacher.daily)state.teacher.daily.wrongReviewBaseline=reviewTotalToday();state.teacher.teacherWrongScope={active:false,scope};persist();cleanup();go('teacher');setTimeout(()=>window.renderTeacher?.(),30)};
   }
   function activate(){
-    const scope=currentScope();if(!scope)return;state.teacher.teacherWrongScope={active:true,scope};const d=state.teacher.daily;if(d){d.teacherExam=scope.exam;d.teacherSubject=scope.subject;d.teacherTopic=scope.topic;d.teacherSetItemIds=[...(scope.itemIds||[])];d.teacherReviewedWrongIds=d.teacherReviewedWrongIds||[]}
+    const scope=currentScope();if(!scope)return;state.teacher.teacherWrongScope={active:true,scope};const d=state.teacher.daily;if(d){d.teacherExam=scope.exam;d.teacherSubject=scope.subject;d.teacherTopic=scope.topic;d.teacherSetItemIds=[...(scope.itemIds||[])];d.teacherReviewedWrongIds=d.teacherReviewedWrongIds||[];d.wrongReviewBaseline=reviewTotalToday()}
     persist();go('wrong');setTimeout(renderScope,80);
   }
 
@@ -80,6 +81,6 @@
     if(e.target.closest('#sqReturn')&&state.teacher.teacherWrongScope?.active)setTimeout(renderScope,80);
   },true);
 
-  const oldGo=window.go;if(typeof oldGo==='function'&&!oldGo.__teacherWrongScope){const wrapped=function(id){const r=oldGo(id);if(id==='wrong'&&state.teacher.teacherWrongScope?.active)setTimeout(renderScope,80);if(id!=='wrong'&&id!=='sourceQuestion'&&state.teacher.teacherWrongScope?.active&&id!=='teacher'){}return r};wrapped.__teacherWrongScope=true;window.go=wrapped;try{go=wrapped}catch{}}
+  const oldGo=window.go;if(typeof oldGo==='function'&&!oldGo.__teacherWrongScope){const wrapped=function(id){const r=oldGo(id);if(id==='wrong'&&state.teacher.teacherWrongScope?.active)setTimeout(renderScope,80);return r};wrapped.__teacherWrongScope=true;window.go=wrapped;try{go=wrapped}catch{}}
   window.renderTeacherWrongScope=renderScope;
 })();

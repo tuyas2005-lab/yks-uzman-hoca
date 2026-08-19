@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YKS Uzman Hoca V5 Yenileme</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f7fb;color:#1f2340;margin:0;display:grid;place-items:center;min-height:100vh;padding:24px}.card{max-width:560px;background:white;border:1px solid #e7e8f0;border-radius:22px;padding:24px;box-shadow:0 18px 50px rgba(30,34,70,.08)}h1{margin-top:0}.ok{color:#137a45}.muted{color:#73778d}.bar{height:10px;background:#eceef6;border-radius:99px;overflow:hidden;margin:18px 0}.bar i{display:block;height:100%;width:0;background:#6757e8;transition:width .3s}.small{font-size:13px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="card"><h1>YKS Uzman Hoca V5 yenileniyor</h1><p id="status" class="muted">Eski önbellek ve demo kayıtları kontrol ediliyor…</p><div class="bar"><i id="bar"></i></div><p class="small">Gerçek çalışma kayıtların korunur. Yalnızca eski demo snapshot'ı kesin olarak eşleşirse temizlenir.</p></div>
+<script>
+(async()=>{
+ const KEY='yksUzmanHocaV4',status=document.getElementById('status'),bar=document.getElementById('bar');
+ const step=(p,t)=>{bar.style.width=p+'%';status.textContent=t};
+ step(15,'Yerel veriler kontrol ediliyor…');
+ try{
+  const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);const ds=new Set(['1|18.08.2026|TYT Matematik|Üslü Sayılar|true','2|18.08.2026|TYT Matematik|Köklü Sayılar|false','3|17.08.2026|TYT Matematik|Problemler|true','4|17.08.2026|Fizik|Hareket|false','5|16.08.2026|TYT Matematik|Köklü Sayılar|false','6|16.08.2026|Türkçe|Paragraf|true','7|15.08.2026|TYT Matematik|Problemler|true','8|15.08.2026|TYT Matematik|Üslü Sayılar|true','9|14.08.2026|TYT Matematik|Köklü Sayılar|true','10|14.08.2026|Fizik|Hareket|true']);const dt=new Set(['02.08.2026|TYT Deneme 1|51.5','09.08.2026|TYT Deneme 2|57','16.08.2026|TYT Deneme 3|61.25']);
+   const sessions=s.sessions||[],trials=s.trials||[];const exactSessions=sessions.length===10&&sessions.every(x=>ds.has(`${x?.id}|${x?.date}|${x?.subject}|${x?.topic}|${x?.correct}`));const exactTrials=trials.length===3&&trials.every(x=>dt.has(`${x?.date}|${x?.name}|${Number(x?.net)}`));
+   const ev=s.studyEvents||[];const onlyMigratedDemo=ev.length>0&&ev.every(e=>/^legacy-(session|trial):/.test(String(e?.id||''))&&((e.meta?.legacyKind==='session'&&Number(e.meta?.legacyId)>=1&&Number(e.meta?.legacyId)<=10)||(e.meta?.legacyKind==='trial')));
+   const noReal=(s.activityLog?.length||0)===0&&(s.miniTests?.history?.length||0)===0&&(s.favorites?.length||0)===0;
+   if(exactSessions&&exactTrials&&noReal&&(ev.length===0||onlyMigratedDemo)){
+    s.sessions=[];s.trials=[];s.studyEvents=[];s.topicMastery={};s.plan=[];s.todayCount=0;s.activityLog=[];s.miniTests={...(s.miniTests||{}),history:[]};s.meta={...(s.meta||{}),appVersion:'5.0.1',legacyDemoSnapshotRemovedAt:Date.now(),dataArchitecture:'StudyEvent-v5'};localStorage.setItem(KEY,JSON.stringify(s));
+   }
+  }
+ }catch(e){console.warn(e)}
+ step(45,'Eski uygulama önbelleği temizleniyor…');
+ try{for(const k of await caches.keys())if(k.startsWith('yks-uzman-hoca-'))await caches.delete(k)}catch{}
+ step(70,'Eski Service Worker kaldırılıyor…');
+ try{if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();for(const r of regs)await r.unregister()}}catch{}
+ step(90,'V5 dosyaları yeniden yükleniyor…');
+ try{await fetch('/service-worker.js?recovery='+Date.now(),{cache:'reload'})}catch{}
+ step(100,'Hazır. Yeni V5 açılıyor…');status.className='ok';
+ setTimeout(()=>location.replace('/?v5fresh='+Date.now()),700);
+})();
+</script>
+</body>
+</html>

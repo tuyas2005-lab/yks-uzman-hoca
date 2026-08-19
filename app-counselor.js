@@ -21,6 +21,6 @@ function startBackgroundServices(){detectLive();initCloud()}
 
 renderAll();applyStartupScreen();initPwa();
 requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  startupIdle(loadStartupModules,1800);
-  startupIdle(startBackgroundServices,3200);
+  setTimeout(()=>startupIdle(loadStartupModules,3500),1200);
+  setTimeout(()=>startupIdle(startBackgroundServices,5000),2200);
 }));

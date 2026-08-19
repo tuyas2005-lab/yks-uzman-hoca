@@ -1,44 +1,8 @@
-import {ECONOMY_MODEL,getClient,setUsageHeaders} from "./_common.js";
-
-const schema={
-  type:"object",
-  additionalProperties:false,
-  required:["question","choices","answer","hint"],
-  properties:{
-    question:{type:"string"},
-    choices:{type:"array",minItems:5,maxItems:5,items:{type:"string"}},
-    answer:{type:"string"},
-    hint:{type:"string"}
-  }
-};
-
 export default async function handler(req,res){
   if(req.method!=="POST") return res.status(405).json({error:"Method not allowed"});
-  const client=getClient();
-  if(!client) return res.status(503).json({error:"OPENAI_API_KEY henüz Vercel'e eklenmedi."});
-  try{
-    const s=req.body?.solution||{};
-    if(!s.subject||!s.topic) return res.status(400).json({error:"Önce bir soru çözülmeli."});
-    const rawOutcome=String(s.curriculum_outcome||"");
-    const outcome=/ayrınt|hazırlan/i.test(rawOutcome)?s.topic:(rawOutcome||s.topic);
-    const response=await client.responses.create({
-      model:ECONOMY_MODEL,
-      store:false,
-      reasoning:{effort:"none"},
-      max_output_tokens:460,
-      input:[
-        {role:"developer",content:`Bir YKS öğrencisi için TEK bir yeni çoktan seçmeli soru üret.\n- Ders kesinlikle: ${s.exam||''} ${s.subject}\n- Konu kesinlikle: ${s.topic}\n- Kazanım: ${outcome}\n- Zorluk: ${s.difficulty||'Orta'}\n- Başka derse veya konuya geçme.\n- Orijinal soruyu kopyalama; aynı kazanımı farklı örnek, sayı, olay veya bağlamla ölç.\n- Tam 5 seçenek üret. Seçenek metinlerinin başına A/B/C/D/E harfi koyma; arayüz harfleri kendisi ekleyecek.\n- answer alanı choices dizisindeki doğru seçeneğin TAM metni olsun.\n- hint kısa olsun ve cevabı doğrudan söylemesin.\n- Türkçe ve YKS düzeyinde yaz.`},
-        {role:"user",content:`Çözülen sorunun kısa çözüm özeti: ${String(s.short_solution||'').slice(0,500)}`}
-      ],
-      text:{format:{type:"json_schema",name:"similar_question",strict:true,schema}}
-    });
-    setUsageHeaders(res,response,ECONOMY_MODEL,"similar");
-    res.setHeader("Cache-Control","no-store");
-    return res.status(200).json(JSON.parse(response.output_text));
-  }catch(e){
-    console.error("similar error",e);
-    if(e?.code==="insufficient_quota") return res.status(429).json({error:"OpenAI API bakiyesi/kotası yetersiz."});
-    if(e?.status===429) return res.status(429).json({error:"OpenAI API geçici kullanım limitine ulaşıldı."});
-    return res.status(500).json({error:e?.message||"Benzer soru oluşturulamadı."});
-  }
+  res.setHeader("Cache-Control","no-store");
+  return res.status(410).json({
+    error:"AI soru üretimi kapalı. Benzer sorular yalnız ÖSYM, MEB/OGM ve kayıtlı PDF soru kütüphanesinden seçilir.",
+    mode:"library-only"
+  });
 }

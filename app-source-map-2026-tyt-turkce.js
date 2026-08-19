@@ -35,26 +35,23 @@
     'osym-2026-tyt-tur-33':{pdfKey:'osym-2026-tyt',page:13,crop:{x:.535,y:.40,w:.40,h:.41}},
     'osym-2026-tyt-tur-34':{pdfKey:'osym-2026-tyt',page:14,crop:{x:.065,y:.10,w:.43,h:.42}},
     'osym-2026-tyt-tur-35':{pdfKey:'osym-2026-tyt',page:14,crop:{x:.535,y:.08,w:.40,h:.45}},
+    'osym-2026-tyt-tur-36':{pdfKey:'osym-2026-tyt',page:14,parts:[{x:.535,y:.08,w:.40,h:.24},{x:.535,y:.52,w:.40,h:.31}]},
     'osym-2026-tyt-tur-37':{pdfKey:'osym-2026-tyt',page:15,crop:{x:.065,y:.08,w:.43,h:.57}},
-    'osym-2026-tyt-tur-39':{pdfKey:'osym-2026-tyt',page:16,crop:{x:.065,y:.08,w:.43,h:.51}}
+    'osym-2026-tyt-tur-38':{pdfKey:'osym-2026-tyt',page:15,parts:[{x:.065,y:.08,w:.43,h:.34},{x:.535,y:.08,w:.40,h:.38}]},
+    'osym-2026-tyt-tur-39':{pdfKey:'osym-2026-tyt',page:16,crop:{x:.065,y:.08,w:.43,h:.51}},
+    'osym-2026-tyt-tur-40':{pdfKey:'osym-2026-tyt',page:16,parts:[{x:.065,y:.08,w:.43,h:.24},{x:.535,y:.08,w:.40,h:.40}]}
   };
-  const PENDING_SHARED=new Set(['osym-2026-tyt-tur-36','osym-2026-tyt-tur-38','osym-2026-tyt-tur-40']);
   function activate(){
     const C=window.YKSQuestionCatalogV1;if(!C?.all)return false;
     let changed=false;
     for(const item of C.all()){
-      const a=MAP[item.id];
-      if(a){
-        item.asset={status:'ready',kind:'cached-pdf-crop',...a};
-        item.answerVerified=!!item.answerKey;
-        if(item.answerKey&&!item.answer)item.answer=item.answerKey;
-        changed=true;
-      }else if(PENDING_SHARED.has(item.id)){
-        item.asset={status:'pending',kind:'shared-passage-pending'};
-        item.answerVerified=!!item.answerKey;
-      }
+      const a=MAP[item.id];if(!a)continue;
+      item.asset={status:'ready',kind:Array.isArray(a.parts)?'cached-pdf-parts':'cached-pdf-crop',...a};
+      item.answerVerified=!!item.answerKey;
+      if(item.answerKey&&!item.answer)item.answer=item.answerKey;
+      changed=true;
     }
-    if(changed)setTimeout(()=>{try{window.renderQuestionIndex?.()}catch{}},0);
+    if(changed){try{window.YKSRegisterSourceMap?.(MAP)}catch{}setTimeout(()=>{try{window.renderQuestionIndex?.()}catch{}},0)}
     return changed;
   }
   if(!activate()){let n=0;const t=setInterval(()=>{if(activate()||++n>30)clearInterval(t)},100)}

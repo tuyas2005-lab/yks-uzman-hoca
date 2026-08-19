@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r12-fast-shell';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r13-fresh-code';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -40,27 +40,23 @@ self.addEventListener('activate', event => {
         .filter(k => k !== CACHE && k.startsWith('yks-uzman-hoca-'))
         .map(k => caches.delete(k))
     );
-
     await self.clients.claim();
 
-    // An installed iPad/iPhone PWA can keep the page loaded from the previous
-    // worker even after the new worker takes control. Reload each same-origin
-    // app window once on activation so HTML + core scripts come from this
-    // worker's freshly populated shell cache. LocalStorage/IndexedDB are not
-    // cleared by this navigation.
+    // Move already-open app windows onto the newly activated shell once.
+    // This navigation does not clear localStorage or IndexedDB.
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     await Promise.all(windows.map(async client => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin) await client.navigate(client.url);
       } catch {
-        // A client can disappear while the worker activates; ignore it.
+        // Client may disappear during activation.
       }
     }));
   })());
 });
 
-async function refreshIntoCache(req, cacheKey = req) {
+async function fetchAndCache(req, cacheKey = req) {
   try {
     const res = await fetch(req, { cache: 'no-store' });
     if (res && (res.ok || res.type === 'opaque')) {
@@ -73,6 +69,13 @@ async function refreshIntoCache(req, cacheKey = req) {
   }
 }
 
+async function networkFirst(req, cacheKey = req) {
+  const fresh = await fetchAndCache(req, cacheKey);
+  if (fresh) return fresh;
+  const cached = await caches.match(cacheKey);
+  return cached || new Response('', { status: 504 });
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -82,11 +85,11 @@ self.addEventListener('fetch', event => {
   if (url.href.startsWith(SUPABASE_CDN)) {
     event.respondWith((async () => {
       const cached = await caches.match(SUPABASE_CDN);
-      const refresh = refreshIntoCache(req, SUPABASE_CDN);
-      event.waitUntil(refresh);
-      if (cached) return cached;
-      const fresh = await refresh;
-      return fresh || new Response('', { status: 504 });
+      if (cached) {
+        event.waitUntil(fetchAndCache(req, SUPABASE_CDN));
+        return cached;
+      }
+      return networkFirst(req, SUPABASE_CDN);
     })());
     return;
   }
@@ -94,15 +97,14 @@ self.addEventListener('fetch', event => {
   if (url.origin !== location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
 
+  // Correctness first: when online, always use the current HTML and app code.
+  // Cache is only the offline fallback, so a previous deployment cannot pin the UI.
   if (req.mode === 'navigate') {
     event.respondWith((async () => {
-      const cached = await caches.match('/index.html');
-      const refresh = refreshIntoCache(req, '/index.html');
-      event.waitUntil(refresh);
-      if (cached) return cached;
-      const fresh = await refresh;
+      const fresh = await fetchAndCache(req, '/index.html');
       if (fresh) return fresh;
-      return new Response('Uygulama şu anda açılamıyor.', {
+      const cached = await caches.match('/index.html');
+      return cached || new Response('Uygulama şu anda açılamıyor.', {
         status: 503,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
       });
@@ -112,22 +114,14 @@ self.addEventListener('fetch', event => {
 
   const isCode = /\.(?:js|css|mjs)$/.test(url.pathname);
   if (isCode) {
-    event.respondWith((async () => {
-      const cached = await caches.match(req);
-      const refresh = refreshIntoCache(req);
-      event.waitUntil(refresh);
-      if (cached) return cached;
-      const fresh = await refresh;
-      if (fresh) return fresh;
-      return new Response('', { status: 504 });
-    })());
+    event.respondWith(networkFirst(req));
     return;
   }
 
+  // Static images/manifests remain cache-first for fast startup.
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
-    const fresh = await refreshIntoCache(req);
-    return fresh || new Response('', { status: 504 });
+    return networkFirst(req);
   })());
 });

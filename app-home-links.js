@@ -16,13 +16,13 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
       loadSeries(window.YKSQuestionCatalogFiles||[],()=>{
         loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
           loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
-            loadScript('/app-source-question-viewer.js?v=3',()=>{
+            loadScript('/app-source-question-viewer.js?v=4',()=>{
               loadScript('/app-source-screen-nav-fix.js?v=1');
               loadSeries([
                 '/app-source-map-2026-tyt-math-01-30.js?v=2',
                 '/app-source-map-2026-tyt-fen.js?v=1',
                 '/app-source-map-2026-tyt-social.js?v=1',
-                '/app-source-map-2026-tyt-turkce.js?v=1'
+                '/app-source-map-2026-tyt-turkce.js?v=2'
               ],()=>{
                 loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
                 loadScript('/app-official-question-pilot.js?v=4');

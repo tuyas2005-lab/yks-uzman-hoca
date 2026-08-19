@@ -26,7 +26,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
                 '/app-source-map-2026-tyt-turkce.js?v=2',
                 '/app-source-map-2026-ayt.js?v=1'
               ],()=>{
-                loadScript('/app-source-incomplete-policy.js?v=1',()=>{
+                loadScript('/app-source-incomplete-policy.js?v=2',()=>{
                   loadScript('/app-question-index.js?v=1',()=>loadScript('/app-question-index-homefix.js?v=1'));
                   loadScript('/app-official-question-pilot.js?v=4');
                   loadScript('/app-mini-tests-source.js?v=3',()=>{

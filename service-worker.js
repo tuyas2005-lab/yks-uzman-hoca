@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r8-fast-shell';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r9-fast-shell';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -10,6 +10,7 @@ const SHELL = [
   '/app-core.js',
   '/app-cloud.js',
   '/app-counselor.js',
+  '/app-solve-payload-guard.js',
   '/app-personal-teacher-source-launch-v3.js'
 ];
 

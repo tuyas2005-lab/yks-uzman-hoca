@@ -2,10 +2,59 @@
   const n=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   function setPrefill(subject='',topic=''){state.miniTests??={history:[]};state.miniTests.prefillSubject=subject||state.miniTests.prefillSubject||'';state.miniTests.prefillTopic=topic||'';save()}
   document.addEventListener('click',e=>{const task=e.target.closest('#dailyPlan [data-home-task]');if(task){const title=task.querySelector('strong')?.textContent||'';if(/mini test|seviye ölçümü/i.test(title)){const topic=title.split('•').slice(1).join('•').trim();const metric=window.getLearningSnapshot?.().metrics?.find(x=>x.topic===topic);setPrefill(metric?`${metric.exam} ${metric.subject}`:'',topic)}}const subjectBtn=e.target.closest('#home .subject');if(subjectBtn)setPrefill(subjectBtn.textContent.trim(),'')},true);
-  if(typeof go==='function'&&!window.__connectedGo){const base=go;go=function(id){try{window.YKSDataV5?.syncLegacy?.();window.refreshLearningModel?.()}catch{}const r=base(id);if(id==='home')setTimeout(()=>window.renderHome?.(),0);if(id==='topics')setTimeout(()=>window.renderTopics?.(),0);if(id==='wrong'){setTimeout(()=>window.renderWrong?.(),0);setTimeout(()=>window.renderWrongV2?.(),10)}if(id==='stats')setTimeout(()=>window.renderStats?.(),0);if(id==='tests')setTimeout(()=>window.renderMiniTestHome?.(),0);if(id==='teacher')setTimeout(()=>{try{window.renderTeacher?.()}catch{}},0);if(id==='coach')setTimeout(()=>{try{window.renderCoach?.()}catch{}},0);return r};window.go=go;window.__connectedGo=true}
+
+  const afterPaint=(fn,delay=40)=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>{
+    const run=()=>{try{fn()}catch(e){console.warn('Geçiş sonrası yenileme:',e)}};
+    if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:900});else setTimeout(run,0);
+  },delay)));
+
+  if(typeof go==='function'&&!window.__connectedGo){
+    const base=go;
+    go=function(id){
+      // Ekranı önce değiştir. Veri modeli / ağır render işleri navigasyonu bloklamasın.
+      const r=base(id);
+      afterPaint(()=>{
+        if(id==='home')window.renderHome?.();
+        if(id==='topics')window.renderTopics?.();
+        if(id==='wrong'){window.renderWrong?.();setTimeout(()=>window.renderWrongV2?.(),10)}
+        if(id==='stats')window.renderStats?.();
+        if(id==='tests')window.renderMiniTestHome?.();
+        if(id==='teacher')window.renderTeacher?.();
+        if(id==='coach')window.renderCoach?.();
+      },id==='home'?80:40);
+      return r;
+    };
+    window.go=go;window.__connectedGo=true;
+  }
 })();
-function loadScript(src,onload){const s=document.createElement('script');s.src=src;s.onload=onload||null;s.onerror=()=>console.warn('Yüklenemedi:',src);document.body.appendChild(s)}
+
+// Ağır V5 bağımlılıklarını tek tek ve tarayıcı boş kaldıkça yükle.
+// Özellikle tabletlerde onlarca scriptin aynı anda parse edilmesi menü tıklamalarını 15-30 sn bloke edebiliyordu.
+const __yksScriptQueue=[];
+let __yksScriptLoading=false;
+function __yksPumpScripts(){
+  if(__yksScriptLoading||!__yksScriptQueue.length)return;
+  const job=__yksScriptQueue.shift();
+  __yksScriptLoading=true;
+  const start=()=>{
+    const s=document.createElement('script');
+    s.src=job.src;
+    s.async=true;
+    const done=(ok=true)=>{
+      __yksScriptLoading=false;
+      if(ok&&job.onload){try{job.onload()}catch(e){console.warn('Script callback:',job.src,e)}}
+      if(!ok)console.warn('Yüklenemedi:',job.src);
+      setTimeout(__yksPumpScripts,70);
+    };
+    s.onload=()=>done(true);
+    s.onerror=()=>done(false);
+    document.body.appendChild(s);
+  };
+  if('requestIdleCallback'in window)requestIdleCallback(start,{timeout:1400});else setTimeout(start,90);
+}
+function loadScript(src,onload){__yksScriptQueue.push({src,onload});__yksPumpScripts()}
 function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.length){done?.();return}loadScript(a.shift(),next)};next()}
+
 (function bootV5Deps(tries=0){
   if(!window.YKSDataV5){if(tries<100)setTimeout(()=>bootV5Deps(tries+1),40);return}
   loadScript('/app-live-status.js?v=1');

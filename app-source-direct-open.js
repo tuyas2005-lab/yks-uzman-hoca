@@ -17,10 +17,6 @@
     return all.find(x=>q&&String(x.questionNo||'')===q&&z.includes(norm(x.subject))&&z.includes(norm(x.topic)))||null;
   }
 
-  function recordOpen(item){
-    try{window.YKSDataV5?.record?.({source:'official-question-open',exam:item.exam,subject:item.subject,topic:item.topic,curriculumOutcome:(item.subtopics||[]).join(' • '),result:'unknown',interaction:'opened-source',questionCount:0,signals:[],meta:{catalogId:item.id,provider:item.provider,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual}},{persistNow:true})}catch{}
-  }
-
   function bind(){
     const items=[];
     document.querySelectorAll('.mts-q,.official-source-card').forEach(card=>{
@@ -40,7 +36,6 @@
         if(window.isSourceQuestionReady&&!window.isSourceQuestionReady(item)){
           alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;
         }
-        recordOpen(item);
         window.openSourceQuestion(item,{type:mini?'mini':'official',card,returnScreen:mini?'tests':'similar'});
       };
     });

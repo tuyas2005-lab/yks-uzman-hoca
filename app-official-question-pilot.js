@@ -7,10 +7,6 @@
 
   const qFromResult=x=>({exam:x?.exam||'TYT',subject:x?.subject||'Matematik',topic:x?.topic||'',curriculumOutcome:x?.curriculum_outcome||'',shortSolution:x?.short_solution||'',difficulty:x?.difficulty||'',visualPreferred:true});
 
-  function recordOpen(item){
-    try{window.YKSDataV5?.record?.({source:'official-question-open',exam:item.exam,subject:item.subject,topic:item.topic,curriculumOutcome:(item.subtopics||[]).join(' • '),result:'unknown',interaction:'opened-source',questionCount:0,signals:[],meta:{catalogId:item.id,provider:item.provider,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual}},{persistNow:true})}catch{}
-  }
-
   function recordResult(item,kind){
     const exists=(state.studyEvents||[]).some(x=>x?.source==='source-question-result'&&x?.meta?.catalogId===item.id);if(exists)return false;
     const result=kind==='correct'?'correct':kind==='wrong'?'wrong':'unknown';
@@ -31,8 +27,8 @@
     if(!choices)return;
     choices.className='official-source-list';
     if(!items.length){choices.innerHTML='<div class="official-empty"><b>Bu konu için çözülmemiş kaynak sorusu kalmadı.</b><br>Yeni kaynaklar indekslendikçe havuz otomatik genişleyecek. AI soru üretimi kullanılmıyor.</div>';return}
-    choices.innerHTML=items.map((x,i)=>`<div class="official-source-card"><div class="official-source-main"><div><div class="official-source-meta"><span class="official-chip">${esc(x.providerLabel)}</span>${x.year?`<span class="official-chip year">${x.year} ${esc(x.exam)}</span>`:''}${x.visual?'<span class="official-chip visual">🖼️ Şekilli</span>':''}</div><h3>${esc(x.topic)} • ${esc(x.questionNo||'Kaynak sayfası')}</h3><p>${esc(x.collection)}${x.subtopics?.length?` • ${esc(x.subtopics.join(' / '))}`:''}</p></div><button class="official-open" data-official-open="${i}">Orijinal Soruyu Aç ↗</button></div><div class="official-result-row"><span>Çözdükten sonra:</span><button class="official-result" data-official-result="${i}" data-result="correct">✓ Doğru</button><button class="official-result" data-official-result="${i}" data-result="wrong">✕ Yanlış</button><button class="official-result" data-official-result="${i}" data-result="unable">? Yapamadım</button></div></div>`).join('');
-    choices.querySelectorAll('[data-official-open]').forEach(b=>b.onclick=()=>{const item=items[Number(b.dataset.officialOpen)];if(!item)return;recordOpen(item);window.open(item.access.url,'_blank','noopener,noreferrer')});
+    choices.innerHTML=items.map((x,i)=>`<div class="official-source-card"><div class="official-source-main"><div><div class="official-source-meta"><span class="official-chip">${esc(x.providerLabel)}</span>${x.year?`<span class="official-chip year">${x.year} ${esc(x.exam)}</span>`:''}${x.visual?'<span class="official-chip visual">🖼️ Şekilli</span>':''}</div><h3>${esc(x.topic)} • ${esc(x.questionNo||'Kaynak sayfası')}</h3><p>${esc(x.collection)}${x.subtopics?.length?` • ${esc(x.subtopics.join(' / '))}`:''}</p></div><button class="official-open" data-official-open="${i}">Soruyu Çöz →</button></div><div class="official-result-row"><span>Çözdükten sonra:</span><button class="official-result" data-official-result="${i}" data-result="correct">✓ Doğru</button><button class="official-result" data-official-result="${i}" data-result="wrong">✕ Yanlış</button><button class="official-result" data-official-result="${i}" data-result="unable">? Yapamadım</button></div></div>`).join('');
+    choices.querySelectorAll('[data-official-open]').forEach(b=>b.onclick=e=>{e?.preventDefault?.();e?.stopPropagation?.();const item=items[Number(b.dataset.officialOpen)];if(!item)return;const card=b.closest('.official-source-card');if(typeof window.openSourceQuestion!=='function'){alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return}if(window.isSourceQuestionReady&&!window.isSourceQuestionReady(item)){alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return}window.openSourceQuestion(item,{type:'official',card,returnScreen:'similar'})});
     choices.querySelectorAll('[data-official-result]').forEach(b=>b.onclick=()=>{const item=items[Number(b.dataset.officialResult)];if(!item)return;if(recordResult(item,b.dataset.result))setTimeout(()=>renderCandidates(candidates()),30)});
   }
 

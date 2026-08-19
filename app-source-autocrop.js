@@ -22,7 +22,7 @@
     })();
     docs.set(key,p);return p;
   }
-  const markerRe=q=>new RegExp(`^\\s*${String(q).replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\s*\\.`);
+  const markerRe=q=>new RegExp(`^\\s*${String(q)}\\s*\\.`);
 
   async function detectCrop(item){
     if(hasManual(item)||item?.asset?.crop||item?.asset?.parts)return item.asset;
@@ -51,7 +51,8 @@
       const next=same[0]||null;
       const top=Math.max(.045,(H-cur.y-cur.h*1.7)/H);
       const bottom=next?Math.min(.965,(H-next.y+next.h*.9)/H):.955;
-      const x=right?.515:.055,w=right?.43:.44;
+      const x=right ? .515 : .055;
+      const w=right ? .43 : .44;
       const crop={x,y:Math.max(.035,top-.012),w,h:Math.max(.10,bottom-top+.015)};
       item.asset={status:'ready',kind:'auto-text-crop',pdfKey:'osym-2026-tyt',page:pageNo,crop};
       item.answerVerified=true;
@@ -63,7 +64,8 @@
   function decorate(){
     for(const x of C()?.all?.()||[]){
       if(!eligible(x)||hasManual(x))continue;
-      x.asset={status:'ready',kind:'auto-text-crop',pdfKey:'osym-2026-tyt',page:Number(x.access.page),crop:x.asset?.crop};
+      const old=x.asset||{};
+      x.asset={status:'ready',kind:'auto-text-crop',pdfKey:'osym-2026-tyt',page:Number(x.access.page),crop:old.crop};
       x.answerVerified=true;
     }
   }

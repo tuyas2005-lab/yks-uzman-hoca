@@ -158,10 +158,11 @@
     resetAnalysisView();go('analyze');
     const wrap=document.querySelector('#analyze .analysis-wrap');
     try{
-      if(!liveApi)throw new Error('Canlı bağlantı hazır değil.');
+      if(location.protocol==='file:')throw new Error('Canlı çözüm için uygulamayı sunucudan aç.');
       const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),35000);
       const r=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({text:activeQuestion.text,image:activeQuestion.image,student:{name:state.profile.name,tone:state.profile.tone}})});
       clearTimeout(timer);const j=await r.json();if(!r.ok)throw new Error(j.error||'API hatası');
+      liveApi=true;
       const base={...j,curriculum_outcome:'Ayrıntılar hazırlanıyor…',steps:[j.short_solution||'Ayrıntılar hazırlanıyor…'],why:'Ayrıntılar hazırlanıyor…',tip:'Ayrıntılar hazırlanıyor…',distractor:'Ayrıntılar hazırlanıyor…',exam_note:'Ayrıntılar hazırlanıyor…',sources:[]};
       applyLiveResult(base);wrap?.classList.remove('ai-working','ai-loading');resetQuestionForm();go('solution');
       void enrichSolution(base,serial);

@@ -9,7 +9,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
 (function bootV5Deps(tries=0){
   if(!window.YKSDataV5){if(tries<100)setTimeout(()=>bootV5Deps(tries+1),40);return}
   loadScript('/app-live-status.js?v=1');
-  loadScript('/app-favorites-nav-fix.js?v=1');
+  loadScript('/app-ui-cleanup-v1.js?v=1');
   loadScript('/app-topic-ui.js?v=1');
   loadScript('/data/question-catalog-v1.js?v=2',()=>{
     loadScript('/data/catalog/catalog-manifest.js?v=2',()=>{
@@ -17,6 +17,7 @@ function loadSeries(list,done){const a=[...(list||[])];const next=()=>{if(!a.len
         loadScript('/data/question-catalog-dedupe.js?v=1',()=>{
           loadScript('/data/question-catalog-policy-v2.js?v=2',()=>{
             loadScript('/app-source-question-viewer.js?v=4',()=>{
+              loadScript('/app-tablet-pen.js?v=1');
               loadScript('/app-source-screen-nav-fix.js?v=1');
               loadSeries([
                 '/app-source-map-2026-tyt-math-01-30.js?v=2',

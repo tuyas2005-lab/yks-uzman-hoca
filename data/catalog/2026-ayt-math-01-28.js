@@ -30,7 +30,7 @@
     base('osym-2026-ayt-mat-20','Limit',['belirsizlik','küp farkı','limit hesabı','parametre'],['limit','0/0','çarpanlara ayırma'],'Orta-Zor',false,20,null,'12'),
     base('osym-2026-ayt-mat-21','Türev - Çarpım Kuralı',['çarpımın türevi','türev değeri'],['türev','çarpım kuralı'],'Orta',false,21,null,'16'),
     base('osym-2026-ayt-mat-22','İkinci Türev',['ikinci türev','türev uygulamaları','fonksiyon değeri'],['türev','ikinci türev'],'Orta-Zor',false,22,null,'-2'),
-    base('osym-2026-ayt-mat-23','Türev Grafiği ve Kök Yorumu',['türev grafiği','alan','fonksiyonun kökü','işaret analizi'],['türev','grafik','kök','alan','şekilli'],'Zor',true,23,'A','Yalnız I'),
+    (()=>{const r=base('osym-2026-ayt-mat-23','Türev Grafiği ve Kök Yorumu',['türev grafiği','alan','fonksiyonun kökü','işaret analizi'],['türev','grafik','kök','alan','şekilli'],'Zor',true,23,null,'');r.cancelled=true;r.verification.answerKey='cancelled-by-court-2026-07-21';return r})(),
     base('osym-2026-ayt-mat-24','Belirli İntegral',['belirli integral','integral hesabı'],['integral','belirli integral'],'Orta',false,24,null,'33'),
     base('osym-2026-ayt-mat-25','İntegral ve Alan',['integral','değişken dönüşümü','f(2x)','alan'],['integral','alan','fonksiyon'],'Orta-Zor',true,25,null,'3'),
     base('osym-2026-ayt-mat-26','İntegral - Alan Karşılaştırma',['integral alanı','boyalı bölgeler','alan sıralaması'],['integral','alan','grafik','renkli bölgeler','şekilli'],'Zor',true,26,null,'M-K-S'),

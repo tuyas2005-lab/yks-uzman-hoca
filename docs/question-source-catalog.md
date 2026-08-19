@@ -31,25 +31,40 @@ Bkz. `docs/question-taxonomy.md` (konu/topic sözlüğü) ve `data/catalog/**` d
 | Tarih | 5 | 5/5 | 5/5 |
 | Türkçe | 40 | 40/40 | 40/40 |
 
-### AYT — answerKey doğrulanmış, crop runtime auto-crop ile üretiliyor (henüz manuel QA yapılmadı)
+### AYT — answerKey doğrulandı (2 soru resmen iptal), crop: auto-crop mevcut / visual QA pending
 
 | Ders | Soru | answerKey | Crop durumu |
 |------|------|-----------|--------------|
-| Biyoloji | 13 | 13/13 | auto-crop (QA bekliyor) |
-| Coğrafya-1 | 6 | 6/6 | auto-crop (QA bekliyor) |
-| Coğrafya-2 | 11 | 11/11 | auto-crop (QA bekliyor) |
-| Din Kültürü ve Ahlak Bilgisi | 6 | 6/6 | auto-crop (QA bekliyor) |
-| Felsefe Grubu | 12 | 12/12 | auto-crop (QA bekliyor) |
-| Fizik | 14 | 14/14 | auto-crop (QA bekliyor) |
-| Kimya | 13 | 13/13 | auto-crop (QA bekliyor) |
-| Matematik | 40 | 40/40 | auto-crop (QA bekliyor) |
-| Tarih-1 | 10 | 10/10 | auto-crop (QA bekliyor) |
-| Tarih-2 | 11 | 11/11 | auto-crop (QA bekliyor) |
-| Türk Dili ve Edebiyatı | 24 | 23/24 | auto-crop (QA bekliyor) |
+| Biyoloji | 13 | 13/13 | auto-crop mevcut / visual QA pending |
+| Coğrafya-1 | 6 | 6/6 | auto-crop mevcut / visual QA pending |
+| Coğrafya-2 | 11 | 11/11 | auto-crop mevcut / visual QA pending |
+| Din Kültürü ve Ahlak Bilgisi | 6 | 6/6 | auto-crop mevcut / visual QA pending |
+| Felsefe Grubu | 12 | 12/12 | auto-crop mevcut / visual QA pending |
+| Fizik | 14 | 14/14 | auto-crop mevcut / visual QA pending |
+| Kimya | 13 | 13/13 | auto-crop mevcut / visual QA pending |
+| Matematik | 40 | 39/40 + 1 iptal (mat-23) | auto-crop mevcut / visual QA pending |
+| Tarih-1 | 10 | 10/10 | auto-crop mevcut / visual QA pending |
+| Tarih-2 | 11 | 11/11 | auto-crop mevcut / visual QA pending |
+| Türk Dili ve Edebiyatı | 24 | 23/24 + 1 iptal (tde1-20) | auto-crop mevcut / visual QA pending |
 
-> **Not:** AYT crop'ları `app-source-map-2026-ayt.js` içindeki runtime PDF.js tarayıcısı ile otomatik üretiliyor.
-> Bu "ready" görünse de talimat madde 32 gereği manuel gözle QA'dan geçmeden tam güvenilir sayılmaz.
-> Sıradaki öncelikli iş: 2026 AYT için örnekleme QA (görsel) + gerekiyorsa manuel source-map override.
+**AYT 2026 toplam: 160 soru = 158 geçerli answerKey + 2 resmen iptal (mat-23, tde1-20).**
+
+> **Not — Crop QA durumu (kritik):** AYT crop'ları `app-source-map-2026-ayt.js` içindeki runtime
+> PDF.js tarayıcısı ile **otomatik** üretiliyor (auto-crop). Bu, uygulama tarafında `asset.status:'ready'`
+> olarak görünür, **ANCAK bu görsel olarak doğrulanmış/verified anlamına gelmez.**
+> Golden Rule (madde 89) gereği: hiçbir AYT crop'u gözle QA'dan geçmeden "doğrulanmış",
+> "verified" veya "fully ready" olarak nitelendirilemez ve bu dokümanda öyle nitelendirilmemiştir.
+> **Doğru statü tanımı: "auto-crop mevcut / visual QA pending."**
+>
+> PDF'e görsel erişim şu an ortam kısıtı nedeniyle mümkün değil (bkz. aşağıdaki teknik not).
+> Bu bir veri hatası değil, bir **araç/ortam kısıtıdır**. Kullanıcı PDF'i dosya olarak
+> sağladığında 2026 AYT'ye geri dönülüp gerçek görsel QA yapılacaktır.
+>
+> **Teknik not (19 Ağustos 2026):** `bash_tool` ortamının network proxy'si yalnız belirli
+> domainlere (GitHub, npm, pypi vb.) izin veriyor; `dokuman.osym.gov.tr` ve `cdn.osym.gov.tr`
+> bu listede değil. `curl`, `wget` ve Python `urllib` ile denenmiş, üçü de aynı
+> `x-deny-reason: host_not_allowed` hatasıyla reddedilmiştir. `web_fetch` aracı yalnız metin
+> döndürüyor (görsel/byte erişimi yok). Bu nedenle crop QA şimdilik **pending**.
 
 ### AYT answerKey bağımsız doğrulama (19 Ağustos 2026, güncellendi 19 Ağustos 2026)
 

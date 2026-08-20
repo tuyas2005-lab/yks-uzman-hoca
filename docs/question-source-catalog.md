@@ -105,8 +105,16 @@ doğrulaması için kullanıldı.
 |------|------|-----------|--------------|
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2025 TYT toplamı (şu ana kadar işlenen):** 40/125 soru (Türkçe tamamlandı; Sosyal Bilimler,
+**2025 TYT toplamı (şu ana kadar işlenen):** 40/120 soru (Türkçe tamamlandı; Sosyal Bilimler,
 Temel Matematik, Fen Bilimleri sırada — aynı PDF ve cevap anahtarı zaten elde edilmiş durumda).
+
+> **2025 TYT toplam soru sayısı notu:** Booklet'te basılı toplam 125 soru görünür (Türkçe 40 +
+> Sosyal Bilimler 25 + Matematik 40 + Fen 20), ancak Sosyal Bilimler testinde 21-25 numaralı
+> sorular ("Din Kültürü ve Ahlak Bilgisi dersini yasal olarak almak zorunda olmayan veya farklı
+> müfredat ile alanlar için Felsefe") 16-20 numaralı Din Kültürü sorularının **alternatifidir**,
+> aynı öğrenci ikisini birden cevaplamaz. AYT'deki alt-track Felsefe (41-46) için uygulanan
+> mantıkla tutarlı olarak, bu 5 alternatif soru ayrı benzersiz içerik sayılmaz. Gerçek benzersiz
+> soru sayısı: 40 + 20 + 40 + 20 = **120**.
 
 > **Not:** 2025 TYT için henüz `app-source-map-2025-*.js` gibi bir crop/source-map dosyası
 > oluşturulmadı — 2026 AYT'dekiyle aynı sebepten (PDF'e görsel/piksel erişim ortam kısıtı

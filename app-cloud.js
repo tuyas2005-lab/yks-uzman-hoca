@@ -44,9 +44,25 @@ function cloudClone(x){try{return structuredClone(x)}catch{return JSON.parse(JSO
 function cloudKey(x,kind){if(x?.id!==undefined&&x?.id!==null&&String(x.id)!=='')return String(x.id);if(x?.signature)return String(x.signature);if(kind==='trial')return [x?.type,x?.date,x?.name,x?.totalNet??x?.net].join('|');if(kind==='session')return [x?.createdAt,x?.date,x?.time,x?.subject,x?.topic,x?.source,x?.correct].join('|');if(kind==='activity')return [x?.createdAt,x?.dateKey,x?.subject,x?.topic,x?.source,x?.type,x?.count].join('|');return JSON.stringify(x||{})}
 function mergeArrayByKey(local=[],remote=[],kind='',preferRemote=false){const map=new Map(),put=(x,fromRemote)=>{const k=cloudKey(x,kind);if(!k)return;const old=map.get(k);if(!old){map.set(k,cloudClone(x));return}const oldStamp=Number(old.updatedAt||old.createdAt||0),newStamp=Number(x?.updatedAt||x?.createdAt||0);if(newStamp>oldStamp||(newStamp===oldStamp&&fromRemote===preferRemote))map.set(k,cloudClone(x))};(local||[]).forEach(x=>put(x,false));(remote||[]).forEach(x=>put(x,true));return[...map.values()]}
 function mergeStudyEvents(local=[],remote=[]){const out=mergeArrayByKey(local,remote,'studyEvent',true);return out.sort((a,b)=>Number(a.timestamp||0)-Number(b.timestamp||0))}
+function cloudHash(s){let h=2166136261;for(const ch of String(s||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0).toString(36)}
+function counselorReset(rows=[]){const first=rows?.[0];return first?.role==='assistant'&&/^Sohbeti temizledik\./.test(String(first?.text||''))}
+function counselorSame(a,b){if(!a||!b)return false;const aid=String(a.id||''),bid=String(b.id||'');if(aid&&bid&&!aid.startsWith('cm-legacy:')&&!bid.startsWith('cm-legacy:'))return aid===bid;return String(a.role||'')===String(b.role||'')&&String(a.text||'')===String(b.text||'')}
+function decorateCounselorMessages(rows=[],stamp=0){const list=(rows||[]).filter(Boolean),base=Math.max(1,Number(stamp||0));return list.map((m,i)=>{const c=cloudClone(m),role=String(c.role||'assistant'),text=String(c.text||''),id=String(c.id||`cm-legacy:${cloudHash(`${i}|${role}|${text}`)}`),createdAt=Number(c.createdAt)||Math.max(1,base-Math.max(0,list.length-1-i));return{...c,id,createdAt,role,text}})}
+function uniqueCounselorMessages(rows=[]){const seen=new Set();return(rows||[]).filter(m=>{const k=String(m?.id||`${m?.role||''}|${m?.text||''}|${m?.createdAt||0}`);if(seen.has(k))return false;seen.add(k);return true})}
+function mergeCounselorMessages(localState={},remoteState={},preferRemote=false){
+  const localStamp=Number(localState.meta?.localUpdatedAt||0),remoteStamp=Number(remoteState.meta?.localUpdatedAt||0),local=decorateCounselorMessages(localState.counselorMessages||[],localStamp),remote=decorateCounselorMessages(remoteState.counselorMessages||[],remoteStamp);
+  if(!local.length)return remote.slice(-40);if(!remote.length)return local.slice(-40);
+  const localReset=counselorReset(local),remoteReset=counselorReset(remote);
+  if(localReset!==remoteReset){const resetRows=localReset?local:remote,otherRows=localReset?remote:local,resetState=localReset?localState:remoteState,resetStamp=Number(resetState.meta?.counselorClearedAt||resetState.meta?.localUpdatedAt||0),postClear=otherRows.filter(m=>!String(m.id||'').startsWith('cm-legacy:')&&Number(m.createdAt||0)>resetStamp);return uniqueCounselorMessages([...resetRows,...postClear]).slice(-40)}
+  let common=0;while(common<local.length&&common<remote.length&&counselorSame(local[common],remote[common]))common++;
+  if(common===local.length&&common===remote.length)return(preferRemote?remote:local).slice(-40);
+  if(common===local.length)return remote.slice(-40);if(common===remote.length)return local.slice(-40);
+  const first=localStamp<=remoteStamp?local:remote,second=localStamp<=remoteStamp?remote:local,head=(preferRemote?remote:local).slice(0,common),merged=uniqueCounselorMessages([...head,...first.slice(common),...second.slice(common)]);return merged.slice(-40)
+}
 function mergeCloudStates(localState={},remoteState={},preferRemote=false){
   const local=cloudClone(localState),remote=cloudClone(remoteState),base=cloudClone(preferRemote?remote:local),other=preferRemote?local:remote;
   base.meta={...(other.meta||{}),...(base.meta||{})};base.meta.localUpdatedAt=Math.max(Number(local.meta?.localUpdatedAt||0),Number(remote.meta?.localUpdatedAt||0));base.meta.appVersion=APP_VERSION;
+  const localClear=counselorReset(local.counselorMessages||[])?Number(local.meta?.counselorClearedAt||local.meta?.localUpdatedAt||0):Number(local.meta?.counselorClearedAt||0),remoteClear=counselorReset(remote.counselorMessages||[])?Number(remote.meta?.counselorClearedAt||remote.meta?.localUpdatedAt||0):Number(remote.meta?.counselorClearedAt||0);base.meta.counselorClearedAt=Math.max(localClear,remoteClear,Number(base.meta.counselorClearedAt||0));
   base.studyEvents=mergeStudyEvents(local.studyEvents||[],remote.studyEvents||[]);
   base.sessions=mergeArrayByKey(local.sessions||[],remote.sessions||[],'session',preferRemote);
   base.activityLog=mergeArrayByKey(local.activityLog||[],remote.activityLog||[],'activity',preferRemote);
@@ -55,7 +71,7 @@ function mergeCloudStates(localState={},remoteState={},preferRemote=false){
   base.fieldArchive={...(other.fieldArchive||{}),...(base.fieldArchive||{})};base.fieldArchive.sessions=mergeArrayByKey(local.fieldArchive?.sessions||[],remote.fieldArchive?.sessions||[],'session',preferRemote);base.fieldArchive.trials=mergeArrayByKey(local.fieldArchive?.trials||[],remote.fieldArchive?.trials||[],'trial',preferRemote);
   base.miniTests={...(other.miniTests||{}),...(base.miniTests||{})};base.miniTests.history=mergeArrayByKey(local.miniTests?.history||[],remote.miniTests?.history||[],'mini-history',preferRemote).sort((a,b)=>Number(b.id||0)-Number(a.id||0)).slice(0,40);
   base.costTracker={...(other.costTracker||{}),...(base.costTracker||{})};base.costTracker.records=mergeArrayByKey(local.costTracker?.records||[],remote.costTracker?.records||[],'cost',preferRemote).slice(-1500);
-  base.counselorMessages=preferRemote?(remote.counselorMessages||local.counselorMessages||[]):(local.counselorMessages||remote.counselorMessages||[]);
+  base.counselorMessages=mergeCounselorMessages(local,remote,preferRemote);
   base.meta.dataArchitecture=base.studyEvents?.length?'StudyEvent-v5':(base.meta.dataArchitecture||other.meta?.dataArchitecture||'');return base;
 }
 

@@ -138,10 +138,10 @@ const cropMapFiles = fs.readdirSync(REPO).filter(f => /^app-source-map-2024/.tes
 check('11a-source-map-dosyasi-yok', cropMapFiles.length === 0, `bulunan dosyalar: ${cropMapFiles.join(',')}`);
 const verifiedCrop = t2024.filter(r => r.asset?.status === 'ready' || (r.access?.crop));
 const pendingCrop = t2024.filter(r => r.access?.page === null);
-const ambiguousCrop = t2024.length - verifiedCrop.length - (t2024.length - verifiedCrop.length);
+const ambiguousCrop = t2024.length - verifiedCrop.length - pendingCrop.length;
 check('11b-verified-crop-0', verifiedCrop.length === 0, `bulunan: ${verifiedCrop.length}`);
 check('11c-pending-crop-125', pendingCrop.length === 125, `bulunan: ${pendingCrop.length}`);
-check('11d-belirsiz-crop-0', (t2024.length - verifiedCrop.length - pendingCrop.length) === 0, `hesap: ${t2024.length}-${verifiedCrop.length}-${pendingCrop.length}`);
+check('11d-belirsiz-crop-0', ambiguousCrop === 0, `hesap: ${t2024.length}-${verifiedCrop.length}-${pendingCrop.length}`);
 
 // --- 12. Taxonomy'de suphe uyandiran mukerrer topic'ler (RAPORLAMA, otomatik degistirme yok) ---
 const topicsBySubject = {};
@@ -199,7 +199,7 @@ console.log(`Manual-review: ${actualReviewIds.size}`);
 console.log(`Duplicate ID: ${dups.length}`);
 console.log(`answerKey eksik: ${missingAnswer.length}`);
 console.log(`File-scope hata sayisi: ${fsWrongYear.length + fsWrongExam.length + fsWrongProvider.length + fsYdtLeak.length}`);
-console.log(`Crop: ${verifiedCrop.length} verified / ${pendingCrop.length} pending / ${t2024.length - verifiedCrop.length - pendingCrop.length} belirsiz`);
+console.log(`Crop: ${verifiedCrop.length} verified / ${pendingCrop.length} pending / ${ambiguousCrop} belirsiz`);
 console.log(`Toplam katalog (tum yillar): ${allRows.length}`);
 console.log(`\nSONUÇ: ${fails.length === 0 ? 'PASS' : 'FAIL'}`);
 if (fails.length) { console.log('\nHatalar:'); fails.forEach(f => console.log('  - ' + f)); }

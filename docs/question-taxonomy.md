@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 535 kayıt / 2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
+Kaynak: 575 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -187,7 +187,7 @@ Kaynak: 535 kayıt / 2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarı
 - Hun Devleti - Roma İlişkileri
 - Türkiye Selçukluları - Yassıçemen Savaşı
 
-### TYT Türkçe (36 konu)
+### TYT Türkçe (37 konu)
 
 - Bağlama Göre Sözcük Seçimi
 - Sözcük ve Söz Öbeklerinde Anlam
@@ -225,6 +225,7 @@ Kaynak: 535 kayıt / 2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarı
 - Cümle Türleri - Yüklemine Göre
 - Tamlama Türleri
 - Paragrafta Değinilen Bilgi
+- Ses Olayları
 
 ## AYT
 

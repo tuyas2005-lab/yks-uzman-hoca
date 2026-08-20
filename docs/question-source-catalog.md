@@ -254,6 +254,29 @@ kaynaklanıyor, katalog kalite politikası değişmedi.)
 > oluşturulmadı — aynı ortam kısıtı nedeniyle (bkz. yukarıdaki teknik not). `page:null`, tahmini
 > sayfa numarası yazılmadı.
 
+## 2023 TYT — İşleniyor (20 Ağustos 2026)
+
+**Kaynak:** ÖSYM resmî sayfası
+(`osym.gov.tr/2023yks-tyt-ayt-ve-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari`) →
+resmî PDF (`dokuman.osym.gov.tr/pdfdokuman/2023/YKS/TSK/yks_tyt_2023_kitapcik_T23ky.pdf`,
+sınav tarihi 17.06.2023). Kitapçık yapısı 2024/2025 ile birebir aynı (125 soru: Türkçe 40,
+Sosyal Bilimler 25 [20 ana + 5 alternatif Felsefe], Matematik 40, Fen 20).
+
+| Ders | Soru | answerKey | Crop durumu |
+|------|------|-----------|--------------|
+| Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+
+**2023 TYT toplamı (şu ana kadar işlenen):** 40/120 standart ilerleme (Türkçe tamamlandı;
+Matematik + Geometri, Sosyal Bilimler, Fen Bilimleri sırada).
+
+> **Yeni taxonomy terimi (2023 Türkçe batch'i):** yalnızca `Ses Olayları` (ünsüz benzeşmesi,
+> ünlü düşmesi, ünsüz yumuşaması gibi fonetik kurallar; mevcut listede tam karşılığı yoktu).
+> 39/40 soru mevcut 2024/2025/2026 terimleriyle eşleşti, zorlama yapılmadı.
+
+> **Not:** 2023 TYT için de henüz crop/source-map dosyası oluşturulmadı — aynı ortam kısıtı
+> nedeniyle. `page:null`, tahmini sayfa numarası yazılmadı. Görsel/grafik/tablo referansı bu
+> batch'te hiç tespit edilmedi (Türkçe testi tamamen metinsel), 0/40 `visual:true`.
+
 ## Yeni PDF yayın ekleme
 
 İleride yüklenen bir soru bankası için PDF bir kez indekslenir. Her soru için ders, konu, kazanım, zorluk, görsel durumu, sayfa ve mümkünse soru kutusunun koordinatları çıkarılır. PDF tekrar işlenmeden katalog üzerinden aranabilir.

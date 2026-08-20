@@ -65,13 +65,22 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
 
 {
   const h=createHarness();
-  const first=h.recordSourceQuestionAttempt(item,'correct','C',{type:'official',actionId:'initial-correct'});
-  const duplicate=h.recordSourceQuestionAttempt(item,'correct','C',{type:'official',actionId:'initial-correct'});
+  const before=attempts(h.state).length;
+  const [first,duplicate]=await Promise.all([
+    Promise.resolve().then(()=>h.recordSourceQuestionAttempt(item,'correct','C',{type:'official',actionId:'initial-correct'})),
+    Promise.resolve().then(()=>h.recordSourceQuestionAttempt(item,'correct','C',{type:'official',actionId:'initial-correct'}))
+  ]);
   assert.equal(first.id,duplicate.id,'aynı UI eylemi aynı attempt kaydını döndürmeli');
+  assert.equal(attempts(h.state).length-before,1,'aynı actionId ile eşzamanlı planlanan çağrıların StudyEvent deltası 1 olmalı');
   assert.equal(attempts(h.state).length,1,'ilk doğru yalnız bir source result üretmeli');
   assert.equal(openWrongs(h.state).length,0,'ilk doğru açık yanlış üretmemeli');
   assert.equal(first.meta.correctAnswer,'C','resmî answerKey saklanmalı');
   assert.equal(first.meta.wrongRecord,false,'doğru attempt yanlış kartı olmamalı');
+
+  const beforeIntentionalRetry=attempts(h.state).length;
+  const intentionalRetry=h.recordSourceQuestionAttempt(item,'correct','C',{type:'official',actionId:'intentional-correct-retry'});
+  assert.equal(attempts(h.state).length-beforeIntentionalRetry,1,'farklı actionId ile bilinçli retry StudyEvent deltasını 1 artırmalı');
+  assert.equal(intentionalRetry.meta.retryOf,first.id,'bilinçli retry ilk attempt ile ilişkilendirilmeli');
 }
 
 {
@@ -102,6 +111,14 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.equal(audits(h.state,'wrong-closure').length,1,'otomatik kapanış audit olayı üretmeli');
   assert.equal(audits(h.state,'wrong-closure')[0].meta.wrongOf,original.id);
 
+  const attemptsBeforeView=attempts(h.state).length;
+  const retryLinksBeforeView=attempts(h.state).filter(x=>x.meta?.retryOf===original.id).length;
+  h.YKSDataV5.record({source:'official-question-open',exam:item.exam,subject:item.subject,topic:item.topic,result:'unknown',questionCount:0,meta:{catalogId:item.id,origin:'wrong'}});
+  assert.equal(attempts(h.state).length,attemptsBeforeView,'salt kaynak soru görüntüleme attempt sayısını artırmamalı');
+  assert.equal(attempts(h.state).filter(x=>x.meta?.retryOf===original.id).length,retryLinksBeforeView,'salt görüntüleme retry ilişkilerini değiştirmemeli');
+  assert.equal(original.meta.wrongRecord,false,'kapalı yanlış detayını görüntülemek yanlışı yeniden açmamalı');
+  assert.equal(original.meta.wrongClosed,true);
+
   assert.equal(h.reopenWrongRecord(original.id),true,'manuel tekrar açma çalışmalı');
   assert.deepEqual(openWrongs(h.state).map(x=>x.id),[original.id],'tekrar açılan canonical yanlış listede görünmeli');
   assert.equal(audits(h.state,'wrong-reopen').length,1,'tekrar açma audit olayı üretmeli');
@@ -113,6 +130,15 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.equal(restoredOriginal.meta.wrongRecord,true,'yenileme sonrası açık yanlış durumu korunmalı');
   assert.equal(restoredOriginal.meta.wrongClosed,false);
   assert.equal(attempts(reloaded.state).filter(x=>x.meta?.retryOf===original.id).length,3,'retry ilişkileri yenileme sonrası korunmalı');
+
+  const correctAfterReopen=reloaded.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',wrongId:original.id,actionId:'retry-correct-after-reopen'});
+  assert.equal(attempts(reloaded.state).length,5,'reopen sonrası doğru retry yeni attempt olarak saklanmalı');
+  assert.equal(correctAfterReopen.meta.retryOf,original.id);
+  assert.equal(openWrongs(reloaded.state).length,0,'reopen sonrası doğru retry canonical yanlışı yeniden kapatmalı');
+  assert.equal(restoredOriginal.meta.wrongRecord,false);
+  assert.equal(restoredOriginal.meta.wrongClosed,true);
+  assert.equal(restoredOriginal.meta.wrongCloseMethod,'retry-correct');
+  assert.equal(audits(reloaded.state,'wrong-closure').length,2,'reopen sonrası ikinci doğru retry yeni closure audit olayı üretmeli');
 }
 
 {

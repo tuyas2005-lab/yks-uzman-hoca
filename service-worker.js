@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r14-startup-resume';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r15-clean-startup-ui';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -10,6 +10,13 @@ const SHELL = [
   '/app-core.js',
   '/app-cloud.js',
   '/app-counselor.js',
+  '/app-analysis-flow.js?v=2',
+  '/app-data-v5.js?v=1',
+  '/app-home-data.js?v=3',
+  '/app-topic-ui.js?v=2',
+  '/app-ui-cleanup-v1.js?v=2',
+  '/app-home-links.js?v=3',
+  '/app-startup-polish.js?v=2',
   '/app-personal-teacher-source-launch-v3.js'
 ];
 
@@ -79,12 +86,10 @@ self.addEventListener('fetch', event => {
 
   if (req.mode === 'navigate') {
     event.respondWith((async () => {
-      const cached = await caches.match('/index.html');
-      const refresh = refreshIntoCache(req, '/index.html');
-      event.waitUntil(refresh);
-      if (cached) return cached;
-      const fresh = await refresh;
+      const fresh = await refreshIntoCache(req, '/index.html');
       if (fresh) return fresh;
+      const cached = await caches.match('/index.html');
+      if (cached) return cached;
       return new Response('Uygulama şu anda açılamıyor.', {
         status: 503,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -96,12 +101,10 @@ self.addEventListener('fetch', event => {
   const isCode = /\.(?:js|css|mjs)$/.test(url.pathname);
   if (isCode) {
     event.respondWith((async () => {
-      const cached = await caches.match(req);
-      const refresh = refreshIntoCache(req);
-      event.waitUntil(refresh);
-      if (cached) return cached;
-      const fresh = await refresh;
+      const fresh = await refreshIntoCache(req);
       if (fresh) return fresh;
+      const cached = await caches.match(req);
+      if (cached) return cached;
       return new Response('', { status: 504 });
     })());
     return;

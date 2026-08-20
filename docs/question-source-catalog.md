@@ -267,9 +267,12 @@ Sosyal Bilimler 25 [20 ana + 5 alternatif Felsefe], Matematik 40, Fen 20).
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2023 TYT toplamı (şu ana kadar işlenen):** 80/120 standart ilerleme (Türkçe + Matematik +
-Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
+**2023 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
+Geometri + Sosyal Bilimler ana pool tamamlandı; yalnız Fen Bilimleri sırada). Kütüphanede
+fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
 
 > **Yeni taxonomy terimi (2023 Türkçe batch'i):** yalnızca `Ses Olayları` (ünsüz benzeşmesi,
 > ünlü düşmesi, ünsüz yumuşaması gibi fonetik kurallar; mevcut listede tam karşılığı yoktu).
@@ -292,6 +295,18 @@ Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
 
 > **Not:** 2023 TYT için de henüz crop/source-map dosyası oluşturulmadı — aynı ortam kısıtı
 > nedeniyle. `page:null`, tahmini sayfa numarası yazılmadı.
+
+> **2023 TYT Sosyal Bilimler (25 soru: 20 ana + 5 alternatif Felsefe):** 10/25 mevcut terimle
+> eşleşti (İlk Türklerde Töre, Millî Mücadele Hazırlık Dönemi, İklim Tipleri, Nüfus Piramidi ve
+> Demografik Yapı, Hz. Muhammed'in Örnekliği, İslam İnanç Esasları, İslam Ahlakı - Ahlaki
+> Değerler, İlk Çağ Felsefesi Problemleri, Bilgi Felsefesi - Spinoza, Çağdaş Felsefe - Nietzsche),
+> 15/25 için yeni terim gerekti (2023'ün farklı tarihî dönemleri/filozofları — Selçuklu kuruluş
+> dönemi, Tanzimat, Anaksimenes-benzeri değil ama Gazali-İbn Rüşd tartışması, Kant'ın ödev
+> etiği vb. — zorlama eşleştirme yapılmadı). 2 soruda kritik görsel veri kaybı: `cog-06` (aylık
+> sıcaklık/yağış grafiği değerleri tamamen kayıp) ve `cog-08` (dört ülkenin nüfus piramidi
+> görselleri tamamen kayıp), ikisi de `needs-manual-review-text-extraction-loss` ile
+> işaretlendi. `track:'alternate-track'` + `trackReason:'din-muafiyeti-felsefe'` şeması önceki
+> yıllarla birebir aynı şekilde uygulandı (`osym-2023-tyt-fel-21..25`).
 
 ## Yeni PDF yayın ekleme
 

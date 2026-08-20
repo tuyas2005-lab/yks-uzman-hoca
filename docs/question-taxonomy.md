@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
+Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -29,7 +29,7 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Canlıların Sınıflandırılması
 - Eşeysiz Üreme
 
-### TYT Coğrafya (12 konu)
+### TYT Coğrafya (15 konu)
 
 - İklim Tipleri
 - İç Kuvvetler - Volkanizma
@@ -43,8 +43,11 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Doğal Afetler - Heyelan
 - Atmosferin Yapısı ve Etkileri
 - Nüfus Piramidi ve Demografik Yapı
+- Dış Kuvvetler - Peribacası ve Kırgıbayır
+- Bölge Türleri - İşlevsel Bölge
+- Doğal Afetler - Erozyon
 
-### TYT Din Kültürü ve Ahlak Bilgisi (13 konu)
+### TYT Din Kültürü ve Ahlak Bilgisi (15 konu)
 
 - İman ve İrade
 - İslam’da Bilgi ve Sorumluluk
@@ -59,8 +62,10 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - İslam'da Bilgi Edinme Yolları
 - İslam Ahlakı - Ahlaki Değerler
 - Kur'an Ayetleri Yorumu
+- İslam'da Hüküm Verme ve Toplumsal Uyum
+- İslam Mezheplerinin Ortaya Çıkışı
 
-### TYT Felsefe (28 konu)
+### TYT Felsefe (35 konu)
 
 - Felsefi Düşüncenin Özellikleri
 - Zihin Felsefesi ve Turing Testi
@@ -90,6 +95,13 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Bilgi Felsefesi - Numen ve Fenomen
 - Bilgi Felsefesi - Spinoza
 - Tarih Felsefesi - Dilthey
+- Felsefenin Doğası ve Özellikleri
+- Zihin Felsefesi - Yapay Zeka ve Bilinç
+- Özgür İrade ve Kader
+- İslam Felsefesi - Gazali ve İbn Rüşd
+- Bilgi Felsefesi - Empirizm Eleştirisi
+- Sanat Felsefesi - Estetik ve Kültürel Rölativizm
+- Ahlak Felsefesi - Kant'ın Ödev Etiği
 
 ### TYT Fizik (11 konu)
 
@@ -172,7 +184,7 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Açılar
 - Formülle Problem Çözme
 
-### TYT Tarih (12 konu)
+### TYT Tarih (15 konu)
 
 - İlk Türklerde Bozkır Kültürü
 - Türk-İslam Devletlerinde Yönetim
@@ -186,6 +198,9 @@ Kaynak: 615 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Lozan Barış Konferansı - Batı Trakya
 - Hun Devleti - Roma İlişkileri
 - Türkiye Selçukluları - Yassıçemen Savaşı
+- Büyük Selçuklu Devleti - Kuruluş Dönemi
+- Tanzimat Fermanı ve Avrupa Devletleri
+- Lozan Barış Konferansı - Türk Heyetinin Duruşu
 
 ### TYT Türkçe (37 konu)
 

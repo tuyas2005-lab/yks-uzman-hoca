@@ -15,9 +15,9 @@ Bkz. `docs/question-taxonomy.md` (konu/topic sözlüğü) ve `data/catalog/**` d
 
 ## Güncel Kapsam (Coverage)
 
-*Son güncelleme: 19 Ağustos 2026 — kaynak: `scripts/validate-catalog.mjs` çıktısı, 285 kayıt üzerinden gerçek runtime taraması.*
+*Son güncelleme: 19 Ağustos 2026 — kaynak: `scripts/validate-catalog.mjs` çıktısı, 325 kayıt üzerinden gerçek runtime taraması.*
 
-### TYT — crop manuel doğrulanmış (hardcoded source-map)
+### 2026 TYT — crop manuel doğrulanmış (hardcoded source-map)
 
 | Ders | Soru | answerKey | Crop hazır |
 |------|------|-----------|------------|
@@ -31,7 +31,7 @@ Bkz. `docs/question-taxonomy.md` (konu/topic sözlüğü) ve `data/catalog/**` d
 | Tarih | 5 | 5/5 | 5/5 |
 | Türkçe | 40 | 40/40 | 40/40 |
 
-### AYT — answerKey doğrulandı (2 soru resmen iptal), crop: auto-crop mevcut / visual QA pending
+### 2026 AYT — answerKey doğrulandı (2 soru resmen iptal), crop: auto-crop mevcut / visual QA pending
 
 | Ders | Soru | answerKey | Crop durumu |
 |------|------|-----------|--------------|
@@ -93,6 +93,26 @@ katalogdaki tüm 160 AYT sorusu tek tek karşılaştırıldı (madde 21-22 gere�
 
 Bu doğrulama yalnız **metin/cevap** seviyesindedir; crop'ların görsel QA'sı hâlâ **pending**
 (bkz. aşağıdaki not — PDF görsel erişimi ortam kısıtı nedeniyle şu an mümkün değil).
+
+### 2025 TYT — kaynak açıldı (19 Ağustos 2026)
+
+Kaynak: ÖSYM resmî sayfası (osym.gov.tr/2025yks-tyt-ayt-ve-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari)
+üzerinden alınan resmî PDF linki (`dokuman.osym.gov.tr/pdfdokuman/2025/YKS/TSK/yks_tyt_2025_kitapcik_d250.pdf`).
+PDF'in tam metni `web_fetch` ile çekilip hem soru sınıflandırması hem resmî cevap anahtarı
+doğrulaması için kullanıldı.
+
+| Ders | Soru | answerKey | Crop durumu |
+|------|------|-----------|--------------|
+| Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+
+**2025 TYT toplamı (şu ana kadar işlenen):** 40/125 soru (Türkçe tamamlandı; Sosyal Bilimler,
+Temel Matematik, Fen Bilimleri sırada — aynı PDF ve cevap anahtarı zaten elde edilmiş durumda).
+
+> **Not:** 2025 TYT için henüz `app-source-map-2025-*.js` gibi bir crop/source-map dosyası
+> oluşturulmadı — 2026 AYT'dekiyle aynı sebepten (PDF'e görsel/piksel erişim ortam kısıtı
+> nedeniyle mümkün değil, bkz. yukarıdaki teknik not). Sorular şu an yalnız metadata + resmî
+> answerKey ile kataloglanmış durumda; `page:null`, tahmini sayfa numarası yazılmadı.
+> `access.pageRange` alanı yalnızca hangi testte olduğunu belirtir, kesin sayfa değildir.
 
 ## Yeni PDF yayın ekleme
 

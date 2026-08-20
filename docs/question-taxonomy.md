@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 285 kayıt / 2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
+Kaynak: 325 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -120,7 +120,7 @@ Kaynak: 285 kayıt / 2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Millî Mücadele Hazırlık Dönemi
 - 1921 Anayasası ve Millî Egemenlik
 
-### TYT Türkçe (29 konu)
+### TYT Türkçe (33 konu)
 
 - Bağlama Göre Sözcük Seçimi
 - Sözcük ve Söz Öbeklerinde Anlam
@@ -151,6 +151,10 @@ Kaynak: 285 kayıt / 2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Söz Öbeğinde Anlam - Paragraf
 - Paragrafta Açıklanan Durum
 - Paragrafta Örnekleme
+- Sözcükte Yapı - Ekler
+- Yazım Kuralları
+- Paragrafta Boşluk Doldurma
+- Paragrafta Kavram Eşleştirme
 
 ## AYT
 

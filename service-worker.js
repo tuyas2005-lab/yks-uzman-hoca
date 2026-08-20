@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r9-counselor-merge-safe';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r10-2024-2025-source-crops';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

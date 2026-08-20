@@ -343,20 +343,53 @@ Fen 20
 
 2023 katalog fazı tamamlanmıştır.
 
-Ancak 2023 için ikinci aşama:
+### 2023 TYT Fen — kaynak hazırlık durumu
 
-exact PDF page
-→ source-map
-→ crop
-→ visual QA
-→ student-ready
+Claude branch:
 
-henüz tamamlanmamıştır.
+`claude/question-library`
 
-2023 Fen Source QA denemesinde Claude ortamının resmî PDF'yi görsel
-render edememesi nedeniyle çalışma durmuştur.
+Son doğrulanmış Claude commit:
 
-PDF dosyası yerel/uploaded kaynak olarak verilerek devam edilmelidir.
+`02fb997b2968b63ee3612eb9c3ece38f896c9944`
+
+Doğrulanmış sonuçlar:
+
+- Fen soru sayısı: 20
+- Exact PDF page: 20/20
+- Source-map: 20/20
+- Crop: 20/20
+- Visual QA: 20/20 PASS
+- `needs-manual-review` flag: 0
+- Korunan answerKey: `ADBBACCEBCAEADDAEBED`
+- Validator: 660 kayıt, 0 hata, 0 uyarı
+- Student-ready: henüz 0/20
+
+Durum:
+
+- Catalog ✅
+- Exact page ✅
+- Source-map ✅
+- Crop geometry ✅
+- Visual QA ✅
+- Runtime integration ⏳
+- Student-ready ⏳
+
+Mevcut runtime blocker:
+
+`app-source-map-2023-tyt-fen.js` dosyası
+`pdfKey:'osym-2023-tyt'` kullanmaktadır. Ancak production
+`api/source-question.js` dosyasındaki `SOURCES` objesinde
+`osym-2023-tyt` henüz tanımlı değildir.
+
+Codex'in read-only doğrulamasında, Claude branch'teki yeni source-map
+dosyasının mevcut production runtime/lazy-load zincirinde yüklendiğini
+gösteren bir referans da bulunmamıştır.
+
+Bu nedenle doğrulanmış crop geometrileri henüz production runtime
+üzerinden render edilemez ve Fen soruları student-ready kabul edilmez.
+
+Runtime entegrasyonu ayrı bir Codex görevi olacaktır.
 
 ---
 

@@ -15,7 +15,7 @@ Bkz. `docs/question-taxonomy.md` (konu/topic sözlüğü) ve `data/catalog/**` d
 
 ## Güncel Kapsam (Coverage)
 
-*Son güncelleme: 19 Ağustos 2026 — kaynak: `scripts/validate-catalog.mjs` çıktısı, 325 kayıt üzerinden gerçek runtime taraması.*
+*Son güncelleme: 20 Ağustos 2026 — kaynak: `scripts/validate-catalog.mjs` çıktısı, 535 kayıt üzerinden gerçek runtime taraması.*
 
 ### 2026 TYT — crop manuel doğrulanmış (hardcoded source-map)
 

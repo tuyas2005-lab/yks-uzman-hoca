@@ -94,7 +94,7 @@
       if(files.length)official.jobs.splice(official.index+1,0,...files);
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
-    ()=>loadScript('/data/question-catalog-policy-v2.js?v=2'),
+    ()=>loadScript('/data/question-catalog-policy-v2.js?v=3'),
     ()=>loadScript('/app-source-question-viewer.js?v=5'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
@@ -112,6 +112,7 @@
     ()=>loadScript('/app-mini-tests-source.js?v=4'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
+    ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
     ()=>loadScript('/app-source-retake-position.js?v=1')
   ],()=>{
     if(typeof window.renderMiniTestHome==='function'){
@@ -128,9 +129,10 @@
     ()=>loadScript('/app-wrong-review-id-fix.js?v=1'),
     ()=>loadScript('/app-wrongs-source-link.js?v=3'),
     ()=>loadScript('/app-wrong-priority-order.js?v=1'),
-    ()=>loadScript('/app-wrong-closure-v2.js?v=1')
+    ()=>loadScript('/app-wrong-closure-v2.js?v=2')
   ],()=>{
     if(typeof window.renderWrongV2==='function'){
+      window.installWrongClosureV2?.();
       window.renderWrongV2();
       markReady('wrong');
     }

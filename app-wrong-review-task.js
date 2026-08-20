@@ -99,7 +99,7 @@
   function openTarget(id){
     const x=wrongs().find(z=>z.id===id);if(!x)return;recordReview(id);
     const catalogId=x.meta?.catalogId,item=window.YKSQuestionCatalogV1?.all?.().find(z=>z.id===catalogId);
-    if(item&&typeof window.openSourceQuestion==='function'&&(!window.isSourceQuestionReady||window.isSourceQuestionReady(item))){window.openSourceQuestion(item,{type:'wrong',returnScreen:'wrong'});return}
+    if(item&&typeof window.openSourceQuestion==='function'&&(!window.isSourceQuestionReady||window.isSourceQuestionReady(item))){window.openSourceQuestion(item,{type:'wrong',wrongId:x.id,returnScreen:'wrong'});return}
     const btn=document.querySelector(`#wrong2Host [data-wrong-id="${CSS.escape(id)}"]`);if(btn){btn.click();return}fallbackModal(x);
   }
 

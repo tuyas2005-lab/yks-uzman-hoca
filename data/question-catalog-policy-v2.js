@@ -4,7 +4,7 @@
   const words=s=>new Set(norm(s).split(' ').filter(x=>x.length>2));
   const overlap=(a,b)=>{const A=words(a),B=words(b);let n=0;A.forEach(x=>B.has(x)&&n++);return n};
   const providerRank=x=>x?.provider==='OSYM'?30:x?.provider==='MEB_OGM'?20:x?.sourceKind==='uploaded'?10:0;
-  const solvedEvents=()=> (window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId);
+  const solvedEvents=()=> (typeof state!=='undefined'&&Array.isArray(state.studyEvents)?state.studyEvents:window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId);
   const solvedIds=()=>new Set(solvedEvents().map(x=>x.meta.catalogId));
   const rowTrack=x=>x?.track||'main';
   const needsTopicReview=x=>x?.verification?.topic==='needs-manual-review-text-extraction-loss';

@@ -94,6 +94,8 @@
     ()=>loadScript('/app-source-map-2026-tyt-social.js?v=1'),
     ()=>loadScript('/app-source-map-2026-tyt-turkce.js?v=2'),
     ()=>loadScript('/app-source-map-2026-ayt.js?v=1'),
+    ()=>loadScript('/app-source-map-2024-2025-tyt.js?v=1'),
+    ()=>loadScript('/app-source-autocrop.js?v=2'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
     ()=>loadScript('/app-question-index.js?v=1'),
     ()=>loadScript('/app-question-index-homefix.js?v=1'),

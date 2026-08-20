@@ -25,7 +25,8 @@
     '/data/catalog/2023-tyt-turkce.js',
     '/data/catalog/2023-tyt-math-01-30.js',
     '/data/catalog/2023-tyt-geometry.js',
-    '/data/catalog/2023-tyt-social.js'
+    '/data/catalog/2023-tyt-social.js',
+    '/data/catalog/2023-tyt-fen.js'
   ];
   window.YKSQuestionCatalogManifest={version:2,scope:{include:['TYT','AYT'],exclude:['YDT']},policy:'library-only-newest-first',updatedAt:'2026-08-20'};
 })();

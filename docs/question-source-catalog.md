@@ -254,7 +254,7 @@ kaynaklanıyor, katalog kalite politikası değişmedi.)
 > oluşturulmadı — aynı ortam kısıtı nedeniyle (bkz. yukarıdaki teknik not). `page:null`, tahmini
 > sayfa numarası yazılmadı.
 
-## 2023 TYT — İşleniyor (20 Ağustos 2026)
+## 2023 TYT — TAMAMLANDI (20 Ağustos 2026)
 
 **Kaynak:** ÖSYM resmî sayfası
 (`osym.gov.tr/2023yks-tyt-ayt-ve-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari`) →
@@ -269,10 +269,40 @@ Sosyal Bilimler 25 [20 ana + 5 alternatif Felsefe], Matematik 40, Fen 20).
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Fen Bilimleri (Fizik+Kimya+Biyoloji) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2023 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
-Geometri + Sosyal Bilimler ana pool tamamlandı; yalnız Fen Bilimleri sırada). Kütüphanede
-fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
+**İki ayrı toplam — önceki yıllarla aynı yapı:**
+
+| Ölçüm | Değer |
+|---|---|
+| **Standart öğrenci pool** | **120/120** ✅ |
+| **Kütüphanede kataloglanan gerçek ÖSYM sorusu** | **125/125** ✅ |
+
+> **2023 TYT Fen Bilimleri (20 soru: Fizik 7 + Kimya 7 + Biyoloji 6):** 15/20 mevcut terimle
+> eşleşti (Kaldırma Kuvveti ve Özkütle, Hareket ve Yer Değiştirme, Isı ve Sıcaklık, Elektrik
+> Akımı ve Direnç, Aynalar, Saf Madde - Element ve Bileşik, Atomun Yapısı, Sıvılar ve Buhar
+> Basıncı, Kimyasal Hesaplamalar, Asitlerin Genel Özellikleri, Biyomoleküller - Polimer Yapılar,
+> Bakteriler, Mitoz Bölünme, Kalıtım - Soyağacı Analizi, Ekoloji). 5/20 için yeni terim gerekti
+> (Elektrik Enerjisi ve Güç, Işık Şiddeti ve Aydınlanma, Kimyasal ve Fiziksel Değişim,
+> Karışımların Ayrılması, Hücrede Koful Çeşitleri ve İşlevleri — mevcut listede tam karşılığı
+> olmayan gerçekten farklı beceriler, zorlama yapılmadı). `track` alanı bu batch'te
+> kullanılmadı (alternate-track kavramı Fen'de gerekmiyor).
+>
+> **needs-manual-review-text-extraction-loss (8 kayıt):**
+> `fiz-01` (gaz kütle-hacim grafiği tamamen kayıp), `fiz-05` (elektrik devre şeması tamamen
+> kayıp), `fiz-07` (ayna düzeneği şemaları tamamen kayıp), `kim-09` (atom numarası/kütle
+> numarası verileri kayıp), `kim-11` (cıva erime/kaynama noktası sıcaklık değerleri kayıp),
+> `biy-18` (mitoz model görseli tamamen kayıp), `biy-19` (renk körlüğü soyağacı şeması tamamen
+> kayıp), `biy-20` (besin ağı şeması tamamen kayıp — trofik düzey sayısı şema olmadan
+> doğrulanamıyor).
+>
+> `visual:true` (7 kayıt, `needs-manual-review` ile karıştırılmadı — bazı görsel sorular veri
+> açısından tamdı): `fiz-01, fiz-05, fiz-06, fiz-07, biy-18, biy-19, biy-20`. `fiz-06` görsel
+> içeriyor ama metin kendi başına yeterliydi (tüm işlemler/ilişkiler açıkça tanımlı), bu yüzden
+> `visual:true` + flag YOK.
+
+**2023 TYT'nin tamamı freeze/final QA aşamasına hazır** (henüz yapılmadı, ayrı onay bekliyor).
+Crop/source-map ve sayfa numarası doğrulaması bu yıl için de tamamen ertelenmiş durumda.
 
 > **Yeni taxonomy terimi (2023 Türkçe batch'i):** yalnızca `Ses Olayları` (ünsüz benzeşmesi,
 > ünlü düşmesi, ünsüz yumuşaması gibi fonetik kurallar; mevcut listede tam karşılığı yoktu).
@@ -293,20 +323,17 @@ fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Fe
 > `mat-23` (satış oranı kayıp), `mat-25` (kıyafet dağılımı yüzdeleri kayıp), `mat-28` (ulaşım
 > ücret tablosu kayıp), `mat-29` (ders süreleri tablosu kayıp), `mat-32` (üçgen açı değeri kayıp).
 
-> **Not:** 2023 TYT için de henüz crop/source-map dosyası oluşturulmadı — aynı ortam kısıtı
-> nedeniyle. `page:null`, tahmini sayfa numarası yazılmadı.
-
 > **2023 TYT Sosyal Bilimler (25 soru: 20 ana + 5 alternatif Felsefe):** 10/25 mevcut terimle
 > eşleşti (İlk Türklerde Töre, Millî Mücadele Hazırlık Dönemi, İklim Tipleri, Nüfus Piramidi ve
 > Demografik Yapı, Hz. Muhammed'in Örnekliği, İslam İnanç Esasları, İslam Ahlakı - Ahlaki
 > Değerler, İlk Çağ Felsefesi Problemleri, Bilgi Felsefesi - Spinoza, Çağdaş Felsefe - Nietzsche),
 > 15/25 için yeni terim gerekti (2023'ün farklı tarihî dönemleri/filozofları — Selçuklu kuruluş
-> dönemi, Tanzimat, Anaksimenes-benzeri değil ama Gazali-İbn Rüşd tartışması, Kant'ın ödev
-> etiği vb. — zorlama eşleştirme yapılmadı). 2 soruda kritik görsel veri kaybı: `cog-06` (aylık
-> sıcaklık/yağış grafiği değerleri tamamen kayıp) ve `cog-08` (dört ülkenin nüfus piramidi
-> görselleri tamamen kayıp), ikisi de `needs-manual-review-text-extraction-loss` ile
-> işaretlendi. `track:'alternate-track'` + `trackReason:'din-muafiyeti-felsefe'` şeması önceki
-> yıllarla birebir aynı şekilde uygulandı (`osym-2023-tyt-fel-21..25`).
+> dönemi, Tanzimat, Gazali-İbn Rüşd tartışması, Kant'ın ödev etiği vb. — zorlama eşleştirme
+> yapılmadı). 2 soruda kritik görsel veri kaybı: `cog-06` (aylık sıcaklık/yağış grafiği değerleri
+> tamamen kayıp) ve `cog-08` (dört ülkenin nüfus piramidi görselleri tamamen kayıp), ikisi de
+> `needs-manual-review-text-extraction-loss` ile işaretlendi. `track:'alternate-track'` +
+> `trackReason:'din-muafiyeti-felsefe'` şeması önceki yıllarla birebir aynı şekilde uygulandı
+> (`osym-2023-tyt-fel-21..25`).
 
 ## Yeni PDF yayın ekleme
 

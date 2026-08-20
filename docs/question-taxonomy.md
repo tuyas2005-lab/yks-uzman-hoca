@@ -5,13 +5,13 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
+Kaynak: 660 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
 ## TYT
 
-### TYT Biyoloji (15 konu)
+### TYT Biyoloji (16 konu)
 
 - Hücre Zarından Madde Geçişleri
 - Amino Asitler ve Proteinler
@@ -28,6 +28,7 @@ Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Biyomoleküller - Polimer Yapılar
 - Canlıların Sınıflandırılması
 - Eşeysiz Üreme
+- Hücrede Koful Çeşitleri ve İşlevleri
 
 ### TYT Coğrafya (15 konu)
 
@@ -103,7 +104,7 @@ Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Sanat Felsefesi - Estetik ve Kültürel Rölativizm
 - Ahlak Felsefesi - Kant'ın Ödev Etiği
 
-### TYT Fizik (11 konu)
+### TYT Fizik (13 konu)
 
 - Özkütle
 - Hareket ve Yer Değiştirme
@@ -116,8 +117,10 @@ Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Işığın Kırılması
 - Elektrik Akımı ve Direnç
 - Yayda Dalga Hareketi
+- Elektrik Enerjisi ve Güç
+- Işık Şiddeti ve Aydınlanma
 
-### TYT Kimya (13 konu)
+### TYT Kimya (15 konu)
 
 - Kimyasal Türler ve Bağlar
 - Atomun Yapısı
@@ -132,6 +135,8 @@ Kaynak: 640 kayıt / 2023+2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 iti
 - Viskozite
 - Donma Noktası Alçalması - Koligatif Özellikler
 - Asitlerin Genel Özellikleri
+- Kimyasal ve Fiziksel Değişim
+- Karışımların Ayrılması
 
 ### TYT Matematik (48 konu)
 

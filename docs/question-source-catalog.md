@@ -335,6 +335,31 @@ Crop/source-map ve sayfa numarası doğrulaması bu yıl için de tamamen ertele
 > `trackReason:'din-muafiyeti-felsefe'` şeması önceki yıllarla birebir aynı şekilde uygulandı
 > (`osym-2023-tyt-fel-21..25`).
 
+### 2023 TYT Fen Bilimleri — source-map + crop görsel QA (20 Ağustos 2026)
+
+Kullanıcı tarafından resmî PDF (`yks_tyt_2023_kitapcik_T23ky.pdf`) dosya olarak yüklendi;
+PyMuPDF ile yerel olarak (network gerekmeden) sayfa sayfa render edilip 20/20 Fen Bilimleri
+sorusu **piksel düzeyinde görsel QA'dan PASS** aldı. Sonuç olarak:
+
+- 8 kayıtta (`fiz-01, fiz-05, fiz-07, kim-09, kim-11, biy-18, biy-19, biy-20`) daha önce
+  `needs-manual-review-text-extraction-loss` olan flag **kaldırıldı** — metin katmanında kayıp
+  olan içerik (grafik değerleri, devre şeması, izotop indisleri, sıcaklık değerleri, mitoz
+  modeli, soyağacı, besin ağı) görsel katmanda tamamen sağlam çıktı; önceki metin-bazlı topic
+  tahminleri doğrulandı, hiçbiri değiştirilmedi.
+- `access.page` alanı 20/20 kayıtta gerçek PDF fiziksel sayfa numarasıyla (35-40) dolduruldu.
+- `app-source-map-2023-tyt-fen.js` oluşturuldu (mevcut `app-source-map-2026-tyt-fen.js` kalıbı
+  birebir takip edildi) — 20 kayıt için `pdfKey:'osym-2023-tyt'` + sayfa + oransal crop
+  koordinatları (`x,y,w,h`) tanımlı, hepsi görsel QA ile doğrulanmış.
+>
+> **Bilinen eksik / blocker:** `pdfKey:'osym-2023-tyt'` şu an `api/source-question.js`
+> içindeki `SOURCES` objesinde **tanımlı değil** (bu dosyaya bu görev kapsamında
+> dokunulmadı). Bu yüzden crop koordinatları doğru ve görsel olarak doğrulanmış olsa da,
+> runtime'da PDF.js `getDoc()` çağrısı bu `pdfKey` için 404 alacak ve crop **gerçekten
+> render edilemeyecektir** — `SOURCES` objesine `"osym-2023-tyt"` eklenene kadar. Bu ayrı
+> bir onay/adım gerektirir; ID/year/exam/subject/topic/answerKey/questionNo dahil hiçbir
+> doğrulanmış alan değiştirilmedi, `app-source-map-2023-tyt-fen.js` de kendi başına yeni bir
+> dosya olarak eklendi (mevcut çekirdek dosyalara dokunulmadı).
+
 ## Yeni PDF yayın ekleme
 
 İleride yüklenen bir soru bankası için PDF bir kez indekslenir. Her soru için ders, konu, kazanım, zorluk, görsel durumu, sayfa ve mümkünse soru kutusunun koordinatları çıkarılır. PDF tekrar işlenmeden katalog üzerinden aranabilir.

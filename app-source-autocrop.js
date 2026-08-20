@@ -54,7 +54,7 @@
       const top=Math.max(.045,(H-cur.y-cur.h*1.7)/H);
       let bottom=next?Math.min(.965,(H-next.y+next.h*.9)/H):.955;
       if(bottom<=top+.06)bottom=Math.min(.965,top+.32);
-      const x=right?.515:.055,w=right?.43:.44;
+      const x=right ? .515 : .055,w=right ? .43 : .44;
       const crop={x,y:Math.max(.035,top-.012),w,h:Math.max(.10,bottom-top+.015)};
       item.asset={status:'ready',kind:'auto-text-crop',pdfKey,page:pageNo,crop};
       item.answerVerified=true;

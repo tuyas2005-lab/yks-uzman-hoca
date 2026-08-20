@@ -12,7 +12,7 @@
     const questionBox=body.querySelector('.wrong2-question');
     try{const url=await window.getSourceQuestionCropUrl?.(id);if(url&&questionBox){questionBox.classList.add('source-crop');questionBox.innerHTML=`<img src="${url}" alt="${item.year||''} ${item.exam} ${item.subject} Soru ${item.questionNo||''}">`}}catch{}
     const box=document.createElement('div');box.className='wrong2-source-note';box.innerHTML='Bu yanlış kaynak kütüphanesindeki tek-soru görüntüsüyle yeniden açılabilir. Tam PDF açılmaz.<br><button class="wrong2-source-open" type="button">Soruyu Tek Görüntüde Aç →</button>';body.appendChild(box);
-    box.querySelector('.wrong2-source-open').onclick=()=>{const modal=document.getElementById('wrong2Modal');modal?.classList.remove('open');window.openSourceQuestion?.(item,{type:'wrong',returnScreen:'wrong',reopenModal:true})};
+    box.querySelector('.wrong2-source-open').onclick=()=>{const modal=document.getElementById('wrong2Modal');modal?.classList.remove('open');window.openSourceQuestion?.(item,{type:'wrong',wrongId:row.id,returnScreen:'wrong',reopenModal:true})};
   }
 
   document.addEventListener('click',e=>{const btn=e.target.closest('#wrong2Host [data-wrong2]');if(!btn)return;const row=visibleRows()[Number(btn.dataset.wrong2)];if(!row?.meta?.externalQuestion||!row.meta?.catalogId)return;setTimeout(()=>enhanceWrong(row),30)},true);

@@ -1,7 +1,7 @@
 (()=>{
-  const C=()=>window.YKSQuestionCatalogV1;
   const D=()=>window.YKSDataV5;
-  let active=null,selected='',committing=false;
+  let active=null;
+  const actionResults=new Map();
 
   const css=document.createElement('style');
   css.textContent=`
@@ -33,7 +33,7 @@
     if(base.__retakePositionWrapped)return;
     const wrapped=function(item,ctx={}){
       const pos=setInfo(ctx);
-      active={item,ctx,position:pos.position,total:pos.total};selected='';committing=false;
+      active={item,ctx,position:pos.position,total:pos.total};
       const r=base(item,ctx);
       setTimeout(decoratePosition,0);
       return r;
@@ -42,51 +42,62 @@
     window.openSourceQuestion=wrapped;
   }
 
-  function matchingEvents(id){return (state.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId===id)}
-  function resolveOlderWrong(ev,now){
-    if(!ev?.meta?.wrongRecord)return;
-    const meta={...(ev.meta||{}),wrongRecord:false,wrongResolvedAt:now,resolvedByRetake:true};
-    try{D()?.patch?.(ev.id,{meta})}catch{ev.meta=meta}
+  function matchingEvents(id){
+    return (state.studyEvents||[])
+      .filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId===id)
+      .slice()
+      .sort((a,b)=>Number(a.timestamp||a.createdAt||0)-Number(b.timestamp||b.createdAt||0));
   }
-  function patchNewEvent(ev,item,kind,studentAnswer){
-    if(!ev)return;
-    const wrong=kind!=='correct';
-    const meta={...(ev.meta||{}),catalogId:item.id,studentAnswer:studentAnswer||'',correctAnswer:item.answerKey||item.answer||'',wrongRecord:wrong,wrongKind:wrong?kind:'',retake:true,retakeAt:Date.now()};
-    try{D()?.patch?.(ev.id,{meta})}catch{ev.meta=meta}
+
+  const isOpenWrong=ev=>ev?.meta?.wrongRecord===true&&!ev?.meta?.wrongClosed;
+  const isRecoverableLegacyWrong=ev=>ev?.meta?.resolvedByRetake===true&&!ev?.meta?.wrongClosed&&ev?.result!=='correct';
+
+  function patchMeta(ev,changes){
+    if(!ev)return null;
+    const meta={...(ev.meta||{}),...changes};
+    try{return D()?.patch?.(ev.id,{meta})||null}catch{ev.meta=meta;return ev}
   }
-  function appendAttempt(item,kind,studentAnswer){
+
+  function canonicalWrong(catalogId,preferredId=''){
+    const candidates=matchingEvents(catalogId).filter(ev=>isOpenWrong(ev)||isRecoverableLegacyWrong(ev));
+    if(!candidates.length)return null;
+    const preferred=candidates.find(ev=>ev.id===preferredId);
+    const canonical=preferred||candidates.slice().sort((a,b)=>Number(!!a.meta?.retake)-Number(!!b.meta?.retake)||Number(a.timestamp||0)-Number(b.timestamp||0))[0];
+    if(!isOpenWrong(canonical))patchMeta(canonical,{wrongRecord:true,wrongClosed:false,resolvedByRetake:false,legacyRetakeRecovered:true});
+    candidates.filter(ev=>ev.id!==canonical.id&&isOpenWrong(ev)).forEach(ev=>patchMeta(ev,{wrongRecord:false,retry:true,retryOf:canonical.id,duplicateWrongNormalizedAt:Date.now()}));
+    return (state.studyEvents||[]).find(ev=>ev?.id===canonical.id)||canonical;
+  }
+
+  function buildMeta(item,kind,studentAnswer,{isRetry,retryOf,ownsWrong,at}){
     const wrong=kind!=='correct',answer=item.answerKey||item.answer||'';
-    const meta={catalogId:item.id,provider:item.provider,providerLabel:item.providerLabel,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual,sourceYear:item.year||null,wrongRecord:wrong,wrongKind:wrong?kind:'',externalQuestion:true,studentAnswer:studentAnswer||'',correctAnswer:answer,asset:item.asset,retake:true,retakeAt:Date.now(),question:{text:`${item.providerLabel||item.provider||''} ${item.year||''} ${item.exam||''} • ${item.topic||''} • Soru ${item.questionNo||''}`.trim(),image:''},solution:{answer,shortSolution:'Çözümü uygulamadaki Kaynak Soru ekranından tekrar incele.',curriculumOutcome:(item.subtopics||[]).join(' • ')}};
-    try{return D()?.record?.({source:'source-question-result',exam:item.exam,subject:item.subject,topic:item.topic,curriculumOutcome:(item.subtopics||[]).join(' • '),result:kind==='correct'?'correct':kind==='wrong'?'wrong':'unknown',difficulty:item.difficulty||'',interaction:kind==='unable'?'unable':'answered-source',questionCount:1,signals:wrong?[kind==='unable'?'unable':'wrong']:['correct-source'],meta},{persistNow:true})}catch{return null}
+    const meta={catalogId:item.id,provider:item.provider,providerLabel:item.providerLabel,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual,sourceYear:item.year||null,wrongRecord:ownsWrong,wrongKind:wrong?kind:'',externalQuestion:true,studentAnswer:studentAnswer||'',correctAnswer:answer,asset:item.asset,question:{text:`${item.providerLabel||item.provider||''} ${item.year||''} ${item.exam||''} • ${item.topic||''} • Soru ${item.questionNo||''}`.trim(),image:''},solution:{answer,shortSolution:'Çözümü uygulamadaki Kaynak Soru ekranından tekrar incele.',curriculumOutcome:(item.subtopics||[]).join(' • ')}};
+    if(ownsWrong)meta.wrongClosed=false;
+    if(isRetry){meta.retake=true;meta.retakeAt=at;if(retryOf)meta.retryOf=retryOf}
+    return meta;
   }
 
-  function commitAttempt(kind){
-    if(committing||!active?.item)return;committing=true;
-    const item=active.item,id=item.id,answer=String(item.answerKey||item.answer||'').toUpperCase();
-    const student=kind==='unable'?'':selected;
-    const before=matchingEvents(id),beforeIds=new Set(before.map(x=>x.id)),started=Date.now();
-    setTimeout(()=>{
-      const now=Date.now(),all=matchingEvents(id),fresh=all.find(x=>!beforeIds.has(x.id))||null;
-      before.forEach(ev=>resolveOlderWrong(ev,now));
-      if(fresh)patchNewEvent(fresh,item,kind,student);
-      else appendAttempt(item,kind,student);
-      try{save()}catch{}
-      setTimeout(()=>{try{window.refreshSourceSetTracking?.();window.renderWrongV2?.();window.renderStats?.()}catch{}},40);
-      active.lastCommit={kind,student,answer,started};
-    },90);
-  }
-
-  document.addEventListener('click',e=>{
-    const a=e.target.closest('#sourceQuestion [data-sq-answer]');
-    if(a){selected=String(a.dataset.sqAnswer||'').toUpperCase();return}
-    if(e.target.closest('#sourceQuestion #sqCheck')){
-      if(!active?.item||!selected)return;
-      const answer=String(active.item.answerKey||active.item.answer||'').toUpperCase();
-      commitAttempt(selected===answer?'correct':'wrong');
-      return;
+  function recordAttempt(item,kind,studentAnswer='',ctx={}){
+    if(!item?.id||!['correct','wrong','unable'].includes(kind))return null;
+    const actionId=String(ctx?.actionId||'');
+    if(actionId&&actionResults.has(actionId))return actionResults.get(actionId);
+    const previous=matchingEvents(item.id),canonical=canonicalWrong(item.id,String(ctx?.wrongId||''));
+    const isRetry=previous.length>0||ctx?.type==='wrong';
+    const retryOf=isRetry?(canonical?.id||previous[0]?.meta?.retryOf||previous[0]?.id||''):'';
+    const wrong=kind!=='correct',ownsWrong=wrong&&!canonical,at=Date.now();
+    const meta=buildMeta(item,kind,studentAnswer,{isRetry,retryOf,ownsWrong,at});
+    let event=null;
+    try{event=D()?.record?.({source:'source-question-result',exam:item.exam,subject:item.subject,topic:item.topic,curriculumOutcome:(item.subtopics||[]).join(' • '),result:kind==='correct'?'correct':kind==='wrong'?'wrong':'unknown',difficulty:item.difficulty||'',interaction:kind==='unable'?'unable':'answered-source',questionCount:1,signals:wrong?[kind==='unable'?'unable':'wrong']:['correct-source'],meta},{persistNow:true})||null}catch(e){console.error('Kaynak soru sonucu kaydedilemedi',e);return null}
+    if(!event)return null;
+    if(actionId)actionResults.set(actionId,event);
+    if(kind==='correct'&&canonical){
+      if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,'retry-correct');
+      else console.error('Canonical yanlış kapatma API hazır değil; yanlış açık bırakıldı.',canonical.id);
     }
-    if(e.target.closest('#sourceQuestion #sqUnable'))commitAttempt('unable');
-  },true);
+    try{window.refreshSourceSetTracking?.();window.renderWrongV2?.();window.renderStats?.();window.renderHome?.()}catch{}
+    return event;
+  }
+
+  window.recordSourceQuestionAttempt=recordAttempt;
 
   wrapOpen();
 })();

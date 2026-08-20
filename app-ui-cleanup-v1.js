@@ -9,6 +9,6 @@
     const lib=document.getElementById('favoritesLibrary');if(lib){lib.remove();document.body.style.overflow=''}
     document.querySelectorAll('[data-go="favorites"],[data-go="favorite"],.fav-launch').forEach(x=>x.remove());
   }
+  // Tek seferlik temizlik: tüm uygulamayı sürekli izleyen MutationObserver kaldırıldı.
   cleanup();
-  const mo=new MutationObserver(cleanup);mo.observe(document.body,{childList:true,subtree:true});
 })();

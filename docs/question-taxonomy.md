@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 365 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
+Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -20,23 +20,33 @@ Kaynak: 365 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Kalıtım
 - Ekoloji
 
-### TYT Coğrafya (5 konu)
+### TYT Coğrafya (10 konu)
 
 - İklim Tipleri
 - İç Kuvvetler - Volkanizma
 - Nüfusun Dağılışı
 - Bölgeler ve Bölge Sınırları
 - Afet Yönetimi
+- Güneş Işınları Geliş Açısı
+- Bitki Örtüsü - İklim Bölgeleri
+- Nüfusun Dağılışını Etkileyen Faktörler
+- Bölge Türleri - Şekilsel Bölge
+- Doğal Afetler - Heyelan
 
-### TYT Din Kültürü ve Ahlak Bilgisi (5 konu)
+### TYT Din Kültürü ve Ahlak Bilgisi (10 konu)
 
 - İman ve İrade
 - İslam’da Bilgi ve Sorumluluk
 - Hz. Muhammed’in Örnekliği
 - Allah-İnsan ve Evren İlişkisi
 - İslam Düşüncesinde Yorum Farklılıkları
+- İslam'da Bilgi ve Eylem İlişkisi
+- İslam'da Temel Haklar ve Özgürlükler
+- Allah'ın Varlığının Delilleri - Gaye ve Nizam
+- Hz. Muhammed'in Örnekliği
+- Tasavvuf ve İbadet - Sema Töreni
 
-### TYT Felsefe (10 konu)
+### TYT Felsefe (20 konu)
 
 - Felsefi Düşüncenin Özellikleri
 - Zihin Felsefesi ve Turing Testi
@@ -48,6 +58,16 @@ Kaynak: 365 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Descartes ve Yöntemsel Şüphe
 - Siyaset Felsefesi - Rousseau
 - Fenomenoloji
+- Zihin Felsefesi - Çin Odası Argümanı
+- Bilgi Felsefesi - Kuşkuculuk
+- Ahlak Felsefesi - İyi ve Kötü
+- Bilim Felsefesi - Düşünce Deneyi
+- Bilgi Felsefesi - Kant
+- Mantık - Tümevarımsal Akıl Yürütme Hataları
+- Bilgi Felsefesi - Hume ve Nedensellik
+- Ahlak Felsefesi - Aristoteles'te Erdem
+- İlk Çağ ve Orta Çağ Felsefesi Karşılaştırması
+- Çağdaş Felsefe - Nietzsche
 
 ### TYT Fizik (7 konu)
 
@@ -119,13 +139,18 @@ Kaynak: 365 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Permütasyon
 - Açılar
 
-### TYT Tarih (5 konu)
+### TYT Tarih (10 konu)
 
 - İlk Türklerde Bozkır Kültürü
 - Türk-İslam Devletlerinde Yönetim
 - Osmanlı Toplum ve Ekonomisi - Vakıf
 - Millî Mücadele Hazırlık Dönemi
 - 1921 Anayasası ve Millî Egemenlik
+- İlk Türklerde Töre
+- Büyük Selçuklu Devleti - Melikşah Dönemi
+- Osmanlı Ekonomi Politikaları
+- Millî Mücadele - Kütahya Eskişehir Muharebeleri
+- Lozan Barış Konferansı - Batı Trakya
 
 ### TYT Türkçe (33 konu)
 

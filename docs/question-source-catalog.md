@@ -106,10 +106,24 @@ doğrulaması için kullanıldı.
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (Tarih+Coğrafya+Felsefe+Din K., ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2025 TYT toplamı (şu ana kadar işlenen):** 80/120 soru (Türkçe + Matematik + Geometri
-tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada — aynı PDF ve cevap anahtarı zaten elde
-edilmiş durumda).
+**2025 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
+Geometri + Sosyal Bilimler ana pool tamamlandı; Fen Bilimleri sırada). Kütüphanede fiilen
+saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
+
+> **`track` alanı — şema notu (yeni, 20 Ağustos 2026):** Bu batch'te ilk kez katalog satırına
+> opsiyonel `track` ve `trackReason` alanları eklendi. Değer yoksa (undefined) satır normal/ana
+> pool sayılır — bu, önceki tüm kayıtları etkilemez (geriye dönük uyumlu). `track:'alternate-
+> track'` + `trackReason:'din-muafiyeti-felsefe'`: bu soru, aynı test slotunun idari/müfredat
+> alternatifidir (Din Kültürü ve Ahlak Bilgisi dersinden muaf öğrenciler için). Gerçek, bağımsız
+> bir ÖSYM sorusu olarak kütüphanede tam saklanır — silinmez, "içerik değildir" denmez — ama
+> varsayılan öğrenci ilerleme sayacına ve varsayılan Mini Test havuzuna dahil edilmemesi
+> gerekir. **Bu alanın uygulama/runtime tarafında (Mini Test seçim mantığı, ilerleme sayacı)
+> nasıl tüketileceği bu kütüphane batch'inin kapsamı dışındadır** — ChatGPT tarafında
+> geliştirilen uygulama kodu bu alanı okuyup filtrelemelidir; hiçbir `app-*.js` veya `api/*.js`
+> dosyasına bu batch'te dokunulmamıştır.
 
 > **PDF text-extraction kaybı notu (Matematik):** `web_fetch` ile çekilen PDF metninde bazı
 > matematiksel ifadeler/görsel örnekler (özellikle soru 3 ve 5'te "işlem"/"gösterim" detayları)

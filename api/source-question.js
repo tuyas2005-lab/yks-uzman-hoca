@@ -1,6 +1,12 @@
 import {SOLVE_MODEL,getClient,setUsageHeaders} from "./_common.js";
 
 const SOURCES={
+  "osym-2024-tyt":[
+    "https://dokuman.osym.gov.tr/pdfdokuman/2024/YKS/TSK/yks_tyt_2024_kitapcik_T24kt.pdf"
+  ],
+  "osym-2025-tyt":[
+    "https://dokuman.osym.gov.tr/pdfdokuman/2025/YKS/TSK/yks_tyt_2025_kitapcik_d250.pdf"
+  ],
   "osym-2026-tyt":[
     "https://ilgaz.meb.gov.tr/meb_iys_dosyalar/2026_06/6a3a22d27eaf0404587806_yks_tyt_2026_kitapcik_d350.pdf",
     "https://dokuman.osym.gov.tr/pdfdokuman/2026/YKS/TSK/yks_tyt_2026_kitapcik_d350.pdf"

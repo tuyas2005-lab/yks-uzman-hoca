@@ -19,8 +19,8 @@
     const preparable=!!(!imageReady&&answerReady&&item?.asset?.status==='preparable'&&item?.asset?.kind==='auto-text-crop'&&item?.asset?.pdfKey&&item?.asset?.page);
     return{imageReady,answerReady,preparable,complete:imageReady&&answerReady};
   }
-  function defaultSelectable(item){return itemState(item).complete&&rowTrack(item)!=='alternate-track'&&!needsTopicReview(item)}
   function canUseAfterPreparation(item){const st=itemState(item);return(st.complete||st.preparable)&&rowTrack(item)!=='alternate-track'&&!needsTopicReview(item)}
+  function defaultSelectable(item){return canUseAfterPreparation(item)}
 
   function indexedBatch(q={},limit=5){
     const c=C();if(!c)return[];const done=solvedIds();
@@ -40,7 +40,7 @@
 
   function install(tries=0){
     const c=C();if(!c||typeof window.openSourceQuestion!=='function'){if(tries<100)setTimeout(()=>install(tries+1),80);return}
-    c.findNextBatch=indexedBatch;c.selectionPolicy={...(c.selectionPolicy||{}),mode:'library-only-materialized-ready',allowIncomplete:false,readyRequired:true,autoCropPreparation:true,yearGate:true,defaultTrack:'main',strictTopicSkipsManualReview:true};
+    c.findNextBatch=indexedBatch;c.selectionPolicy={...(c.selectionPolicy||{}),mode:'library-only-safe-preparable',allowIncomplete:false,readyRequired:true,autoCropPreparation:true,yearGate:true,defaultTrack:'main',strictTopicSkipsManualReview:true};
     const baseOpen=window.openSourceQuestion;
     window.openSourceQuestion=(item,ctx={})=>{const st=itemState(item);if(st.complete||st.preparable)return baseOpen(item,ctx);return showIncomplete(item,ctx)};
     window.isSourceQuestionReady=defaultSelectable;window.isSourceQuestionPreparable=item=>itemState(item).preparable&&rowTrack(item)!=='alternate-track'&&!needsTopicReview(item);window.isSourceQuestionComplete=item=>itemState(item).complete;window.getSourceQuestionPreparationState=itemState;

@@ -17,6 +17,29 @@
     return all.find(x=>q&&String(x.questionNo||'')===q&&z.includes(norm(x.subject))&&z.includes(norm(x.topic)))||null;
   }
 
+  function openDirect(btn,card,item,mini){
+    if(typeof window.openSourceQuestion!=='function'){
+      alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return;
+    }
+    const ready=typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item);
+    const preparable=typeof window.isSourceQuestionPreparable==='function'&&window.isSourceQuestionPreparable(item);
+    if(!ready&&!preparable){
+      alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;
+    }
+    window.openSourceQuestion(item,{type:mini?'mini':'official',card,returnScreen:mini?'tests':'similar'});
+  }
+
+  // Viewer'ın eski document-capture dinleyicisi preparable sorularda autocrop zincirini atlayabiliyor.
+  // Window capture, document'tan önce çalışır ve tıklamayı daima güncel window.openSourceQuestion zincirine yönlendirir.
+  window.addEventListener('click',e=>{
+    const btn=e.target?.closest?.('.mts-open,.official-open');if(!btn)return;
+    const card=btn.closest('.mts-q,.official-source-card');if(!card)return;
+    const item=resolve(card);if(!item)return;
+    const mini=card.classList.contains('mts-q');
+    e.preventDefault();e.stopImmediatePropagation();
+    openDirect(btn,card,item,mini);
+  },true);
+
   function bind(){
     const items=[];
     document.querySelectorAll('.mts-q,.official-source-card').forEach(card=>{
@@ -30,13 +53,7 @@
       btn.dataset.singleQuestionDirect='1';
       btn.onclick=e=>{
         e.preventDefault();e.stopPropagation();
-        if(typeof window.openSourceQuestion!=='function'){
-          alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return;
-        }
-        if(window.isSourceQuestionReady&&!window.isSourceQuestionReady(item)){
-          alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;
-        }
-        window.openSourceQuestion(item,{type:mini?'mini':'official',card,returnScreen:mini?'tests':'similar'});
+        openDirect(btn,card,item,mini);
       };
     });
     const warmKey=[...new Set(items.map(x=>x.id))].sort().join('|');

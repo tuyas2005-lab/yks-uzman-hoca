@@ -68,7 +68,8 @@
     window.isSourceQuestionReady=item=>(eligible(item)&&item?.asset?.status==='ready'&&hasGeometry(item))||baseReady?.(item)||false;
     window.isSourceQuestionPreparable=item=>canAutoPrepare(item)||false;
     window.openSourceQuestion=async function(item,ctx={}){try{if(canAutoPrepare(item))await detectCrop(item);return baseOpen(item,ctx)}catch(e){console.error('auto crop open',e);alert(`Bu sorunun tek-soru görüntüsü hazırlanamadı: ${e.message||'kırpma hatası'}`)}};
-    window.prepareSourceQuestions=async function(items=[]){const list=(items||[]).filter(Boolean),auto=list.filter(canAutoPrepare);for(const x of auto){try{await detectCrop(x)}catch(e){console.warn('auto crop prewarm',x.id,e)}}return basePrepare?.(list)};
+    const prepare=async function(items=[]){const list=(items||[]).filter(Boolean),auto=list.filter(canAutoPrepare);for(const x of auto){try{await detectCrop(x)}catch(e){console.warn('auto crop prewarm',x.id,e)}}return basePrepare?.(list)};
+    try{Object.defineProperty(window,'prepareSourceQuestions',{configurable:true,writable:true,value:prepare})}catch{window.prepareSourceQuestions=prepare}
     setTimeout(()=>{if(!navigator.connection?.saveData){const visible=(C()?.all?.()||[]).filter(canAutoPrepare);window.prepareSourceQuestions(visible.slice(0,20))}},900);
   }
   install();

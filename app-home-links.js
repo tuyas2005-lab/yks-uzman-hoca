@@ -1,5 +1,9 @@
 (()=>{
   const n=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
+  const gatedScreens=['tests','wrong','teacher','coach','stats'];
+  gatedScreens.forEach(id=>document.getElementById(id)?.classList.add('module-gated'));
+  const liveLabel=document.getElementById('liveText');
+  if(liveLabel&&/demo modu|skill yerel/i.test(liveLabel.textContent||''))liveLabel.textContent='Bağlantı kontrol ediliyor…';
   const markReady=id=>document.getElementById(id)?.classList.add('module-ready');
   function setPrefill(subject='',topic=''){
     state.miniTests??={history:[]};
@@ -228,5 +232,5 @@
     const src=light[li++];
     scheduleJob(()=>loadScript(src)).finally(()=>setTimeout(loadLight,250));
   };
-  setTimeout(loadLight,900);
+  setTimeout(loadLight,250);
 })();

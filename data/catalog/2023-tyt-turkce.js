@@ -9,7 +9,7 @@
     ['Cümle Yorumu',['masal dinlememiş çocuklar','hayal gücü']],
     ['Paragrafta Ulaşılamayan Yargı',['plasebo','numaralanmış cümle','söylenemez']],
     ['Cümle Birleştirme',['iki cümlenin birleştirilmesi','şair mazmun']],
-    ['Tamlama Türleri',['yer tamlayıcısı','numaralanmış cümle']],
+    ['Cümlenin Ögeleri',['yer tamlayıcısı','isim tamlaması','sıfat tamlaması','numaralanmış cümle']],
     ['Fiilimsiler',['isim-fiil sıfat-fiil zarf-fiil','okyanus ısınması']],
     ['Ses Olayları',['ünsüz benzeşmesi','ünlü düşmesi','ünsüz yumuşaması']],
     ['Yazım Kuralları',['numaralanmış söz','yazım yanlışı','Tanpınar romanı']],

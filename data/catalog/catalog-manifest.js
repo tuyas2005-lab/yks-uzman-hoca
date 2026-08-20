@@ -12,7 +12,9 @@
     '/data/catalog/2026-ayt-social2.js',
     '/data/catalog/2026-ayt-answer-fixes.js',
     '/data/catalog/2026-manifest.js',
-    '/data/catalog/2025-tyt-turkce.js'
+    '/data/catalog/2025-tyt-turkce.js',
+    '/data/catalog/2025-tyt-math-01-30.js',
+    '/data/catalog/2025-tyt-geometry.js'
   ];
   window.YKSQuestionCatalogManifest={version:2,scope:{include:['TYT','AYT'],exclude:['YDT']},policy:'library-only-newest-first',updatedAt:'2026-08-19'};
 })();

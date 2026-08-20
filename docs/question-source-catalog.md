@@ -104,9 +104,20 @@ doğrulaması için kullanıldı.
 | Ders | Soru | answerKey | Crop durumu |
 |------|------|-----------|--------------|
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2025 TYT toplamı (şu ana kadar işlenen):** 40/120 soru (Türkçe tamamlandı; Sosyal Bilimler,
-Temel Matematik, Fen Bilimleri sırada — aynı PDF ve cevap anahtarı zaten elde edilmiş durumda).
+**2025 TYT toplamı (şu ana kadar işlenen):** 80/120 soru (Türkçe + Matematik + Geometri
+tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada — aynı PDF ve cevap anahtarı zaten elde
+edilmiş durumda).
+
+> **PDF text-extraction kaybı notu (Matematik):** `web_fetch` ile çekilen PDF metninde bazı
+> matematiksel ifadeler/görsel örnekler (özellikle soru 3 ve 5'te "işlem"/"gösterim" detayları)
+> kayboldu — muhtemelen görsel/özel karakter olarak render edilmiş içerik. Bu iki sorunun
+> `topic` ataması en yakın makul tahmindir ama `verification.topic:'needs-manual-review-text-
+> extraction-loss'` olarak işaretlenmiştir. **Soru metni veya answerKey tahmin edilmemiştir** —
+> yalnız topic sınıflandırması bu kayıp nedeniyle düşük güvenilirlikte. PDF görsel erişimi
+> mümkün olduğunda bu 2 kayıt gözden geçirilmelidir.
 
 > **2025 TYT toplam soru sayısı notu:** Booklet'te basılı toplam 125 soru görünür (Türkçe 40 +
 > Sosyal Bilimler 25 + Matematik 40 + Fen 20), ancak Sosyal Bilimler testinde 21-25 numaralı

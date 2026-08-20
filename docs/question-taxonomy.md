@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 325 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
+Kaynak: 365 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -69,7 +69,7 @@ Kaynak: 325 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Çözeltiler ve Derişim
 - Metallerin Tepkimeleri
 
-### TYT Matematik (40 konu)
+### TYT Matematik (47 konu)
 
 - Rasyonel Sayılar
 - Üslü Sayılar ve Oran
@@ -111,6 +111,13 @@ Kaynak: 325 kayıt / 2025+2026 TYT+AYT kataloğu (19 Ağustos 2026 itibarıyla).
 - Çokgenler ve Yamuk
 - Dikdörtgenler Prizması - Yüzey Alanı
 - Dikdörtgenler Prizması - Yüzey Alanı ve Hacim
+- Eşitsizlikler
+- Asal Sayılar
+- Denklem Kurma - Fiyat Problemleri
+- Saat ve Zaman Problemleri
+- Sayı Örüntüleri
+- Permütasyon
+- Açılar
 
 ### TYT Tarih (5 konu)
 

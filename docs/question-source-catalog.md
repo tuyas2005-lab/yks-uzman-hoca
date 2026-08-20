@@ -194,9 +194,12 @@ hem resmî cevap anahtarı doğrulaması için kullanıldı. Kitapçık yapısı
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2024 TYT toplamı (şu ana kadar işlenen):** 80/120 standart ilerleme (Türkçe + Matematik +
-Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
+**2024 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
+Geometri + Sosyal Bilimler ana pool tamamlandı; yalnız Fen Bilimleri sırada). Kütüphanede
+fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
 
 > **Yeni taxonomy terimleri (2024 Türkçe batch'i):** `Cümle Türleri - Yüklemine Göre`,
 > `Tamlama Türleri`, `Paragrafta Değinilen Bilgi` (mevcut `Paragrafta Değinilmeyen Yargı`nın
@@ -214,7 +217,17 @@ Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
 > - `osym-2024-tyt-mat-13`: tombala kartı sayıları ve hesaplanacak hedef değer kayıp
 > - `osym-2024-tyt-mat-34`: "şanslı üçgen" tanımındaki iç açı ölçüsü kayıp
 
-## 2024 TYT — Sosyal Bilimler ve Fen Bilimleri sırada
+> **2024 TYT Sosyal Bilimler (25 soru: 20 ana + 5 alternatif Felsefe):** metin bütünlüğü
+> korunmuş, hiçbir soruda tablo/formül/sembol kaybı tespit edilmedi (0 `needs-manual-review`).
+> Görsel: yalnızca `cog-07` (bitki dağılışı haritası), `cog-08` (nüfus piramidi), `cog-09`
+> (şekilsel bölge haritası) — 3/25. Taxonomy: 9/25 mevcut terimle eşleşti, 16/25 için yeni terim
+> gerekti (2024'ün tarihî olayları/filozofları — Attila-Roma ilişkileri, Yassıçemen Savaşı,
+> Hegel, Oppenheimer, Locke, Spinoza, Dilthey, Anselmus vb. — 2025/2026 kapsamında hiç
+> işlenmemiş konular; zorlama eşleştirme yapılmadı). `track:'alternate-track'` +
+> `trackReason:'din-muafiyeti-felsefe'` şeması 2025 ile birebir aynı şekilde uygulandı
+> (`osym-2024-tyt-fel-21..25`).
+
+## 2024 TYT — Fen Bilimleri sırada
 
 ## Yeni PDF yayın ekleme
 

@@ -119,13 +119,22 @@ edilmiş durumda).
 > yalnız topic sınıflandırması bu kayıp nedeniyle düşük güvenilirlikte. PDF görsel erişimi
 > mümkün olduğunda bu 2 kayıt gözden geçirilmelidir.
 
-> **2025 TYT toplam soru sayısı notu:** Booklet'te basılı toplam 125 soru görünür (Türkçe 40 +
-> Sosyal Bilimler 25 + Matematik 40 + Fen 20), ancak Sosyal Bilimler testinde 21-25 numaralı
-> sorular ("Din Kültürü ve Ahlak Bilgisi dersini yasal olarak almak zorunda olmayan veya farklı
-> müfredat ile alanlar için Felsefe") 16-20 numaralı Din Kültürü sorularının **alternatifidir**,
-> aynı öğrenci ikisini birden cevaplamaz. AYT'deki alt-track Felsefe (41-46) için uygulanan
-> mantıkla tutarlı olarak, bu 5 alternatif soru ayrı benzersiz içerik sayılmaz. Gerçek benzersiz
-> soru sayısı: 40 + 20 + 40 + 20 = **120**.
+> **2025 TYT toplam soru sayısı notu (güncellendi 20 Ağustos 2026):** Booklet'te basılı toplam
+> 125 **gerçek, bağımsız ÖSYM sorusu** vardır (Türkçe 40 + Sosyal Bilimler 25 + Matematik 40 +
+> Fen 20) — bu 125 sorunun hepsi kütüphanede kataloglanır ve saklanır, hiçbiri "içerik değil"
+> sayılmaz.
+>
+> Ancak Sosyal Bilimler testinde 21-25 numaralı Felsefe soruları, 16-20 numaralı Din Kültürü
+> ve Ahlak Bilgisi sorularının **idari/müfredat alternatifidir** — Din Kültürü dersini almak
+> zorunda olan bir öğrenci 16-20'yi, muaf olan bir öğrenci 21-25'i cevaplar; aynı öğrenci
+> ikisini birden cevaplamaz. Bu yüzden **standart öğrenci ilerleme sayacı** (Mini Test havuzu,
+> "kaç soru kaldı" göstergeleri vb.) yalnızca ana/varsayılan 20 Sosyal Bilimler sorusunu sayar
+> (Tarih 5 + Coğrafya 5 + Felsefe 5 + Din K. 5), toplamda **120**. 21-25 alternatif Felsefe
+> soruları kütüphanede ayrıca saklanır, `track:'alternate-track'` ile makine-okunabilir şekilde
+> işaretlenir ve varsayılan Mini Test havuzuna karışmaz (bkz. 2025 TYT Sosyal Bilimler bölümü
+> altında ayrıntı). Bu, "121-125 benzersiz içerik değildir" demek değildir — tam tersine, her
+> ikisi de gerçek ÖSYM soruları olarak korunur; yalnızca ana ilerleme sayacı 20/120 üzerinden
+> ilerler.
 
 > **Not:** 2025 TYT için henüz `app-source-map-2025-*.js` gibi bir crop/source-map dosyası
 > oluşturulmadı — 2026 AYT'dekiyle aynı sebepten (PDF'e görsel/piksel erişim ortam kısıtı

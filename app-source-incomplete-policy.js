@@ -36,6 +36,10 @@
     return{imageReady,answerReady,complete:imageReady&&answerReady};
   }
 
+  function defaultSelectable(item){
+    return itemState(item).complete&&rowTrack(item)!=='alternate-track'&&!needsTopicReview(item);
+  }
+
   function indexedBatch(q={},limit=5){
     const c=C();if(!c)return[];const done=solvedIds();
     let rows=(c.all?.()||[]).filter(x=>x?.id&&!done.has(x.id))
@@ -83,7 +87,7 @@
       if(st.complete)return baseOpen(item,ctx);
       return showIncomplete(item,ctx);
     };
-    window.isSourceQuestionReady=item=>itemState(item).complete;
+    window.isSourceQuestionReady=defaultSelectable;
     window.isSourceQuestionComplete=item=>itemState(item).complete;
     window.getSourceQuestionPreparationState=itemState;
   }

@@ -19,3 +19,18 @@
 .analysis-wrap.ai-loading .ring strong:after{content:'AI';font-size:26px}
 .analysis-wrap.ai-loading:after{content:'Yeni soru okunuyor • Ders, konu ve kazanım belirleniyor • Çözüm hazırlanıyor';display:block;max-width:520px;margin:20px auto;padding:15px 18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--muted);font-weight:700;line-height:1.5}
 @keyframes analyzePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.96);opacity:.72}}
+
+/* V5.1.2 — temiz başlangıç: legacy/demo arayüz hiçbir zaman ilk boyamada görünmez. */
+html:not(.yks-ready) body{overflow:hidden}
+html:not(.yks-ready) .app{visibility:hidden}
+html:not(.yks-ready) body::before{content:'🎓\A YKS Uzman Hoca\A Çalışma alanın hazırlanıyor…';white-space:pre;position:fixed;inset:0;z-index:20000;display:grid;place-items:center;text-align:center;background:var(--bg);color:var(--ink);font-size:20px;font-weight:850;line-height:1.8;letter-spacing:-.01em}
+html:not(.yks-ready) body::after{content:'';position:fixed;z-index:20001;left:50%;top:calc(50% + 88px);width:26px;height:26px;margin:-13px;border-radius:50%;border:3px solid #ded8ff;border-top-color:var(--violet);animation:yksBootSpin .75s linear infinite}
+@keyframes yksBootSpin{to{transform:rotate(360deg)}}
+.screen.module-gated:not(.module-ready).active{min-height:340px}
+.screen.module-gated:not(.module-ready).active>*{display:none!important}
+.screen.module-gated:not(.module-ready).active::before{content:'Bölüm hazırlanıyor…';display:grid;place-items:center;min-height:300px;padding:30px;border:1px solid #e4e1f2;border-radius:20px;background:var(--surface);color:var(--muted);font-weight:800;text-align:center;box-shadow:0 8px 24px rgba(24,29,70,.04)}
+#tests.module-gated:not(.module-ready).active::before{content:'Mini Testler hazırlanıyor…'}
+#wrong.module-gated:not(.module-ready).active::before{content:'Yanlış kayıtların hazırlanıyor…'}
+#teacher.module-gated:not(.module-ready).active::before{content:'Kişisel Öğretmenin hazırlanıyor…'}
+#coach.module-gated:not(.module-ready).active::before{content:'YKS Koçun hazırlanıyor…'}
+#stats.module-gated:not(.module-ready).active::before{content:'İstatistiklerin hazırlanıyor…'}

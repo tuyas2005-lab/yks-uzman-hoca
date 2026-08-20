@@ -1,5 +1,10 @@
 (()=>{
   const n=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
+  const gatedScreens=['tests','wrong','teacher','coach','stats'];
+  gatedScreens.forEach(id=>document.getElementById(id)?.classList.add('module-gated'));
+  const liveLabel=document.getElementById('liveText');
+  if(liveLabel&&/demo modu|skill yerel/i.test(liveLabel.textContent||''))liveLabel.textContent='Bağlantı kontrol ediliyor…';
+  const markReady=id=>document.getElementById(id)?.classList.add('module-ready');
   function setPrefill(subject='',topic=''){
     state.miniTests??={history:[]};
     state.miniTests.prefillSubject=subject||state.miniTests.prefillSubject||'';
@@ -74,7 +79,11 @@
     });
   }
   function resumeFor(id){
-    Object.values(groups).forEach(g=>{if(g.allowed.has(id))pump(g)});
+    Object.values(groups).forEach(g=>{
+      if(!g.allowed.has(id))return;
+      if(g.ready){try{g.onReady?.()}catch(e){console.warn(g.name+' hazır callback',e)}}
+      else pump(g);
+    });
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
@@ -105,7 +114,10 @@
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-source-retake-position.js?v=1')
   ],()=>{
-    if(activeScreen==='tests')window.renderMiniTestHome?.();
+    if(typeof window.renderMiniTestHome==='function'){
+      markReady('tests');
+      if(activeScreen==='tests')window.renderMiniTestHome();
+    }
     if(activeScreen==='questionIndex')window.go?.('questionIndex');
   });
   groups.official=official;
@@ -117,7 +129,12 @@
     ()=>loadScript('/app-wrongs-source-link.js?v=3'),
     ()=>loadScript('/app-wrong-priority-order.js?v=1'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=1')
-  ],()=>window.renderWrongV2?.());
+  ],()=>{
+    if(typeof window.renderWrongV2==='function'){
+      window.renderWrongV2();
+      markReady('wrong');
+    }
+  });
 
   groups.teacher=makeGroup('teacher',['teacher'],[
     ()=>loadScript('/app-field-track.js?v=2'),
@@ -131,18 +148,34 @@
     ()=>loadScript('/app-personal-teacher-policy-v3.js?v=1'),
     ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=2'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=2')
-  ],()=>window.renderTeacher?.());
+  ],()=>{
+    if(typeof window.renderTeacher==='function'){
+      window.renderTeacher();
+      markReady('teacher');
+    }
+  });
 
   groups.stats=makeGroup('stats',['stats'],[
-    ()=>loadScript('/app-stats-v2.js?v=2'),
-    ()=>loadScript('/app-stats-v3.js?v=2')
-  ],()=>window.renderStats?.());
+    ()=>loadScript('/app-stats-v3.js?v=3')
+  ],()=>{
+    if(typeof window.renderStats==='function'){
+      window.renderStats();
+      markReady('stats');
+    }
+  });
 
   groups.coach=makeGroup('coach',['coach'],[
+    ()=>loadScript('/app-yks-coach.js?v=2'),
+    ()=>loadScript('/app-yks-coach-fix.js?v=2'),
     ()=>loadScript('/app-field-track.js?v=2'),
     ()=>loadScript('/app-strategy-engine.js?v=2'),
     ()=>loadScript('/app-profile-consistency.js?v=1')
-  ],()=>window.renderCoach?.());
+  ],()=>{
+    if(typeof window.renderCoach==='function'){
+      window.renderCoach();
+      markReady('coach');
+    }
+  });
 
   function installQuestionIndexEntry(){
     const nav=document.querySelector('.sidebar .nav');
@@ -191,13 +224,13 @@
   // app-home-links yüklenmeden önce kullanıcı hedef ekrana geçtiyse lazy-load grubunu burada hemen devam ettir.
   resumeFor(activeScreen);
 
-  // Yalnız hafif UI yardımcıları başlangıçta yüklenir. Büyük soru havuzu ve ekran eklentileri lazy-load edilir.
-  const light=['/app-live-status.js?v=1','/app-ui-cleanup-v1.js?v=1','/app-topic-ui.js?v=1'];
+  // Başlangıçta yalnız bağlantı durumunu yenileyen hafif yardımcı yüklenir.
+  const light=['/app-live-status.js?v=1'];
   let li=0;
   const loadLight=()=>{
     if(li>=light.length)return;
     const src=light[li++];
     scheduleJob(()=>loadScript(src)).finally(()=>setTimeout(loadLight,250));
   };
-  setTimeout(loadLight,1800);
+  setTimeout(loadLight,250);
 })();

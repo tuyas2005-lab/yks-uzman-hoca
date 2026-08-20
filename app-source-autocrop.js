@@ -44,7 +44,7 @@
       if(!cur){item.asset={status:'pending',kind:'auto-text-crop-error',pdfKey,page:pageNo,error:'question-marker-not-found'};throw new Error(`Soru ${q} sayfa ${pageNo} üzerinde bulunamadı.`)}
       const right=cur.x>W*.48,same=markers.filter(m=>(m.x>W*.48)===right&&m.y<cur.y-4).sort((a,b)=>b.y-a.y),next=same[0]||null;
       const top=Math.max(.045,(H-cur.y-cur.h*1.7)/H);let bottom=next?Math.min(.965,(H-next.y+next.h*.9)/H):.955;if(bottom<=top+.06)bottom=Math.min(.965,top+.32);
-      const crop={x:right?.515:.055,y:Math.max(.035,top-.012),w:right?.43:.44,h:Math.max(.10,bottom-top+.015)};
+      const crop={x:right ? .515 : .055,y:Math.max(.035,top-.012),w:right ? .43 : .44,h:Math.max(.10,bottom-top+.015)};
       const valid=[crop.x,crop.y,crop.w,crop.h].every(Number.isFinite)&&crop.x>=0&&crop.y>=0&&crop.w>.1&&crop.h>.08&&crop.x+crop.w<=1.001&&crop.y+crop.h<=1.001;
       if(!valid){item.asset={status:'pending',kind:'auto-text-crop-error',pdfKey,page:pageNo,error:'invalid-crop-geometry'};throw new Error(`Soru ${q} için geçerli crop geometrisi üretilemedi.`)}
       item.asset={status:'ready',kind:'auto-text-crop',pdfKey,page:pageNo,crop};item.answerVerified=true;item.verification={...(item.verification||{}),crop:'pdfjs-question-marker'};return item.asset;

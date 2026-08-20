@@ -45,34 +45,29 @@
   function sectionOf(item){if(item?.subject==='Türkçe')return'tur';if(item?.subject==='Matematik')return'math';if(socialSubjects.has(item?.subject))return'social';if(fenSubjects.has(item?.subject))return'fen';return''}
   function pageFor(year,section,q){const rows=SOURCES[year]?.sections?.[section]||[],n=Number(q||0),hit=rows.find(([a,b])=>n>=a&&n<=b);return hit?hit[2]:0}
   function answerRows(C){const out=new Map();for(const row of C.allRecords?.()||C.all?.()||[]){const year=Number(row?.year||0);if(row?.provider!=='OSYM'||row?.exam!=='TYT'||!SOURCES[year]||!row?.id)continue;const old=out.get(row.id);if(!old||(row.answerKey&&!old.answerKey))out.set(row.id,row)}return out}
-  function readiness(){const C=window.YKSQuestionCatalogV1,rows=(C?.all?.()||[]).filter(x=>x?.provider==='OSYM'&&x?.exam==='TYT'&&SOURCES[Number(x?.year||0)]),out={};for(const year of [2024,2025]){const y=rows.filter(x=>Number(x.year)===year),main=y.filter(x=>x.track!=='alternate-track');out[year]={total:y.length,mainTrack:main.length,alternateTrack:y.length-main.length,pageVerified:y.filter(x=>x.access?.page&&x.verification?.page==='verified').length,answerVerified:y.filter(x=>x.answerKey&&x.answerVerified).length,studentReady:y.filter(x=>x.answerKey&&x.answerVerified&&x.asset?.status==='ready').length}}return out}
+  function readiness(){
+    const C=window.YKSQuestionCatalogV1,rows=(C?.all?.()||[]).filter(x=>x?.provider==='OSYM'&&x?.exam==='TYT'&&SOURCES[Number(x?.year||0)]),out={};
+    for(const year of [2024,2025]){
+      const y=rows.filter(x=>Number(x.year)===year),main=y.filter(x=>x.track!=='alternate-track'),hasGeometry=x=>!!(x?.asset?.crop||(Array.isArray(x?.asset?.parts)&&x.asset.parts.length)),answerOk=x=>!!(x.answerKey&&x.answerVerified);
+      out[year]={total:y.length,mainTrack:main.length,alternateTrack:y.length-main.length,pageVerified:main.filter(x=>x.access?.page&&x.verification?.page==='verified').length,answerVerified:main.filter(answerOk).length,materializedCrop:main.filter(x=>answerOk(x)&&x.asset?.status==='ready'&&hasGeometry(x)).length,studentUsable:main.filter(x=>answerOk(x)&&((x.asset?.status==='ready'&&hasGeometry(x))||x.asset?.status==='preparable')).length};
+    }
+    return out;
+  }
   function activate(){
     const C=window.YKSQuestionCatalogV1;if(!C?.all)return false;
     const canonicalAnswers=answerRows(C),runtimeMap={};let changed=0;
     for(const item of C.all()){
       const year=Number(item?.year||0);if(item?.provider!=='OSYM'||item?.exam!=='TYT'||!SOURCES[year])continue;
       const richer=canonicalAnswers.get(item.id);
-      if(richer&&richer!==item){
-        if(richer.answerKey)item.answerKey=richer.answerKey;
-        if(richer.topic)item.topic=richer.topic;
-        if(Array.isArray(richer.subtopics))item.subtopics=[...richer.subtopics];
-        if(Array.isArray(richer.tags))item.tags=[...richer.tags];
-        if(typeof richer.visual==='boolean')item.visual=richer.visual;
-        if(richer.difficulty)item.difficulty=richer.difficulty;
-        item.verification={...(item.verification||{}),...(richer.verification||{})};
-      }
+      if(richer&&richer!==item){if(richer.answerKey)item.answerKey=richer.answerKey;if(richer.topic)item.topic=richer.topic;if(Array.isArray(richer.subtopics))item.subtopics=[...richer.subtopics];if(Array.isArray(richer.tags))item.tags=[...richer.tags];if(typeof richer.visual==='boolean')item.visual=richer.visual;if(richer.difficulty)item.difficulty=richer.difficulty;item.verification={...(item.verification||{}),...(richer.verification||{})}}
       const section=sectionOf(item),page=pageFor(year,section,item.questionNo);if(!page)continue;
-      item.access??={};item.access.page=page;item.access.pdfKey=SOURCES[year].pdfKey;
-      item.verification??={};item.verification.exactPage='verified-visual-official-pdf';item.verification.page='verified';
+      item.access??={};item.access.page=page;item.access.pdfKey=SOURCES[year].pdfKey;item.verification??={};item.verification.exactPage='verified-visual-official-pdf';item.verification.page='verified';
       if(item.answerKey){item.answerVerified=true;if(!item.answer)item.answer=item.answerKey}
       const patch=REVIEW_PATCHES[item.id];if(patch){if(patch.topic)item.topic=patch.topic;if(patch.subtopics)item.subtopics=patch.subtopics;item.verification.topic='manual-visual-verified'}
-      const manual=MANUAL[item.id];
-      if(manual){item.asset={status:'ready',kind:Array.isArray(manual.parts)?'cached-pdf-parts':'cached-pdf-crop',...manual};runtimeMap[item.id]=manual}else runtimeMap[item.id]={pdfKey:SOURCES[year].pdfKey,page};
-      changed++;
+      const manual=MANUAL[item.id];if(manual){item.asset={status:'ready',kind:Array.isArray(manual.parts)?'cached-pdf-parts':'cached-pdf-crop',...manual};runtimeMap[item.id]=manual}else runtimeMap[item.id]={pdfKey:SOURCES[year].pdfKey,page};changed++;
     }
     if(changed){try{window.YKSRegisterSourceMap?.(runtimeMap)}catch{};setTimeout(()=>{try{window.renderQuestionIndex?.()}catch{}},0)}
     window.YKS2024_2025SourceMap={sources:SOURCES,manual:MANUAL,count:changed};window.get2024_2025SourceReadiness=readiness;return changed>0;
   }
-  if(!activate()){let n=0;const t=setInterval(()=>{if(activate()||++n>40)clearInterval(t)},100)}
-  window.activate2024_2025TytSourceMap=activate;
+  if(!activate()){let n=0;const t=setInterval(()=>{if(activate()||++n>40)clearInterval(t)},100)}window.activate2024_2025TytSourceMap=activate;
 })();

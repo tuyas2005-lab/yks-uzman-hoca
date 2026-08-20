@@ -265,17 +265,33 @@ Sosyal Bilimler 25 [20 ana + 5 alternatif Felsefe], Matematik 40, Fen 20).
 | Ders | Soru | answerKey | Crop durumu |
 |------|------|-----------|--------------|
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2023 TYT toplamı (şu ana kadar işlenen):** 40/120 standart ilerleme (Türkçe tamamlandı;
-Matematik + Geometri, Sosyal Bilimler, Fen Bilimleri sırada).
+**2023 TYT toplamı (şu ana kadar işlenen):** 80/120 standart ilerleme (Türkçe + Matematik +
+Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
 
 > **Yeni taxonomy terimi (2023 Türkçe batch'i):** yalnızca `Ses Olayları` (ünsüz benzeşmesi,
 > ünlü düşmesi, ünsüz yumuşaması gibi fonetik kurallar; mevcut listede tam karşılığı yoktu).
 > 39/40 soru mevcut 2024/2025/2026 terimleriyle eşleşti, zorlama yapılmadı.
 
+> **2023 TYT Matematik+Geometri (40 soru):** Bu yılın PDF'inde ciddi text-extraction kaybı var
+> — 15 soruda kritik matematiksel veri (tablo/grafik/oran/koşul/formül) tamamen kayıp, hepsi
+> `needs-manual-review-text-extraction-loss` ile işaretlendi (liste aşağıda). **0 yeni topic
+> gerekti — 40/40 soru mevcut 2024/2025/2026 TYT Matematik terimleriyle eşleşti** (48 terimlik
+> mevcut sözlük tüm 2023 içeriğini kapsadı, zorlama yapılmadı). Görsel: 20/40 (`mat-01, 02, 07,
+> 08, 17, 18, 20, 22, 25, 27, 28, 29, 30, 31, 32, 34, 35, 36, 38, 40`).
+>
+> needs-manual-review listesi (15 kayıt):
+> `mat-01` (nota sembolleri tablosu kayıp), `mat-03` (nüfus artış oranı kayıp), `mat-04` (kare
+> alanı üslü ifade kayıp), `mat-05` (sayı gösterimi kayıp), `mat-06` (sayı doğrusu koşulu kayıp),
+> `mat-10` (küme koşulu kayıp), `mat-12` (fonksiyon tanımı kayıp), `mat-13` (eşitlik/sembol
+> tanımı kayıp), `mat-16` (haftalık sıcaklık verileri kayıp), `mat-20` (anket oy dağılımı kayıp),
+> `mat-23` (satış oranı kayıp), `mat-25` (kıyafet dağılımı yüzdeleri kayıp), `mat-28` (ulaşım
+> ücret tablosu kayıp), `mat-29` (ders süreleri tablosu kayıp), `mat-32` (üçgen açı değeri kayıp).
+
 > **Not:** 2023 TYT için de henüz crop/source-map dosyası oluşturulmadı — aynı ortam kısıtı
-> nedeniyle. `page:null`, tahmini sayfa numarası yazılmadı. Görsel/grafik/tablo referansı bu
-> batch'te hiç tespit edilmedi (Türkçe testi tamamen metinsel), 0/40 `visual:true`.
+> nedeniyle. `page:null`, tahmini sayfa numarası yazılmadı.
 
 ## Yeni PDF yayın ekleme
 

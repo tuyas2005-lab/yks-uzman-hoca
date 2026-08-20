@@ -5,7 +5,7 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
+Kaynak: 450 kayıt / 2024+2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
@@ -38,7 +38,7 @@ Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Bölge Türleri - Şekilsel Bölge
 - Doğal Afetler - Heyelan
 
-### TYT Din Kültürü ve Ahlak Bilgisi (10 konu)
+### TYT Din Kültürü ve Ahlak Bilgisi (9 konu)
 
 - İman ve İrade
 - İslam’da Bilgi ve Sorumluluk
@@ -48,7 +48,6 @@ Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - İslam'da Bilgi ve Eylem İlişkisi
 - İslam'da Temel Haklar ve Özgürlükler
 - Allah'ın Varlığının Delilleri - Gaye ve Nizam
-- Hz. Muhammed'in Örnekliği
 - Tasavvuf ve İbadet - Sema Töreni
 
 ### TYT Felsefe (20 konu)
@@ -164,7 +163,7 @@ Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Millî Mücadele - Kütahya Eskişehir Muharebeleri
 - Lozan Barış Konferansı - Batı Trakya
 
-### TYT Türkçe (33 konu)
+### TYT Türkçe (36 konu)
 
 - Bağlama Göre Sözcük Seçimi
 - Sözcük ve Söz Öbeklerinde Anlam
@@ -199,6 +198,9 @@ Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Yazım Kuralları
 - Paragrafta Boşluk Doldurma
 - Paragrafta Kavram Eşleştirme
+- Cümle Türleri - Yüklemine Göre
+- Tamlama Türleri
+- Paragrafta Değinilen Bilgi
 
 ## AYT
 

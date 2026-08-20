@@ -180,6 +180,27 @@ Bu 4 kayıt, PDF görsel erişimi mümkün olduğunda öncelikli gözden geçirm
 > answerKey ile kataloglanmış durumda; `page:null`, tahmini sayfa numarası yazılmadı.
 > `access.pageRange` alanı yalnızca hangi testte olduğunu belirtir, kesin sayfa değildir.
 
+## 2024 TYT — İşleniyor (20 Ağustos 2026)
+
+**Kaynak:** ÖSYM resmî sayfası
+(`osym.gov.tr/2024yks-tyt-ayt-ve-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari`) →
+resmî PDF (`dokuman.osym.gov.tr/pdfdokuman/2024/YKS/TSK/yks_tyt_2024_kitapcik_T24kt.pdf`,
+sınav tarihi 08.06.2024). PDF'in tam metni `web_fetch` ile çekildi; hem soru sınıflandırması
+hem resmî cevap anahtarı doğrulaması için kullanıldı. Kitapçık yapısı 2025 ile birebir aynı
+(Sosyal Bilimler'de 20 ana + 5 alternatif Felsefe track'i dahil).
+
+| Ders | Soru | answerKey | Crop durumu |
+|------|------|-----------|--------------|
+| Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+
+**2024 TYT toplamı (şu ana kadar işlenen):** 40/120 standart ilerleme (Türkçe tamamlandı;
+Temel Matematik + Geometri, Sosyal Bilimler, Fen Bilimleri sırada).
+
+> **Yeni taxonomy terimleri (2024 Türkçe batch'i):** `Cümle Türleri - Yüklemine Göre`,
+> `Tamlama Türleri`, `Paragrafta Değinilen Bilgi` (mevcut `Paragrafta Değinilmeyen Yargı`nın
+> pozitif karşılığı — "hangisine değinilmiştir" kalıbı, "değinilmemiştir" değil). 37/40 soru
+> mevcut 2025/2026 terimleriyle eşleşti, zorlama yapılmadı.
+
 ## Yeni PDF yayın ekleme
 
 İleride yüklenen bir soru bankası için PDF bir kez indekslenir. Her soru için ders, konu, kazanım, zorluk, görsel durumu, sayfa ve mümkünse soru kutusunun koordinatları çıkarılır. PDF tekrar işlenmeden katalog üzerinden aranabilir.

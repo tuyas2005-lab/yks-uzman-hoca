@@ -1,6 +1,9 @@
 import {SOLVE_MODEL,getClient,setUsageHeaders} from "./_common.js";
 
 const SOURCES={
+  "osym-2023-tyt":[
+    "https://dokuman.osym.gov.tr/pdfdokuman/2023/YKS/TSK/yks_tyt_2023_kitapcik_T23ky.pdf"
+  ],
   "osym-2024-tyt":[
     "https://dokuman.osym.gov.tr/pdfdokuman/2024/YKS/TSK/yks_tyt_2024_kitapcik_T24kt.pdf"
   ],

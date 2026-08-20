@@ -188,6 +188,9 @@
     window.__connectedGo=true;
   }
 
+  // app-home-links yüklenmeden önce kullanıcı hedef ekrana geçtiyse lazy-load grubunu burada hemen devam ettir.
+  resumeFor(activeScreen);
+
   // Yalnız hafif UI yardımcıları başlangıçta yüklenir. Büyük soru havuzu ve ekran eklentileri lazy-load edilir.
   const light=['/app-live-status.js?v=1','/app-ui-cleanup-v1.js?v=1','/app-topic-ui.js?v=1'];
   let li=0;

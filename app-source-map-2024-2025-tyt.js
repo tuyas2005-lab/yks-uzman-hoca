@@ -63,11 +63,31 @@
     const n=Number(q||0),hit=rows.find(([a,b])=>n>=a&&n<=b);
     return hit?hit[2]:0;
   }
+  function answerRows(C){
+    const out=new Map();
+    for(const row of C.allRecords?.()||C.all?.()||[]){
+      const year=Number(row?.year||0);if(row?.provider!=='OSYM'||row?.exam!=='TYT'||!SOURCES[year]||!row?.id)continue;
+      const old=out.get(row.id);
+      if(!old||(row.answerKey&&!old.answerKey))out.set(row.id,row);
+    }
+    return out;
+  }
+  function readiness(){
+    const C=window.YKSQuestionCatalogV1,rows=(C?.all?.()||[]).filter(x=>x?.provider==='OSYM'&&x?.exam==='TYT'&&SOURCES[Number(x?.year||0)]),out={};
+    for(const year of [2024,2025]){
+      const y=rows.filter(x=>Number(x.year)===year),main=y.filter(x=>x.track!=='alternate-track');
+      out[year]={total:y.length,mainTrack:main.length,alternateTrack:y.length-main.length,pageVerified:y.filter(x=>x.access?.page&&x.verification?.page==='verified').length,answerVerified:y.filter(x=>x.answerKey&&x.answerVerified).length,studentReady:y.filter(x=>x.answerKey&&x.answerVerified&&x.asset?.status==='ready').length};
+    }
+    return out;
+  }
   function activate(){
     const C=window.YKSQuestionCatalogV1;if(!C?.all)return false;
-    const runtimeMap={};let changed=0;
+    const canonicalAnswers=answerRows(C),runtimeMap={};let changed=0;
     for(const item of C.all()){
       const year=Number(item?.year||0);if(item?.provider!=='OSYM'||item?.exam!=='TYT'||!SOURCES[year])continue;
+      const richer=canonicalAnswers.get(item.id);
+      if(!item.answerKey&&richer?.answerKey)item.answerKey=richer.answerKey;
+      if(richer?.verification?.answerKey==='official'){item.verification??={};item.verification.answerKey='official'}
       const section=sectionOf(item),page=pageFor(year,section,item.questionNo);if(!page)continue;
       item.access??={};item.access.page=page;item.access.pdfKey=SOURCES[year].pdfKey;
       item.verification??={};item.verification.exactPage='verified-visual-official-pdf';item.verification.page='verified';
@@ -80,6 +100,7 @@
     }
     if(changed){try{window.YKSRegisterSourceMap?.(runtimeMap)}catch{};setTimeout(()=>{try{window.renderQuestionIndex?.()}catch{}},0)}
     window.YKS2024_2025SourceMap={sources:SOURCES,manual:MANUAL,count:changed};
+    window.get2024_2025SourceReadiness=readiness;
     return changed>0;
   }
   if(!activate()){let n=0;const t=setInterval(()=>{if(activate()||++n>40)clearInterval(t)},100)}

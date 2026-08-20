@@ -108,10 +108,33 @@ doğrulaması için kullanıldı.
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (Tarih+Coğrafya+Felsefe+Din K., ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Fen Bilimleri (Fizik+Kimya+Biyoloji) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2025 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
-Geometri + Sosyal Bilimler ana pool tamamlandı; Fen Bilimleri sırada). Kütüphanede fiilen
-saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
+## 2025 TYT — TAMAMLANDI (20 Ağustos 2026)
+
+**İki ayrı toplam — ikisi de doğru, farklı şeyi ölçüyor:**
+
+| Ölçüm | Değer |
+|---|---|
+| **Standart öğrenci pool** (Mini Test havuzu, ilerleme sayacı) | **120/120** ✅ |
+| **Kütüphanede kataloglanan gerçek ÖSYM sorusu** (booklet'teki tüm bağımsız içerik) | **125/125** ✅ |
+
+Fark: 5 `alternate-track` Felsefe sorusu (osym-2025-tyt-fel-21..25) gerçek, bağımsız ÖSYM
+içeriğidir ve kütüphanede tam saklanır (125'e dahil), ama standart öğrenci ilerleme sayacına
+dahil edilmez (120'ye dahil değil) çünkü aynı öğrenci Din Kültürü (16-20) XOR alternatif
+Felsefe (21-25)'den yalnızca birini cevaplar.
+
+**needs-manual-review-text-extraction-loss işaretli kayıtlar (topic ataması düşük güvenilirlikte,
+answerKey etkilenmedi):**
+
+| ID | Ders | Konu (en yakın tahmin) | Sebep |
+|---|---|---|---|
+| `osym-2025-tyt-mat-03` | Matematik | Üslü Sayılar ve Oran | Matematik kitabı sayfası görseli/işlem detayları PDF metninde kayıp |
+| `osym-2025-tyt-mat-05` | Matematik | Köklü Sayılar ve İşlem Önceliği | Sayı gösterimi ifadesi PDF metninde kayıp |
+| `osym-2025-tyt-kim-10` | Kimya | Moleküller Arası Etkileşimler | Kaynama noktası/etkileşim türü tablosu PDF metninde kayıp |
+| `osym-2025-tyt-kim-13` | Kimya | Donma Noktası Alçalması - Koligatif Özellikler | Donma noktası değerleri tablosu PDF metninde kayıp |
+
+Bu 4 kayıt, PDF görsel erişimi mümkün olduğunda öncelikli gözden geçirme adayıdır.
 
 > **`track` alanı — şema notu (yeni, 20 Ağustos 2026):** Bu batch'te ilk kez katalog satırına
 > opsiyonel `track` ve `trackReason` alanları eklendi. Değer yoksa (undefined) satır normal/ana
@@ -125,13 +148,14 @@ saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
 > geliştirilen uygulama kodu bu alanı okuyup filtrelemelidir; hiçbir `app-*.js` veya `api/*.js`
 > dosyasına bu batch'te dokunulmamıştır.
 
-> **PDF text-extraction kaybı notu (Matematik):** `web_fetch` ile çekilen PDF metninde bazı
-> matematiksel ifadeler/görsel örnekler (özellikle soru 3 ve 5'te "işlem"/"gösterim" detayları)
-> kayboldu — muhtemelen görsel/özel karakter olarak render edilmiş içerik. Bu iki sorunun
-> `topic` ataması en yakın makul tahmindir ama `verification.topic:'needs-manual-review-text-
-> extraction-loss'` olarak işaretlenmiştir. **Soru metni veya answerKey tahmin edilmemiştir** —
-> yalnız topic sınıflandırması bu kayıp nedeniyle düşük güvenilirlikte. PDF görsel erişimi
-> mümkün olduğunda bu 2 kayıt gözden geçirilmelidir.
+> **PDF text-extraction kaybı notu (genel, Matematik + Kimya):** `web_fetch` ile çekilen PDF
+> metninde bazı matematiksel ifadeler/tablo verileri/görsel örnekler kayboldu — muhtemelen
+> görsel/özel karakter olarak render edilmiş içerik (Matematik soru 3, 5: işlem/gösterim
+> detayları; Kimya soru 10, 13: kaynama/donma noktası veri tabloları). Bu 4 sorunun `topic`
+> ataması en yakın makul tahmindir ama `verification.topic:'needs-manual-review-text-
+> extraction-loss'` olarak işaretlenmiştir (tam liste yukarıda). **Soru metni veya answerKey
+> hiçbirinde tahmin edilmemiştir** — yalnız topic sınıflandırması bu kayıp nedeniyle düşük
+> güvenilirlikte. PDF görsel erişimi mümkün olduğunda bu 4 kayıt gözden geçirilmelidir.
 
 > **2025 TYT toplam soru sayısı notu (güncellendi 20 Ağustos 2026):** Booklet'te basılı toplam
 > 125 **gerçek, bağımsız ÖSYM sorusu** vardır (Türkçe 40 + Sosyal Bilimler 25 + Matematik 40 +

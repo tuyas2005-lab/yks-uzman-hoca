@@ -5,13 +5,13 @@ Yeni bir soru eklerken `topic` alanı için önce burayı kontrol et.
 Aynı beceriyi ölçen sorular için farklı topic isimleri üretme (örn. 'Köklü Sayılar' / 'Köklü İfadeler' ayrımı yapma).
 
 Bu sözlük, mevcut katalogdaki (`data/catalog/**`) gerçek kayıtlardan çıkarılmıştır — uydurma değildir.
-Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
+Kaynak: 410 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 
 ---
 
 ## TYT
 
-### TYT Biyoloji (6 konu)
+### TYT Biyoloji (11 konu)
 
 - Hücre Zarından Madde Geçişleri
 - Amino Asitler ve Proteinler
@@ -19,6 +19,11 @@ Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Hücre Bölünmeleri
 - Kalıtım
 - Ekoloji
+- Hücre Zarı Yapısı
+- Canlıların Ortak Özellikleri
+- Bakteriler
+- Mitoz Bölünme
+- Kalıtım - Soyağacı Analizi
 
 ### TYT Coğrafya (10 konu)
 
@@ -69,7 +74,7 @@ Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - İlk Çağ ve Orta Çağ Felsefesi Karşılaştırması
 - Çağdaş Felsefe - Nietzsche
 
-### TYT Fizik (7 konu)
+### TYT Fizik (9 konu)
 
 - Özkütle
 - Hareket ve Yer Değiştirme
@@ -78,8 +83,10 @@ Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Elektrostatik
 - Su Dalgaları
 - Aynalar
+- Net Kuvvet ve Sürtünme
+- Işığın Kırılması
 
-### TYT Kimya (7 konu)
+### TYT Kimya (12 konu)
 
 - Kimyasal Türler ve Bağlar
 - Atomun Yapısı
@@ -88,6 +95,11 @@ Kaynak: 390 kayıt / 2025+2026 TYT+AYT kataloğu (20 Ağustos 2026 itibarıyla).
 - Kimyasal Hesaplamalar
 - Çözeltiler ve Derişim
 - Metallerin Tepkimeleri
+- Saf Madde - Element ve Bileşik
+- Periyodik Sistem - Element Özellikleri
+- Moleküller Arası Etkileşimler
+- Viskozite
+- Donma Noktası Alçalması - Koligatif Özellikler
 
 ### TYT Matematik (47 konu)
 

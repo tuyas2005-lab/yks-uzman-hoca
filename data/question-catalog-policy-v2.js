@@ -6,6 +6,18 @@
   const providerRank=x=>x?.provider==='OSYM'?30:x?.provider==='MEB_OGM'?20:x?.sourceKind==='uploaded'?10:0;
   const solvedEvents=()=> (window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId);
   const solvedIds=()=>new Set(solvedEvents().map(x=>x.meta.catalogId));
+  const rowTrack=x=>x?.track||'main';
+  const needsTopicReview=x=>x?.verification?.topic==='needs-manual-review-text-extraction-loss';
+
+  function trackEligible(x,q={}){
+    if(q.track)return rowTrack(x)===q.track;
+    if(q.includeAlternateTrack===true)return true;
+    return rowTrack(x)!=='alternate-track';
+  }
+
+  function topicEligible(x,q={}){
+    return !norm(q.topic)||!needsTopicReview(x);
+  }
 
   function relevance(x,q={}){
     const query=norm([q.topic,q.curriculumOutcome,q.shortSolution].join(' '));
@@ -25,6 +37,8 @@
   function eligible(q={}){
     const done=solvedIds();
     return C.all().filter(x=>!done.has(x.id))
+      .filter(x=>trackEligible(x,q))
+      .filter(x=>topicEligible(x,q))
       .filter(x=>!q.exam||String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase())
       .filter(x=>!q.subject||norm(x.subject)===norm(q.subject))
       .map(x=>({...x,_match:relevance(x,q),_year:Number(x.year||0)}))
@@ -40,7 +54,11 @@
   }
 
   function progress(q={}){
-    const all=C.all().filter(x=>!q.exam||String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase()).filter(x=>!q.subject||norm(x.subject)===norm(q.subject));
+    const all=C.all()
+      .filter(x=>trackEligible(x,q))
+      .filter(x=>topicEligible(x,q))
+      .filter(x=>!q.exam||String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase())
+      .filter(x=>!q.subject||norm(x.subject)===norm(q.subject));
     const done=solvedIds();
     const relevant=all.map(x=>({...x,_match:relevance(x,q)})).filter(x=>!norm(q.topic)||x._match>0);
     const years=[...new Set(relevant.map(x=>Number(x.year||0)))].sort((a,b)=>b-a);
@@ -50,5 +68,5 @@
   C.findNextBatch=findNextBatch;
   C.getSolvedIds=solvedIds;
   C.getProgress=progress;
-  C.selectionPolicy={mode:'library-only',order:['topic-match','unsolved','year-desc','provider','relevance'],yearGate:true,providerOrder:['OSYM','MEB_OGM','uploaded-pdf'],openedIsSolved:false,resultMarksSolved:true};
+  C.selectionPolicy={mode:'library-only',order:['topic-match','unsolved','year-desc','provider','relevance'],yearGate:true,providerOrder:['OSYM','MEB_OGM','uploaded-pdf'],openedIsSolved:false,resultMarksSolved:true,defaultTrack:'main',alternateTrackOptIn:true,strictTopicSkipsManualReview:true};
 })();

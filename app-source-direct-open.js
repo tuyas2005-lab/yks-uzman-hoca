@@ -21,7 +21,9 @@
     if(typeof window.openSourceQuestion!=='function'){
       alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return;
     }
-    if(window.isSourceQuestionReady&&!window.isSourceQuestionReady(item)){
+    const ready=typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item);
+    const preparable=typeof window.isSourceQuestionPreparable==='function'&&window.isSourceQuestionPreparable(item);
+    if(!ready&&!preparable){
       alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;
     }
     window.openSourceQuestion(item,{type:mini?'mini':'official',card,returnScreen:mini?'tests':'similar'});

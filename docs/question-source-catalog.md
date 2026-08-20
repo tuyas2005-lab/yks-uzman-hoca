@@ -180,7 +180,7 @@ Bu 4 kayıt, PDF görsel erişimi mümkün olduğunda öncelikli gözden geçirm
 > answerKey ile kataloglanmış durumda; `page:null`, tahmini sayfa numarası yazılmadı.
 > `access.pageRange` alanı yalnızca hangi testte olduğunu belirtir, kesin sayfa değildir.
 
-## 2024 TYT — İşleniyor (20 Ağustos 2026)
+## 2024 TYT — TAMAMLANDI (20 Ağustos 2026)
 
 **Kaynak:** ÖSYM resmî sayfası
 (`osym.gov.tr/2024yks-tyt-ayt-ve-ydt-temel-soru-kitapciklari-ve-cevap-anahtarlari`) →
@@ -196,10 +196,14 @@ hem resmî cevap anahtarı doğrulaması için kullanıldı. Kitapçık yapısı
 | Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (ana pool) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 | Sosyal Bilimler (Felsefe, `alternate-track`) | 5 | 5/5 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Fen Bilimleri (Fizik+Kimya+Biyoloji) | 20 | 20/20 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2024 TYT toplamı (şu ana kadar işlenen):** 100/120 standart ilerleme (Türkçe + Matematik +
-Geometri + Sosyal Bilimler ana pool tamamlandı; yalnız Fen Bilimleri sırada). Kütüphanede
-fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Felsefe).
+**İki ayrı toplam — 2025 ile aynı yapı:**
+
+| Ölçüm | Değer |
+|---|---|
+| **Standart öğrenci pool** | **120/120** ✅ |
+| **Kütüphanede kataloglanan gerçek ÖSYM sorusu** | **125/125** ✅ |
 
 > **Yeni taxonomy terimleri (2024 Türkçe batch'i):** `Cümle Türleri - Yüklemine Göre`,
 > `Tamlama Türleri`, `Paragrafta Değinilen Bilgi` (mevcut `Paragrafta Değinilmeyen Yargı`nın
@@ -209,13 +213,6 @@ fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Fe
 > **Yeni taxonomy terimi (2024 Matematik+Geometri batch'i):** yalnızca `Formülle Problem Çözme`
 > (VKİ/vücut kitle indeksi gibi verilen bir formülü uygulayarak çözme becerisi; mevcut terimlerde
 > tam karşılığı yoktu). 39/40 soru mevcut terimlerle eşleşti.
->
-> **needs-manual-review-text-extraction-loss (5 kayıt, Matematik+Geometri):**
-> - `osym-2024-tyt-mat-04`: "b sayısı"nı tanımlayan not (su damlamış kitap sayfası) tamamen kayıp
-> - `osym-2024-tyt-mat-09`: termometre birim sistemi ve hedef sıcaklık değeri kayıp
-> - `osym-2024-tyt-mat-10`: küme tanımları (A, B kümelerinin içeriği) tamamen kayıp
-> - `osym-2024-tyt-mat-13`: tombala kartı sayıları ve hesaplanacak hedef değer kayıp
-> - `osym-2024-tyt-mat-34`: "şanslı üçgen" tanımındaki iç açı ölçüsü kayıp
 
 > **2024 TYT Sosyal Bilimler (25 soru: 20 ana + 5 alternatif Felsefe):** metin bütünlüğü
 > korunmuş, hiçbir soruda tablo/formül/sembol kaybı tespit edilmedi (0 `needs-manual-review`).
@@ -227,7 +224,35 @@ fiilen saklanan gerçek soru sayısı 105 (100 ana pool + 5 `alternate-track` Fe
 > `trackReason:'din-muafiyeti-felsefe'` şeması 2025 ile birebir aynı şekilde uygulandı
 > (`osym-2024-tyt-fel-21..25`).
 
-## 2024 TYT — Fen Bilimleri sırada
+> **2024 TYT Fen Bilimleri (20 soru: Fizik+Kimya+Biyoloji):** Taxonomy: 13/20 mevcut terimle
+> eşleşti (Özkütle, Net Kuvvet ve Sürtünme, Kaldırma Kuvveti ve Özkütle, Isı ve Sıcaklık, Işığın
+> Kırılması, Çözeltiler ve Derişim, Atomun Yapısı, Moleküller Arası Etkileşimler, Sıvılar ve Buhar
+> Basıncı, Kimyasal Hesaplamalar, Kalıtım - Soyağacı Analizi, Ekoloji), 7/20 için yeni terim
+> gerekti (Elektrik Akımı ve Direnç, Yayda Dalga Hareketi, Asitlerin Genel Özellikleri, Hücre
+> Çekirdeği, Biyomoleküller - Polimer Yapılar, Canlıların Sınıflandırılması, Eşeysiz Üreme).
+> Görsel: `fiz-01, fiz-05, fiz-06, fiz-07, kim-12, biy-19, biy-20` — 7/20.
+
+**needs-manual-review-text-extraction-loss işaretli kayıtlar (toplam 9, tüm 2024 TYT):**
+
+| ID | Ders | Sebep |
+|---|---|---|
+| `osym-2024-tyt-mat-04` | Matematik | "b sayısı" tanımlayan not tamamen kayıp |
+| `osym-2024-tyt-mat-09` | Matematik | Termometre birim sistemi + hedef değer kayıp |
+| `osym-2024-tyt-mat-10` | Matematik | Küme tanımları tamamen kayıp |
+| `osym-2024-tyt-mat-13` | Matematik | Tombala kartı verileri + hedef değer kayıp |
+| `osym-2024-tyt-mat-34` | Matematik | "Şanslı üçgen" açı ölçüsü kayıp |
+| `osym-2024-tyt-fiz-01` | Fizik | Ebru kütle-hacim grafiği değerleri tamamen kayıp |
+| `osym-2024-tyt-fiz-05` | Fizik | İletken tel V-I grafiği değerleri tamamen kayıp |
+| `osym-2024-tyt-kim-12` | Kimya | Gaz örnekleri çizelgesi tamamen kayıp |
+| `osym-2024-tyt-biy-19` | Biyoloji | Hemofili soyağacı şeması tamamen kayıp |
+
+Bu 9 kayıt, PDF görsel erişimi mümkün olduğunda öncelikli gözden geçirme adayıdır. (Karşılaştırma:
+2025 Fen'de yalnız 2 kayıt flag'lenmişti — bu, yıllar arası PDF text-extraction kalite farkından
+kaynaklanıyor, katalog kalite politikası değişmedi.)
+
+> **Not:** 2024 TYT için de henüz `app-source-map-2024-*.js` gibi bir crop/source-map dosyası
+> oluşturulmadı — aynı ortam kısıtı nedeniyle (bkz. yukarıdaki teknik not). `page:null`, tahmini
+> sayfa numarası yazılmadı.
 
 ## Yeni PDF yayın ekleme
 

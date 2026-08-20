@@ -192,14 +192,29 @@ hem resmî cevap anahtarı doğrulaması için kullanıldı. Kitapçık yapısı
 | Ders | Soru | answerKey | Crop durumu |
 |------|------|-----------|--------------|
 | Türkçe | 40 | 40/40 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Matematik (1-30) | 30 | 30/30 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
+| Geometri (31-40) | 10 | 10/10 (resmî anahtarla satır satır doğrulandı) | auto-crop yok / visual QA pending |
 
-**2024 TYT toplamı (şu ana kadar işlenen):** 40/120 standart ilerleme (Türkçe tamamlandı;
-Temel Matematik + Geometri, Sosyal Bilimler, Fen Bilimleri sırada).
+**2024 TYT toplamı (şu ana kadar işlenen):** 80/120 standart ilerleme (Türkçe + Matematik +
+Geometri tamamlandı; Sosyal Bilimler, Fen Bilimleri sırada).
 
 > **Yeni taxonomy terimleri (2024 Türkçe batch'i):** `Cümle Türleri - Yüklemine Göre`,
 > `Tamlama Türleri`, `Paragrafta Değinilen Bilgi` (mevcut `Paragrafta Değinilmeyen Yargı`nın
 > pozitif karşılığı — "hangisine değinilmiştir" kalıbı, "değinilmemiştir" değil). 37/40 soru
 > mevcut 2025/2026 terimleriyle eşleşti, zorlama yapılmadı.
+
+> **Yeni taxonomy terimi (2024 Matematik+Geometri batch'i):** yalnızca `Formülle Problem Çözme`
+> (VKİ/vücut kitle indeksi gibi verilen bir formülü uygulayarak çözme becerisi; mevcut terimlerde
+> tam karşılığı yoktu). 39/40 soru mevcut terimlerle eşleşti.
+>
+> **needs-manual-review-text-extraction-loss (5 kayıt, Matematik+Geometri):**
+> - `osym-2024-tyt-mat-04`: "b sayısı"nı tanımlayan not (su damlamış kitap sayfası) tamamen kayıp
+> - `osym-2024-tyt-mat-09`: termometre birim sistemi ve hedef sıcaklık değeri kayıp
+> - `osym-2024-tyt-mat-10`: küme tanımları (A, B kümelerinin içeriği) tamamen kayıp
+> - `osym-2024-tyt-mat-13`: tombala kartı sayıları ve hesaplanacak hedef değer kayıp
+> - `osym-2024-tyt-mat-34`: "şanslı üçgen" tanımındaki iç açı ölçüsü kayıp
+
+## 2024 TYT — Sosyal Bilimler ve Fen Bilimleri sırada
 
 ## Yeni PDF yayın ekleme
 

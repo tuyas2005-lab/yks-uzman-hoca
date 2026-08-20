@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r11-crop-readiness-hardening';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r12-mini-test-year-filter';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

@@ -26,7 +26,7 @@
     ['din','Din Kültürü ve Ahlak Bilgisi',"İslam'da Bilgi ve Eylem İlişkisi",['Meleklerin Koruyucusu belgeseli','iyilik','bilgiyle sınırlı kalmama']],
     ['din','Din Kültürü ve Ahlak Bilgisi',"İslam'da Temel Haklar ve Özgürlükler",['Hz. Ömer','Eyle emannamesi','can mal inanç dokunulmazlığı']],
     ['din','Din Kültürü ve Ahlak Bilgisi',"Allah'ın Varlığının Delilleri - Gaye ve Nizam",['gaye nizam delili','ayet örnekleri']],
-    ['din','Din Kültürü ve Ahlak Bilgisi','Hz. Muhammed\'in Örnekliği',['kız çocukları','hadis','toplumsal değer']],
+    ['din','Din Kültürü ve Ahlak Bilgisi','Hz. Muhammed’in Örnekliği',['kız çocukları','hadis','toplumsal değer']],
     ['din','Din Kültürü ve Ahlak Bilgisi','Tasavvuf ve İbadet - Sema Töreni',['Mevlevilik','sema','sembolik anlam']],
     ['fel','Felsefe','Mantık - Tümevarımsal Akıl Yürütme Hataları',['yetersiz örnek','hatalı genelleme'],true],
     ['fel','Felsefe','Bilgi Felsefesi - Hume ve Nedensellik',['David Hume','nedensellik ilkesi','zihinsel alışkanlık'],true],

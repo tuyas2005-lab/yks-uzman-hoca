@@ -44,6 +44,41 @@ for (const f of files) {
 
 const t2025 = allRows.filter(r => r.year === 2025 && r.exam === 'TYT');
 
+// --- FILE-SCOPE KONTROL (mantik hatasi duzeltmesi) ---
+// Onceki versiyon year/exam kontrolunu t2025 (zaten year===2025&&exam==='TYT' filtreli)
+// uzerinde yapiyordu - bu, dosyada yanlislikla year:2026 veya exam:'AYT' yazilmis bir
+// kaydin filtre asamasinda kaybolup hic yakalanamamasi anlamina gelirdi (yanlis pozitif
+// guvenlik). Duzeltme: 2025-tyt-*.js dosyalarini AYRI, IZOLE bir sandbox'ta, hicbir
+// property filtresi uygulamadan yukleyip HAM haliyle kontrol ediyoruz.
+const catalogManifestSrc = fs.readFileSync(path.join(catalogDir, 'catalog-manifest.js'), 'utf8');
+const manifestSandbox = { window: {}, console };
+vm.createContext(manifestSandbox);
+vm.runInContext(catalogManifestSrc, manifestSandbox);
+const tyt2025Files = manifestSandbox.window.YKSQuestionCatalogFiles.filter(f => /\/2025-tyt-[^/]+\.js$/.test(f));
+
+const fileScopeRows = [];
+const fsSandbox = {
+  window: { YKSQuestionCatalogV1: { register(rows) { fileScopeRows.push(...rows); }, all() { return fileScopeRows; } } },
+  console, setInterval: () => 0, clearInterval: () => {},
+};
+vm.createContext(fsSandbox);
+for (const f of tyt2025Files) {
+  const abs = path.join(REPO, f.replace(/^\//, ''));
+  const src = fs.readFileSync(abs, 'utf8');
+  vm.runInContext(src, fsSandbox, { filename: f });
+}
+
+check('10e-file-scope-dosya-listesi', tyt2025Files.length === 5, `bulunan dosyalar: ${tyt2025Files.join(', ')}`);
+check('10f-file-scope-toplam-125', fileScopeRows.length === 125, `bulunan: ${fileScopeRows.length}`);
+const fsWrongYear = fileScopeRows.filter(r => r.year !== 2025);
+const fsWrongExam = fileScopeRows.filter(r => r.exam !== 'TYT');
+const fsWrongProvider = fileScopeRows.filter(r => r.provider !== 'OSYM');
+const fsYdtLeak = fileScopeRows.filter(r => /ydt/i.test(r.id) || /yabancı dil/i.test(r.subject||'') || /yabancı dil/i.test(r.topic||''));
+check('10g-file-scope-yil-2025', fsWrongYear.length === 0, `yanlis yil: ${fsWrongYear.map(r=>`${r.id}:${r.year}`).join(',')}`);
+check('10h-file-scope-exam-TYT', fsWrongExam.length === 0, `yanlis exam: ${fsWrongExam.map(r=>`${r.id}:${r.exam}`).join(',')}`);
+check('10i-file-scope-provider-OSYM', fsWrongProvider.length === 0, `yanlis provider: ${fsWrongProvider.map(r=>`${r.id}:${r.provider}`).join(',')}`);
+check('10j-file-scope-ydt-sizinti-yok', fsYdtLeak.length === 0, `YDT izi: ${fsYdtLeak.map(r=>r.id).join(',')}`);
+
 // --- 1. Toplam 125, duplicate ID yok ---
 check('1a-toplam-125', t2025.length === 125, `bulunan: ${t2025.length}`);
 const idCounts = {};
@@ -105,14 +140,9 @@ check('9a-standart-pool-120', mainPool.length === 120, `main pool: ${mainPool.le
 check('9b-fiziksel-katalog-125', t2025.length === 125, `toplam katalog: ${t2025.length}`);
 
 // --- 10. Yanlislikla 2026/YDT/yanlis exam/yanlis provider yok ---
-const wrongYear = t2025.filter(r => r.year !== 2025);
-const wrongExam = t2025.filter(r => r.exam !== 'TYT');
-const wrongProvider = t2025.filter(r => r.provider !== 'OSYM');
-const ydtLeak = t2025.filter(r => /ydt/i.test(r.id) || /yabancı dil/i.test(r.subject||'') || /yabancı dil/i.test(r.topic||''));
-check('10a-yil-2025', wrongYear.length === 0, `yanlis yil: ${wrongYear.map(r=>r.id).join(',')}`);
-check('10b-exam-TYT', wrongExam.length === 0, `yanlis exam: ${wrongExam.map(r=>r.id).join(',')}`);
-check('10c-provider-OSYM', wrongProvider.length === 0, `yanlis provider: ${wrongProvider.map(r=>r.id).join(',')}`);
-check('10d-ydt-sizinti-yok', ydtLeak.length === 0, `YDT izi: ${ydtLeak.map(r=>r.id).join(',')}`);
+// Gercek kontrol yukarida FILE-SCOPE olarak yapildi (10e-10j) - t2025 zaten
+// year===2025&&exam==='TYT' filtresinden gectigi icin burada tekrar ayni property'yi
+// kontrol etmenin guvenlik degeri yok (onceki versiyonun hatasi buydu, kaldirildi).
 
 // --- 11. Taxonomy'de suphe uyandiran mukerrer topic'ler (RAPORLAMA, otomatik degistirme yok) ---
 const topicsBySubject = {};

@@ -1,6 +1,7 @@
 (()=>{
   const C=()=>window.YKSQuestionCatalogV1,D=()=>window.YKSDataV5;
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const normText=s=>String(s||'').toLocaleLowerCase('tr-TR');
   const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
   const PDFWORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
   const CACHE_NAME='yks-source-question-crops-v4';
@@ -58,7 +59,20 @@
   function installReadyPolicy(){const c=C();if(!c?.findNextBatch||c.__readyPolicy)return;const base=c.findNextBatch.bind(c);c.findNextBatch=(q={},limit=5)=>base(q,Math.max(40,limit*8)).filter(isReady).slice(0,limit);c.isStudentReady=isReady;c.__readyPolicy=true}
   async function renderCrop(item){const token=++renderToken,root=document.getElementById('sqImage');root.innerHTML='<div class="sq-loading">📄 Orijinal soru hazırlanıyor…</div>';cropData='';try{const url=await getCropUrl(item);if(token!==renderToken)return;const img=document.createElement('img');img.alt=`${item.year||''} ${item.exam} ${item.subject} Soru ${item.questionNo||''}`;img.src=url;root.innerHTML='';root.appendChild(img)}catch(e){console.error('source crop',e);root.innerHTML=`<div class="sq-loading">Sorunun tek görüntüsü yüklenemedi.<br><small>${esc(e.message||'PDF erişim hatası')}</small></div>`}}
 
-  function resolveItem(card){const all=C()?.all?.()||[],id=card?.dataset?.catalogId;if(id)return all.find(x=>x.id===id)||null;const txt=card?.innerText||'';let candidates=all.filter(x=>txt.includes(x.collection||'')&&txt.includes(x.topic||'')&&txt.includes(String(x.questionNo||'')));if(candidates.length===1)return candidates[0];candidates=all.filter(x=>txt.includes(x.collection||'')&&txt.includes(String(x.questionNo||'')));return candidates[0]||null}
+  function resolveItem(card){
+    const all=C()?.all?.()||[],id=String(card?.dataset?.catalogId||'').trim();
+    if(id)return all.find(x=>x.id===id)||null;
+    const text=card?.innerText||'',normalized=normText(text),questionNo=(text.match(/\bSoru\s*(\d+)\b/i)||[])[1]||'',examInfo=text.match(/\b(20\d{2})\s+(TYT|AYT|YDT)\b/i);
+    if(!questionNo||!examInfo)return null;
+    const year=Number(examInfo[1]),exam=examInfo[2].toUpperCase(),unique=rows=>[...new Map(rows.filter(x=>x?.id).map(x=>[x.id,x])).values()];
+    const candidates=unique(all.filter(x=>Number(x.year)===year&&String(x.exam||'').toUpperCase()===exam&&String(x.questionNo||'')===questionNo&&x.subject&&normalized.includes(normText(x.subject))));
+    const topicMatches=candidates.filter(x=>x.topic&&normalized.includes(normText(x.topic)));
+    if(topicMatches.length===1)return topicMatches[0];
+    const collectionMatches=candidates.filter(x=>x.collection&&normalized.includes(normText(x.collection)));
+    if(collectionMatches.length===1)return collectionMatches[0];
+    return candidates.length===1?candidates[0]:null
+  }
+  window.resolveSourceQuestionCard=resolveItem;
   function showScreen(){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s===screen));document.querySelectorAll('[data-go]').forEach(b=>b.classList.remove('active'));window.scrollTo({top:0,behavior:'smooth'})}
   function showPreserved(id){const target=document.getElementById(id);if(!target)return false;document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s===target));document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===id));window.scrollTo({top:0,behavior:'smooth'});return true}
   function recordOpen(item,ctx={}){const id=String(item?.id||'');if(!id)return;const now=Date.now(),last=recentOpenAt.get(id)||0;if(now-last<1500)return;recentOpenAt.set(id,now);try{D()?.record?.({source:'official-question-open',exam:item.exam,subject:item.subject,topic:item.topic,curriculumOutcome:(item.subtopics||[]).join(' • '),result:'unknown',interaction:'opened-source',questionCount:0,signals:[],meta:{catalogId:item.id,provider:item.provider,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual,origin:ctx?.type||'source'}},{persistNow:true})}catch{}}

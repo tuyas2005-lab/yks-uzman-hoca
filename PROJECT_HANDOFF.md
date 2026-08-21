@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-ac7508730cd4c115b4605464c424492c63e0b7c6
+c1ecbb001a2d78a1f23ca8a398c1d4c25d7e02af
 
 Commit:
 
-Unify source question retry and wrong closure flow
+Integrate 2023 TYT Fen source runtime
 
 Production:
 
@@ -287,6 +287,15 @@ Kurallar:
 - bilinçli yeni retry yeni attempt olarak kaydedilmelidir
 - geçmiş attempt'ler silinmemelidir
 - Yanlışlarım'da aynı canonical hata için duplicate açık kart olmamalıdır
+
+## Source Card Catalog Resolver
+
+Mini Test ve resmî kaynak kartları, katalogdan gelen gerçek `id` değerini
+canonical `data-catalog-id` olarak render eder.
+
+Tek resolver bu açık kimliği önceliklendirir. Yalnız legacy kartlarda çalışan
+fallback; yıl, sınav, ders ve soru numarasını birlikte doğrulamadan eşleşme
+yapmaz. Belirsiz eşleşmelerde ilk kaydı seçmek yerine `null` döndürür.
 
 ---
 
@@ -363,7 +372,7 @@ Doğrulanmış sonuçlar:
 - `needs-manual-review` flag: 0
 - Korunan answerKey: `ADBBACCEBCAEADDAEBED`
 - Validator: 660 kayıt, 0 hata, 0 uyarı
-- Student-ready: henüz 0/20
+- Student-ready: 20/20
 
 Durum:
 
@@ -372,24 +381,19 @@ Durum:
 - Source-map ✅
 - Crop geometry ✅
 - Visual QA ✅
-- Runtime integration ⏳
-- Student-ready ⏳
+- Runtime integration ✅
+- Student-ready ✅
 
-Mevcut runtime blocker:
+Production runtime sonucu:
 
-`app-source-map-2023-tyt-fen.js` dosyası
-`pdfKey:'osym-2023-tyt'` kullanmaktadır. Ancak production
-`api/source-question.js` dosyasındaki `SOURCES` objesinde
-`osym-2023-tyt` henüz tanımlı değildir.
+- `osym-2023-tyt` PDF kaynağı API `SOURCES` objesine eklendi.
+- `app-source-map-2023-tyt-fen.js` runtime/lazy-load zincirine bağlandı.
+- 20/20 Fen sorusu runtime crop testini geçti.
+- Fizik 1 ve Biyoloji 19 production source viewer kabul testini geçti.
+- Mini Test → TYT → Fizik → 2023 akışı production üzerinde doğrulandı.
+- 2024/2025/2026 source regression ve Source Learning Loop PASS.
 
-Codex'in read-only doğrulamasında, Claude branch'teki yeni source-map
-dosyasının mevcut production runtime/lazy-load zincirinde yüklendiğini
-gösteren bir referans da bulunmamıştır.
-
-Bu nedenle doğrulanmış crop geometrileri henüz production runtime
-üzerinden render edilemez ve Fen soruları student-ready kabul edilmez.
-
-Runtime entegrasyonu ayrı bir Codex görevi olacaktır.
+Önceki runtime blocker çözülmüş ve production doğrulaması tamamlanmıştır.
 
 ---
 

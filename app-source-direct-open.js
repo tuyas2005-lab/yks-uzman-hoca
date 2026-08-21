@@ -1,21 +1,7 @@
 (()=>{
-  const C=()=>window.YKSQuestionCatalogV1;
-  const norm=s=>String(s||'').toLocaleLowerCase('tr-TR');
   let warmTimer=0,bindTimer=0,lastWarmKey='';
 
-  function resolve(card){
-    const all=C()?.all?.()||[];
-    const id=card?.dataset?.catalogId;
-    if(id){const hit=all.find(x=>x.id===id);if(hit)return hit}
-    const text=card?.innerText||'';
-    const q=(text.match(/Soru\s*(\d+)/i)||[])[1]||'';
-    let rows=all.filter(x=>q&&String(x.questionNo||'')===q&&text.includes(x.collection||''));
-    if(rows.length===1)return rows[0];
-    rows=all.filter(x=>q&&String(x.questionNo||'')===q&&text.includes(x.subject||'')&&text.includes(x.topic||''));
-    if(rows.length===1)return rows[0];
-    const z=norm(text);
-    return all.find(x=>q&&String(x.questionNo||'')===q&&z.includes(norm(x.subject))&&z.includes(norm(x.topic)))||null;
-  }
+  const resolve=card=>window.resolveSourceQuestionCard?.(card)||null;
 
   function openDirect(btn,card,item,mini){
     if(typeof window.openSourceQuestion!=='function'){

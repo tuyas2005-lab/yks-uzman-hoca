@@ -48,8 +48,7 @@
 
       <div class="section-title"><h2>Hızlı Başla</h2></div>
       <div class="quick-grid">
-        <button class="quick" data-go="upload"><div class="ico">📷</div><div><b>Soru Yükle</b><small>Fotoğraftan soru çöz</small></div></button>
-        <button class="quick" data-go="write"><div class="ico">✍️</div><div><b>Soru Yaz</b><small>Metin olarak yapıştır</small></div></button>
+        <button class="quick" data-go="upload"><div class="ico">📷</div><div><b>Soru Çöz</b><small>Fotoğrafla veya yazarak sorunu çöz</small></div></button>
         <button class="quick" data-go="tests"><div class="ico">🧪</div><div><b>Mini Test</b><small>Zayıf konundan 5 soru</small></div></button>
         <button class="quick" data-go="counselor"><div class="ico">💬</div><div><b>Rehber Öğretmen</b><small>Motivasyon ve çalışma desteği</small></div></button>
       </div>
@@ -66,11 +65,24 @@
     </section>
 
     <section id="upload" class="screen">
-      <div class="screen-head"><button class="back" data-go="home">←</button><h1>Soru Yükle</h1></div>
-      <div class="card upload-box"><div id="drop" class="drop"><div><div class="camera">📷</div><h2>Sorunun fotoğrafını ekle</h2><p class="muted">Net, düz ve yakın çekim en iyi sonucu verir.</p><input id="fileInput" type="file" accept="image/*" capture="environment" hidden><button id="pick" class="primary">Kamera / Galeri</button></div></div><img id="preview" class="preview hidden"><div id="uploadActions" class="actions hidden"><button id="clear" class="ghost">Yeniden Seç</button><button id="analyzeImage" class="primary">Analiz Et</button></div></div>
+      <div class="screen-head solve-head"><button class="back" data-go="home">←</button><div><h1>Soru Çöz</h1><p>Bir soruyu fotoğrafla veya yaz</p></div></div>
+      <div class="card upload-box solve-workspace">
+        <div class="solve-media-actions">
+          <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+          <input id="fileInput" type="file" accept="image/*" hidden>
+          <button id="takePhoto" class="secondary" type="button"><span>📷</span><span><b>Kameradan Çek</b><small>Telefon veya tablet kamerasını aç</small></span></button>
+          <button id="pickGallery" class="secondary" type="button"><span>🖼️</span><span><b>Galeriden Seç</b><small>Cihazındaki bir görseli kullan</small></span></button>
+        </div>
+        <div id="imagePreviewBox" class="solve-preview hidden">
+          <img id="preview" class="preview" alt="Seçilen soru görseli">
+          <div class="solve-preview-actions"><button id="changeImage" class="ghost" type="button">Değiştir</button><button id="removeImage" class="ghost" type="button">Kaldır</button></div>
+        </div>
+        <label class="solve-text-label" for="questionText">Soruyu yaz veya görsele açıklama ekle</label>
+        <textarea id="questionText" class="solve-text" placeholder="Sorunu buraya yaz veya yapıştır..."></textarea>
+        <div id="solveValidation" class="solve-validation hidden" role="alert"></div>
+        <button id="solveQuestion" class="primary full solve-submit" type="button">Soruyu Çöz</button>
+      </div>
     </section>
-
-    <section id="write" class="screen"><div class="screen-head"><button class="back" data-go="home">←</button><h1>Soru Yaz</h1></div><div class="card"><textarea id="questionText" style="width:100%;min-height:240px;border:1px solid var(--line);border-radius:15px;padding:14px" placeholder="Soruyu buraya yaz veya yapıştır..."></textarea><button id="analyzeText" class="primary full" style="margin-top:12px">Analiz Et</button></div></section>
 
     <section id="analyze" class="screen"><div class="analysis-wrap"><div class="ring"><strong>78%</strong></div><h1>Soru analiz ediliyor</h1><p class="muted">MEB kazanımı ve çözüm yolu eşleştiriliyor.</p><div class="checklist"><div>✅ Görüntü/metin kontrol edildi</div><div>✅ Ders: TYT Matematik</div><div>✅ Konu: Üslü İfadeler</div><div>✅ Kazanım eşleştirildi</div><div>◌ Çözüm hazırlanıyor</div></div><div class="card analysis-card"><b>Analiz Sonucu</b><div class="meta"><div><b>Ders</b><br><span id="aSubject">TYT Matematik</span></div><div><b>Konu</b><br><span id="aTopic">Üslü İfadeler</span></div><div><b>Zorluk</b><br><span id="aDifficulty">Orta</span></div><div><b>MEB</b><br><span id="aOutcome">Üslü ifadeler</span></div></div></div><button id="showSolution" class="primary full" data-go="solution" style="margin-top:14px">Çözümü Göster</button></div></section>
 

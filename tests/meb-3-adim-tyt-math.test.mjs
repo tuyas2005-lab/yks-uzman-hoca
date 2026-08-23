@@ -37,6 +37,17 @@ test('explicit MEB catalog identity wins and uses its static asset',()=>{
   }
 });
 
+test('all MEB catalog assets exist at repository-root asset paths',()=>{
+  const rows=runtime().rows;
+  assert.equal(rows.length,24);
+  for(const item of rows){
+    assert.match(item.asset.url,/^\/assets\/meb-3-adim-tyt-math\/[\w-]+\.jpg$/);
+    assert.ok(!item.asset.url.includes('/public/'));
+    assert.ok(fs.existsSync(new URL(item.asset.url.slice(1),root)),item.asset.url);
+  }
+  assert.equal(fs.readdirSync(new URL('assets/meb-3-adim-tyt-math/',root)).filter(x=>x.endsWith('.jpg')).length,24);
+});
+
 test('legacy resolver rejects ambiguous MEB/ÖSYM question number fallback',()=>{
   const rt=runtime(),all=[...rt.rows,{id:'osym-2026-tyt-mat-05',provider:'OSYM',year:2026,exam:'TYT',subject:'Matematik',questionNo:'5',topic:'Başka Konu'}];
   assert.equal(rt.resolve(all,{text:'2026 TYT Matematik • Soru 5',subject:'Matematik'}),null);

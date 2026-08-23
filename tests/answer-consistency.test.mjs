@@ -7,7 +7,7 @@ const pureSource=source
   .replace(/^import[^\n]+\n/,'')
   .split('function setPipelineUsageHeaders')[0]
   .replaceAll('export function ','function ')+`
-globalThis.consistencyTestApi={normalizeAnswer,answersEquivalent,hasDirectAnswerContradiction,candidateIsConsistent,selectFinalSolution};`;
+globalThis.consistencyTestApi={normalizeAnswer,answersEquivalent,hasDirectAnswerContradiction,verificationIsReliable,candidateIsConsistent,selectFinalSolution};`;
 
 const context={console,String,Math,Object,JSON,RegExp};
 context.globalThis=context;
@@ -17,6 +17,7 @@ vm.runInContext(pureSource,context,{filename:'api/solve.js'});
 const {
   answersEquivalent,
   hasDirectAnswerContradiction,
+  verificationIsReliable,
   candidateIsConsistent,
   selectFinalSolution
 }=context.consistencyTestApi;
@@ -28,14 +29,15 @@ assert.equal(answersEquivalent('C) Ankara','C) İstanbul'),false,'aynı şık ha
 assert.equal(hasDirectAnswerContradiction('E','E seçeneği yanlıştır; doğru cevap C olmalıdır.'),true,'doğrudan answer/açıklama çelişkisi yakalanmalı');
 
 const stableCandidate={subject:'Matematik',exam:'TYT',topic:'Denklemler',difficulty:'Kolay',answer:'x = 6',short_solution:'2x = 12 olduğundan x = 6 bulunur.'};
-const stableVerification={consistent:true,candidateCorrect:true,explanationSupportsAnswer:true,verifiedAnswer:'6',verifiedShortSolution:'2x = 12, dolayısıyla x = 6.',reason:'Yerine koyma sonucu sağlıyor.',confidence:'high'};
+const stableVerification={independentAnswer:'6',consistent:true,candidateCorrect:true,explanationSupportsAnswer:true,verifiedAnswer:'6',verifiedShortSolution:'2x = 12, dolayısıyla x = 6.',reason:'Yerine koyma sonucu sağlıyor.',confidence:'high'};
+assert.equal(verificationIsReliable(stableVerification),true);
 assert.equal(candidateIsConsistent(stableCandidate,stableVerification),true);
 const stableDecision=selectFinalSolution(stableCandidate,stableVerification);
 assert.equal(stableDecision.solution.answer,'x = 6');
 assert.equal(stableDecision.corrected,false);
 
 const contradictoryCandidate={subject:'Coğrafya',exam:'TYT',topic:'Harita Bilgisi',difficulty:'Orta',answer:'E',short_solution:'E seçeneği yanlıştır; haritada doğru konum C ile gösterilmiştir.'};
-const contradictionVerification={consistent:false,candidateCorrect:false,explanationSupportsAnswer:false,verifiedAnswer:'C',verifiedShortSolution:'Haritadaki işaretli alan C seçeneğindeki konumdur.',reason:'Aday cevap açıklamayla ve haritayla çelişiyor.',confidence:'high'};
+const contradictionVerification={independentAnswer:'C',consistent:false,candidateCorrect:false,explanationSupportsAnswer:false,verifiedAnswer:'C',verifiedShortSolution:'Haritadaki işaretli alan C seçeneğindeki konumdur.',reason:'Aday cevap açıklamayla ve haritayla çelişiyor.',confidence:'high'};
 const corrected={...contradictoryCandidate,answer:'C',short_solution:'Haritadaki işaretli alan C seçeneğindeki konumdur.'};
 const correctedDecision=selectFinalSolution(contradictoryCandidate,contradictionVerification,corrected);
 assert.equal(correctedDecision.solution.answer,'C','çelişen ilk cevap final olarak geçmemeli');
@@ -45,8 +47,37 @@ assert.equal(hasDirectAnswerContradiction(correctedDecision.solution.answer,corr
 
 const mismatchedCorrection={...corrected,answer:'D',short_solution:'Doğru seçenek D olur.'};
 const fallbackDecision=selectFinalSolution(contradictoryCandidate,contradictionVerification,mismatchedCorrection);
-assert.equal(fallbackDecision.solution.answer,'C','verifier ile uyuşmayan correction yerine doğrulanmış cevap kullanılmalı');
-assert.equal(fallbackDecision.source,'verifier-fallback');
+assert.equal(fallbackDecision.solution.answer,'Doğrulanamadı','üç farklı cevapta verifier fallback kesin cevap vermemeli');
+assert.equal(fallbackDecision.uncertain,true);
+assert.equal(fallbackDecision.source,'uncertainty');
+
+const blindMismatchVerification={...stableVerification,independentAnswer:'5',verifiedAnswer:'6'};
+assert.equal(verificationIsReliable(blindMismatchVerification),false,'independentAnswer ve verifiedAnswer farklıysa verifier güvenilmez olmalı');
+const blindMismatchDecision=selectFinalSolution(stableCandidate,blindMismatchVerification);
+assert.equal(blindMismatchDecision.solution.answer,'Doğrulanamadı');
+assert.equal(blindMismatchDecision.uncertain,true);
+
+const candidateA={...stableCandidate,answer:'A',short_solution:'Doğru seçenek A olur.'};
+const verifierE={...stableVerification,independentAnswer:'E',consistent:false,candidateCorrect:false,explanationSupportsAnswer:true,verifiedAnswer:'E',verifiedShortSolution:'Doğru seçenek E olur.'};
+const correctionE={...candidateA,answer:'E',short_solution:'Doğru seçenek E olur.'};
+const correctionC={...candidateA,answer:'C',short_solution:'Doğru seçenek C olur.'};
+const threeWayDecision=selectFinalSolution(candidateA,verifierE,correctionC);
+assert.equal(threeWayDecision.solution.answer,'Doğrulanamadı','A/E/C üç-yol uyuşmazlığı kesin cevap vermemeli');
+assert.equal(threeWayDecision.uncertain,true);
+const validCorrectionDecision=selectFinalSolution(candidateA,verifierE,correctionE);
+assert.equal(validCorrectionDecision.solution.answer,'E');
+assert.equal(validCorrectionDecision.corrected,true);
+assert.equal(validCorrectionDecision.uncertain,false);
+const verifierFallbackDecision=selectFinalSolution(candidateA,verifierE,null);
+assert.equal(verifierFallbackDecision.solution.answer,'E','correction yoksa internally consistent verifier fallback korunmalı');
+assert.equal(verifierFallbackDecision.source,'verifier-fallback');
+
+const candidateB={...stableCandidate,answer:'B',short_solution:'Doğru seçenek B olur.'};
+const verifierB={...stableVerification,independentAnswer:'B',verifiedAnswer:'B',verifiedShortSolution:'Doğru seçenek B olur.'};
+const agreementDecision=selectFinalSolution(candidateB,verifierB);
+assert.equal(agreementDecision.solution.answer,'B');
+assert.equal(agreementDecision.corrected,false);
+assert.equal(agreementDecision.uncertain,false);
 
 const uncertainDecision=selectFinalSolution(stableCandidate,{...stableVerification,consistent:false,confidence:'low',verifiedAnswer:'',verifiedShortSolution:''});
 assert.equal(uncertainDecision.solution.answer,'Doğrulanamadı');
@@ -54,6 +85,8 @@ assert.equal(uncertainDecision.solution.short_solution,'Bu sorunun cevabını g�
 assert.equal(uncertainDecision.uncertain,true);
 
 assert.equal((source.match(/name:"yks_corrected_solution"/g)||[]).length,1,'pipeline en fazla tek correction pass tanımlamalı');
+assert.match(source,/required:\["independentAnswer","consistent"/,'verifier schema independentAnswer ile başlamalı');
+assert.match(source,/independentAnswer alanına sabitle/,'verifier prompt bağımsız cevabı candidate karşılaştırmasından önce sabitlemeli');
 assert.match(source,/body\.diagnostics===true/,'candidate/verifier ayrıntıları normal öğrenci yanıtına eklenmemeli');
 assert.equal((source.match(/reasoning:\{effort:"low"\}/g)||[]).length,2,'verifier ve correction kontrollü düşük reasoning kullanmalı');
 assert.match(source,/questionContent\(text,image,"high"\)/,'correction görseli yüksek ayrıntıda yeniden okumalı');
@@ -115,6 +148,13 @@ assert.equal(stableHandlerResponse.body.verification.consistent,true);
 assert.equal(stableHandlerResponse.body.verification.corrected,false);
 assert.equal(handlerContext.mockClient.calls.length,2,'tutarlı adayda correction çağrısı yapılmamalı');
 
+handlerContext.mockClient=mockClient([{...stableCandidate},{...blindMismatchVerification}]);
+const blindMismatchHandlerResponse=mockResponse();
+await handlerContext.consistencyHandler({method:'POST',body:{text:'2x = 12 ise x kaçtır?',diagnostics:true}},blindMismatchHandlerResponse);
+assert.equal(blindMismatchHandlerResponse.body.answer,'Doğrulanamadı');
+assert.equal(blindMismatchHandlerResponse.body.verification.uncertain,true);
+assert.equal(handlerContext.mockClient.calls.length,2,'güvenilmez verifier correction tetiklememeli');
+
 handlerContext.mockClient=mockClient(responseFixture());
 const studentResponse=mockResponse();
 await handlerContext.consistencyHandler({method:'POST',body:{text:'Haritadaki doğru konum hangisidir?'}},studentResponse);
@@ -127,6 +167,7 @@ handlerContext.mockClient=mockClient(responseFixture());
 const diagnosticResponse=mockResponse();
 await handlerContext.consistencyHandler({method:'POST',body:{text:'Haritadaki doğru konum hangisidir?',diagnostics:true}},diagnosticResponse);
 assert.equal(diagnosticResponse.body.verification.firstAnswer,'E');
+assert.equal(diagnosticResponse.body.verification.independentAnswer,'C');
 assert.equal(diagnosticResponse.body.verification.verifiedAnswer,'C');
 assert.equal(diagnosticResponse.body.verification.finalAnswer,'C');
 assert.equal(diagnosticResponse.body.verification.consistent,false);

@@ -12,8 +12,9 @@ const solutionSchema={
 
 const verificationSchema={
   type:"object",additionalProperties:false,
-  required:["consistent","candidateCorrect","explanationSupportsAnswer","verifiedAnswer","verifiedShortSolution","reason","confidence"],
+  required:["independentAnswer","consistent","candidateCorrect","explanationSupportsAnswer","verifiedAnswer","verifiedShortSolution","reason","confidence"],
   properties:{
+    independentAnswer:{type:"string"},
     consistent:{type:"boolean"},candidateCorrect:{type:"boolean"},explanationSupportsAnswer:{type:"boolean"},
     verifiedAnswer:{type:"string"},verifiedShortSolution:{type:"string"},reason:{type:"string"},
     confidence:{type:"string",enum:["high","medium","low"]}
@@ -77,8 +78,17 @@ export function hasDirectAnswerContradiction(answer,shortSolution){
   return !!stated&&stated.toLocaleLowerCase("tr-TR")!==choice;
 }
 
+export function verificationIsReliable(verification={}){
+  const independentAnswer=String(verification.independentAnswer||"").trim();
+  const verifiedAnswer=String(verification.verifiedAnswer||"").trim();
+  const verifiedShortSolution=String(verification.verifiedShortSolution||"").trim();
+  return (verification.confidence==="high"||verification.confidence==="medium")&&!!independentAnswer&&!!verifiedAnswer&&
+    !!verifiedShortSolution&&answersEquivalent(independentAnswer,verifiedAnswer)&&
+    !hasDirectAnswerContradiction(verifiedAnswer,verifiedShortSolution);
+}
+
 export function candidateIsConsistent(candidate={},verification={}){
-  return verification.confidence!=="low"&&verification.consistent===true&&verification.candidateCorrect===true&&
+  return verificationIsReliable(verification)&&verification.consistent===true&&verification.candidateCorrect===true&&
     verification.explanationSupportsAnswer===true&&answersEquivalent(candidate.answer,verification.verifiedAnswer)&&
     !hasDirectAnswerContradiction(candidate.answer,candidate.short_solution);
 }
@@ -89,7 +99,7 @@ function controlledUncertainty(candidate={}){
 
 export function selectFinalSolution(candidate={},verification={},corrected=null){
   const candidateConsistent=candidateIsConsistent(candidate,verification);
-  if(verification.confidence==="low")return{solution:controlledUncertainty(candidate),candidateConsistent:false,finalConsistent:false,corrected:false,uncertain:true,source:"uncertainty"};
+  if(!verificationIsReliable(verification))return{solution:controlledUncertainty(candidate),candidateConsistent:false,finalConsistent:false,corrected:false,uncertain:true,source:"uncertainty"};
   if(candidateConsistent)return{solution:candidate,candidateConsistent:true,finalConsistent:true,corrected:false,uncertain:false,source:"candidate"};
 
   const verifiedAnswer=String(verification.verifiedAnswer||"").trim(),verifiedShortSolution=String(verification.verifiedShortSolution||"").trim();
@@ -97,6 +107,9 @@ export function selectFinalSolution(candidate={},verification={},corrected=null)
   const correctedUsable=!!corrected?.answer&&!!corrected?.short_solution&&answersEquivalent(corrected.answer,verifiedAnswer)&&
     !hasDirectAnswerContradiction(corrected.answer,corrected.short_solution);
   if(correctedUsable)return{solution:{...candidate,answer:corrected.answer,short_solution:corrected.short_solution},candidateConsistent:false,finalConsistent:true,corrected:true,uncertain:false,source:"correction"};
+  const threeWayMismatch=!!corrected?.answer&&!answersEquivalent(candidate.answer,verifiedAnswer)&&
+    !answersEquivalent(corrected.answer,verifiedAnswer)&&!answersEquivalent(corrected.answer,candidate.answer);
+  if(threeWayMismatch)return{solution:controlledUncertainty(candidate),candidateConsistent:false,finalConsistent:false,corrected:false,uncertain:true,source:"uncertainty"};
   if(verifierUsable)return{solution:{...candidate,answer:verifiedAnswer,short_solution:verifiedShortSolution},candidateConsistent:false,finalConsistent:true,corrected:true,uncertain:false,source:"verifier-fallback"};
   return{solution:controlledUncertainty(candidate),candidateConsistent:false,finalConsistent:false,corrected:false,uncertain:true,source:"uncertainty"};
 }
@@ -138,11 +151,11 @@ export default async function handler(req,res){
     let verificationResponse=null,verification;
     try{
       const verificationInput=questionContent(text,image,"high");
-      verificationInput.push({type:"input_text",text:`Aşağıdaki aday çözüm güvenilmezdir ve yalnız bağımsız çözümünden SONRA karşılaştırılmalıdır:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
+      verificationInput.push({type:"input_text",text:`ADAY KARŞILAŞTIRMA BÖLÜMÜ — Bu bilgiyi yalnız independentAnswer alanını sabitledikten sonra değerlendir:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
       verificationResponse=await client.responses.create({
         model:ECONOMY_MODEL,store:false,reasoning:{effort:"low"},max_output_tokens:image?1600:700,
         input:[
-          {role:"developer",content:`YKS cevap doğrulayıcısısın. İlk modelin sonucunu onaylamak için değil, soruyu bağımsız yeniden çözmek için çalışırsın.\n1. Önce soru metnini ve varsa görseli aday cevaptan bağımsız çöz.\n2. Matematikte mümkünse aritmetik, denklem çözme, oran-yüzde hesabı, seçenek yerine koyma veya sonuç geri-kontrolü yap.\n3. Geometride çizimin ölçekli olduğunu varsayma; yalnız verilen açı, kenar, paralellik ve zorunlu açı ilişkilerini kullan. Gerekirse seçenekleri tek tek doğrula.\n4. Sonra aday answer doğru mu ve short_solution aynı cevabı gerçekten destekliyor mu kontrol et.\n5. Doğrudan çelişkide consistent=false olmalı. Örneğin answer E iken açıklama E seçeneğini yanlışlıyorsa tutarlı sayma.\n6. verifiedAnswer gerçek final cevap; verifiedShortSolution onu destekleyen en fazla 2-3 kısa cümle olsun.\n7. confidence=high yalnız cevap bağımsız hesap/çıkarımla doğrulandıysa kullan. Gerçekten doğrulayamıyorsan confidence=low kullan; tahmin yürütme.\n8. reason yalnız kısa doğrulama özeti olsun; gizli düşünme zinciri yazma.`},
+          {role:"developer",content:`YKS cevap doğrulayıcısısın. İlk modelin sonucunu onaylamak için değil, soruyu bağımsız yeniden çözmek için çalışırsın.\n1. Candidate bilgisine bakmadan önce soru metnini ve varsa görseli bağımsız çöz; kendi cevabını independentAnswer alanına sabitle.\n2. independentAnswer, sonraki candidate karşılaştırması nedeniyle değiştirilemez.\n3. Matematikte mümkünse aritmetik, denklem çözme, oran-yüzde hesabı, seçenek yerine koyma veya sonuç geri-kontrolü yap.\n4. Geometride çizimin ölçekli olduğunu varsayma; yalnız verilen açı, kenar, paralellik ve zorunlu açı ilişkilerini kullan. Gerekirse seçenekleri tek tek doğrula.\n5. Ancak independentAnswer sabitlendikten sonra candidate answer doğru mu ve short_solution aynı cevabı gerçekten destekliyor mu kontrol et.\n6. verifiedAnswer bağımsız çözümden türemeli ve independentAnswer ile aynı cevabı göstermeli; candidate tarafından değiştirilmemeli.\n7. Doğrudan çelişkide consistent=false olmalı. Örneğin answer E iken açıklama E seçeneğini yanlışlıyorsa tutarlı sayma.\n8. verifiedShortSolution bağımsız cevabı destekleyen en fazla 2-3 kısa cümle olsun.\n9. confidence=high yalnız cevap bağımsız hesap/çıkarımla doğrulandıysa kullan. Gerçekten doğrulayamıyorsan confidence=low kullan; tahmin yürütme.\n10. reason yalnız kısa doğrulama özeti olsun; gizli düşünme zinciri yazma.`},
           {role:"user",content:verificationInput}
         ],
         text:{format:{type:"json_schema",name:"yks_answer_verification",strict:true,schema:verificationSchema}}
@@ -150,16 +163,16 @@ export default async function handler(req,res){
       verification=parseJson(verificationResponse);
     }catch(error){
       console.error("solve verify error",safeError(error));
-      verification={consistent:false,candidateCorrect:false,explanationSupportsAnswer:false,verifiedAnswer:"",verifiedShortSolution:"",reason:"Doğrulama servisi tamamlanamadı.",confidence:"low"};
+      verification={independentAnswer:"",consistent:false,candidateCorrect:false,explanationSupportsAnswer:false,verifiedAnswer:"",verifiedShortSolution:"",reason:"Doğrulama servisi tamamlanamadı.",confidence:"low"};
     }
     const verificationMs=Date.now()-verificationStarted;
 
     let correctionResponse=null,corrected=null,correctionMs=0;
-    if(!candidateIsConsistent(candidate,verification)&&verification.confidence!=="low"){
+    if(!candidateIsConsistent(candidate,verification)&&verificationIsReliable(verification)){
       const correctionStarted=Date.now();
       try{
         const correctionInput=questionContent(text,image,"high");
-        correctionInput.push({type:"input_text",text:`İlk çözüm güvenilir bulunmadı. Bağımsız verifier özeti:\n${JSON.stringify({verifiedAnswer:verification.verifiedAnswer,verifiedShortSolution:verification.verifiedShortSolution,reason:verification.reason,confidence:verification.confidence})}\nGüvenilmeyen ilk çıktı:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
+        correctionInput.push({type:"input_text",text:`İlk çözüm güvenilir bulunmadı. Bağımsız verifier özeti:\n${JSON.stringify({independentAnswer:verification.independentAnswer,verifiedAnswer:verification.verifiedAnswer,verifiedShortSolution:verification.verifiedShortSolution,reason:verification.reason,confidence:verification.confidence})}\nGüvenilmeyen ilk çıktı:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
         correctionResponse=await client.responses.create({
           model:ECONOMY_MODEL,store:false,reasoning:{effort:"low"},max_output_tokens:image?1200:600,
           input:[
@@ -180,7 +193,7 @@ export default async function handler(req,res){
       {response:correctionResponse,model:ECONOMY_MODEL,feature:"solve-correct"}
     ]);
     const diagnostics={
-      firstAnswer:String(candidate.answer||""),verifiedAnswer:String(verification.verifiedAnswer||""),finalAnswer:String(decision.solution.answer||""),
+      firstAnswer:String(candidate.answer||""),independentAnswer:String(verification.independentAnswer||""),verifiedAnswer:String(verification.verifiedAnswer||""),finalAnswer:String(decision.solution.answer||""),
       consistent:decision.candidateConsistent,finalConsistent:decision.finalConsistent,corrected:decision.corrected,uncertain:decision.uncertain,
       source:decision.source,confidence:verification.confidence,reason:String(verification.reason||"").slice(0,500),
       timingMs:{firstSolve:candidateMs,verification:verificationMs,correction:correctionMs,total:totalMs},

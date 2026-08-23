@@ -41,12 +41,7 @@
   state.favorites ??=[];
 
   function resetQuestionForm(){
-    try{fileInput.value=''}catch{}
-    selectedImageData='';
-    try{preview.removeAttribute('src');preview.classList.add('hidden')}catch{}
-    try{drop.classList.remove('hidden')}catch{}
-    try{uploadActions.classList.add('hidden')}catch{}
-    try{questionText.value=''}catch{}
+    try{window.resetSolveWorkspace?.()}catch{}
   }
 
   function resetAnalysisView(){
@@ -134,9 +129,9 @@
       shot.innerHTML='';
       if(activeQuestion.image){
         const img=document.createElement('img');img.src=activeQuestion.image;img.alt='Yüklenen soru';img.style.maxWidth='100%';img.style.maxHeight='360px';img.style.borderRadius='12px';shot.appendChild(img);
-      }else{
-        const p=document.createElement('p');p.textContent=activeQuestion.text||'Metin sorusu';p.style.whiteSpace='pre-wrap';p.style.textAlign='left';p.style.width='100%';shot.appendChild(p);
       }
+      if(activeQuestion.text){const p=document.createElement('p');p.className='question-context';p.textContent=activeQuestion.text;shot.appendChild(p)}
+      if(!activeQuestion.image&&!activeQuestion.text){const p=document.createElement('p');p.textContent='Metin sorusu';shot.appendChild(p)}
     }
     populateTips();
   };
@@ -155,12 +150,15 @@
   liveSolve=async function({text='',image=''}){
     const serial=++solveSerial;
     activeQuestion={text:String(text||'').trim(),image:String(image||'')};
+    const request={student:{name:state.profile.name,tone:state.profile.tone}};
+    if(activeQuestion.text)request.text=activeQuestion.text;
+    if(activeQuestion.image)request.image=activeQuestion.image;
     resetAnalysisView();go('analyze');
     const wrap=document.querySelector('#analyze .analysis-wrap');
     try{
       if(location.protocol==='file:')throw new Error('Canlı çözüm için uygulamayı sunucudan aç.');
       const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),35000);
-      const r=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({text:activeQuestion.text,image:activeQuestion.image,student:{name:state.profile.name,tone:state.profile.tone}})});
+      const r=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify(request)});
       clearTimeout(timer);const j=await r.json();if(!r.ok)throw new Error(j.error||'API hatası');
       liveApi=true;
       const base={...j,curriculum_outcome:'Ayrıntılar hazırlanıyor…',steps:[j.short_solution||'Ayrıntılar hazırlanıyor…'],why:'Ayrıntılar hazırlanıyor…',tip:'Ayrıntılar hazırlanıyor…',distractor:'Ayrıntılar hazırlanıyor…',exam_note:'Ayrıntılar hazırlanıyor…',sources:[]};
@@ -169,7 +167,7 @@
       return true;
     }catch(e){
       wrap?.classList.remove('ai-working','ai-loading');
-      if(e?.name==='AbortError')alert('Çözüm beklenenden uzun sürdü. Lütfen tekrar deneyin.');else alert('Canlı çözüm alınamadı: '+e.message);return false;
+      console.warn(e?.name==='AbortError'?'Çözüm isteği zaman aşımına uğradı.':'Canlı çözüm alınamadı:',e?.message||e);return false;
     }
   };
 

@@ -23,7 +23,7 @@ export default async function handler(req,res){
     const body=req.body||{};
     const text=String(body.text||"").trim();
     const image=typeof body.image==="string"?body.image:"";
-    if(!text&&!image) return res.status(400).json({error:"Soru metni veya görseli gerekli."});
+    if(!text&&!image) return res.status(400).json({error:"Bir soru fotoğrafı seç veya sorunu yaz."});
 
     const content=[{type:"input_text",text:text||"Görseldeki YKS sorusunu dikkatle oku. Önce doğru cevabı bul, sonra dersini, sınav türünü ve konusunu belirle; çok kısa bir çözüm yaz."}];
     if(image) content.push({type:"input_image",image_url:image,detail:"auto"});
@@ -42,7 +42,7 @@ export default async function handler(req,res){
     const result=JSON.parse(response.output_text);
     const ms=Date.now()-started;
     const usage=setUsageHeaders(res,response,SOLVE_MODEL,"solve");
-    console.log("solve ok",{ms,model:SOLVE_MODEL,hasImage:!!image,stage:"fast",costUsd:usage.costUsd});
+    console.log("solve ok",{ms,model:SOLVE_MODEL,inputType:image&&text?"image+text":image?"image":"text",stage:"fast",costUsd:usage.costUsd});
     res.setHeader("Cache-Control","no-store");
     res.setHeader("Server-Timing",`solve;dur=${ms}`);
     return res.status(200).json(result);

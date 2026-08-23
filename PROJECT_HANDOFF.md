@@ -1,6 +1,6 @@
 # YKS Uzman Hoca — Project Handoff
 
-Last updated: 2026-08-21
+Last updated: 2026-08-23
 
 Bu dosya YKS Uzman Hoca projesinin güncel çalışma hafızasıdır.
 
@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-c1ecbb001a2d78a1f23ca8a398c1d4c25d7e02af
+17c352ea9580fae1064abea904b1b896df9570de
 
 Commit:
 
-Integrate 2023 TYT Fen source runtime
+Fix source card catalog resolution
 
 Production:
 
@@ -435,7 +435,7 @@ Kaynak soru → StudyEvent → Yanlışlarım → retry → kapanış.
 
 DURUM:
 
-SIRADA
+IN DEVELOPMENT
 
 Mevcut ana sayfada bulunan:
 

@@ -24,43 +24,67 @@ function runtime() {
     'data/question-catalog-v1.js',
     'data/catalog/2023-tyt-math-01-30.js',
     'data/catalog/2023-tyt-geometry.js',
+    'data/catalog/2024-tyt-math-01-30.js',
+    'data/catalog/2024-tyt-geometry.js',
+    'data/catalog/2025-tyt-math-01-30.js',
+    'data/catalog/2025-tyt-geometry.js',
     'app-source-map-2023-tyt-math-geometry.js'
   ]) vm.runInContext(read(file), context, { filename: file });
   return window;
 }
 
-test('2023 TYT mathematics integrates 40 official mapped ready questions', () => {
-  const window = runtime();
-  const rows = window.YKSQuestionCatalogV1.all().filter(row =>
-    row.id?.startsWith('osym-2023-tyt-mat-') && row.provider === 'OSYM' && row.exam === 'TYT'
+function rows() {
+  return runtime().YKSQuestionCatalogV1.all().filter(row =>
+    row.id?.startsWith('osym-2023-tyt-mat-') &&
+    row.provider === 'OSYM' &&
+    row.exam === 'TYT'
   );
+}
 
-  assert.equal(rows.length, 40);
-  assert.equal(new Set(rows.map(row => row.id)).size, 40);
-  assert.ok(rows.every(row => row.answerKey && row.answerVerified));
-  assert.ok(rows.every(row => row.access?.page && row.access?.url));
-  assert.ok(rows.every(row => row.asset?.status === 'ready' && row.asset?.crop));
-  assert.ok(rows.every(row => row.canonicalTopicId && row.mappingConfidence));
-  assert.equal(rows.filter(row => row.verification?.topic?.startsWith('needs-manual-review')).length, 0);
+test('2023 TYT mathematics integrates 40 official mapped ready questions', () => {
+  const list = rows();
 
-  const taxonomy = new Set(window.YKSTopicTaxonomyV1.all({
+  assert.equal(list.length, 40);
+  assert.equal(new Set(list.map(row => row.id)).size, 40);
+  assert.ok(list.every(row => row.answerKey && row.answerVerified));
+  assert.ok(list.every(row => row.access?.page && row.access?.url));
+  assert.ok(list.every(row => row.asset?.status === 'ready' && row.asset?.crop));
+  assert.ok(list.every(row => row.canonicalTopicId && row.mappingConfidence));
+  assert.equal(list.filter(row => row.verification?.topic?.startsWith('needs-manual-review')).length, 0);
+
+  const taxonomy = new Set(runtime().YKSTopicTaxonomyV1.all({
     exam: 'TYT',
     subjectId: 'matematik',
     active: true
   }).map(row => row.id));
-  assert.ok(rows.every(row => taxonomy.has(row.canonicalTopicId)));
-  assert.ok(rows.filter(row => Number(row.questionNo) >= 31).every(row =>
+  assert.ok(list.every(row => taxonomy.has(row.canonicalTopicId)));
+  assert.ok(list.filter(row => Number(row.questionNo) >= 31).every(row =>
     row.verification?.domain === 'GEOMETRI'
   ));
 });
 
 test('2023 readiness A/B/C buckets are deterministic', () => {
-  const rows = runtime().YKSQuestionCatalogV1.all().filter(row =>
-    row.id?.startsWith('osym-2023-tyt-mat-')
-  );
-  const A = rows.filter(row => row.asset?.status === 'ready' && row.asset?.crop &&
+  const list = rows();
+  const A = list.filter(row => row.asset?.status === 'ready' && row.asset?.crop &&
     row.answerKey && row.answerVerified && row.canonicalTopicId).length;
-  const B = rows.filter(row => row.asset?.status === 'preparable').length;
-  const C = rows.filter(row => !row.asset?.status || row.verification?.topic?.startsWith('needs-manual-review')).length;
+  const B = list.filter(row => row.asset?.status === 'preparable').length;
+  const C = list.filter(row => !row.asset?.status || row.verification?.topic?.startsWith('needs-manual-review')).length;
   assert.deepEqual({ A, B, C }, { A: 40, B: 0, C: 0 });
+});
+
+test('2023 identities do not duplicate existing official question identities', () => {
+  const all = runtime().YKSQuestionCatalogV1.all().filter(row =>
+    row.provider === 'OSYM' && row.exam === 'TYT' && row.id
+  );
+  assert.equal(new Set(all.map(row => row.id)).size, all.length);
+
+  const identity = row => [
+    row.provider,
+    row.exam,
+    row.year,
+    row.subject,
+    row.questionNo
+  ].join('|');
+  const official = all.filter(row => row.collection?.includes('TYT Temel Soru Kitapçığı'));
+  assert.equal(new Set(official.map(identity)).size, official.length);
 });

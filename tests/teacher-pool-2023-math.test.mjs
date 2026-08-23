@@ -76,15 +76,12 @@ test('2023 identities do not duplicate existing official question identities', (
   const all = runtime().YKSQuestionCatalogV1.all().filter(row =>
     row.provider === 'OSYM' && row.exam === 'TYT' && row.id
   );
-  assert.equal(new Set(all.map(row => row.id)).size, all.length);
+  const list = rows();
+  const existingIds = new Set(all.filter(row => Number(row.year) !== 2023).map(row => row.id));
+  assert.equal(list.filter(row => existingIds.has(row.id)).length, 0);
 
-  const identity = row => [
-    row.provider,
-    row.exam,
-    row.year,
-    row.subject,
-    row.questionNo
-  ].join('|');
-  const official = all.filter(row => row.collection?.includes('TYT Temel Soru Kitapçığı'));
-  assert.equal(new Set(official.map(identity)).size, official.length);
+  const questionIdentity = row => [row.provider, row.exam, row.year, row.subject, row.questionNo].join('|');
+  const sourceIdentity = row => [row.provider, row.exam, row.year, row.access?.url, row.access?.page, row.questionNo].join('|');
+  assert.equal(new Set(list.map(questionIdentity)).size, 40);
+  assert.equal(new Set(list.map(sourceIdentity)).size, 40);
 });

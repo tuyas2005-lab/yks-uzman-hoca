@@ -29,6 +29,7 @@
   const loaded=new Set();
   const loading=new Map();
 
+  const SCRIPT_LOAD_TIMEOUT=8000;
   function loadScript(src){
     if(loaded.has(src))return Promise.resolve();
     if(loading.has(src))return loading.get(src);
@@ -36,8 +37,21 @@
       const s=document.createElement('script');
       s.src=src;
       s.async=true;
-      s.onload=()=>{loaded.add(src);loading.delete(src);resolve()};
-      s.onerror=()=>{loading.delete(src);console.warn('Yüklenemedi:',src);reject(new Error(src))};
+      let settled=false;
+      const finish=(fn)=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(timer);
+        loading.delete(src);
+        fn();
+      };
+      const timer=setTimeout(()=>{
+        s.remove();
+        console.warn('Zaman aşımı:',src);
+        finish(()=>reject(new Error('Script load timeout: '+src)));
+      },SCRIPT_LOAD_TIMEOUT);
+      s.onload=()=>finish(()=>{loaded.add(src);resolve()});
+      s.onerror=()=>finish(()=>{console.warn('Yüklenemedi:',src);reject(new Error(src))});
       document.body.appendChild(s);
     });
     loading.set(src,p);
@@ -237,3 +251,4 @@
   };
   setTimeout(loadLight,250);
 })();
+

@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-5626d255f28002c8122cfac5cc304f17ed434a3e
+528d2c3906603409e657641257be0ec540eac50d
 
 Commit:
 
-Unify photo and text question solving
+Fix stale V5 architecture CI assertion
 
 Production:
 
@@ -478,13 +478,21 @@ Sol navigasyondaki Soru Çöz aynı birleşik ekrana gider.
 
 DURUM:
 
-IN DEVELOPMENT
+TAMAMLANDI / PRODUCTION
 
-İlk solve sonucu candidate olarak kabul edilir. Bağımsız verifier,
-soruyu yeniden çözer ve candidate answer ile short_solution uyumunu
-kontrol eder. Uyuşmazlıkta öğrenciye gösterimden önce en fazla bir
-correction pass uygulanır; doğrulama güvenilir değilse kontrollü
-belirsizlik mesajı döner.
+Production feature SHA:
+
+d9eb3eab98a10fb24a232b5a298900eeb49bf927
+
+Production feature commit:
+
+Add answer consistency verification
+
+Candidate Solve
+→ Independent Verifier
+→ Correction gerekirse maksimum 1 pass
+→ 3-way mismatch veya düşük güven
+→ Controlled Uncertainty
 
 Backlog:
 

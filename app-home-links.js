@@ -106,6 +106,8 @@
     ()=>loadScript('/app-source-map-2024-2025-tyt.js?v=1'),
     ()=>loadScript('/app-source-map-2023-tyt-fen.js?v=1'),
     ()=>loadScript('/app-source-map-2023-tyt-math-geometry.js?v=1'),
+    ()=>loadScript('/data/catalog/meb-3-adim-tyt-math-sprint-1.js?v=1'),
+    ()=>loadScript('/app-source-map-meb-3-adim-tyt-math-sprint-1.js?v=1'),
     ()=>loadScript('/app-source-autocrop.js?v=2'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
     ()=>loadScript('/app-question-index.js?v=1'),

@@ -144,12 +144,12 @@
     ()=>loadScript('/app-low-cost.js?v=2'),
     ()=>loadScript('/app-low-cost-fix.js?v=2'),
     ()=>loadScript('/app-teacher-performance.js?v=2'),
-    ()=>loadScript('/app-personal-teacher-v2.js?v=1'),
+    ()=>loadScript('/app-personal-teacher-v2.js?v=2'),
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=1'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=2'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=2'),
+    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=3'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=2')
   ],()=>{
     if(typeof window.renderTeacher==='function'){
@@ -159,7 +159,7 @@
   });
 
   groups.stats=makeGroup('stats',['stats'],[
-    ()=>loadScript('/app-stats-v3.js?v=3')
+    ()=>loadScript('/app-stats-v3.js?v=4')
   ],()=>{
     if(typeof window.renderStats==='function'){
       window.renderStats();
@@ -168,7 +168,7 @@
   });
 
   groups.coach=makeGroup('coach',['coach'],[
-    ()=>loadScript('/app-yks-coach.js?v=2'),
+    ()=>loadScript('/app-yks-coach.js?v=3'),
     ()=>loadScript('/app-yks-coach-fix.js?v=2'),
     ()=>loadScript('/app-field-track.js?v=2'),
     ()=>loadScript('/app-strategy-engine.js?v=2'),

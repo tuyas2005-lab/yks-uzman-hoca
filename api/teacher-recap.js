@@ -19,14 +19,16 @@ export default async function handler(req,res){
   if(!client)return res.status(503).json({error:"OPENAI_API_KEY tanımlı değil."});
   const body=req.body||{};
   const topic=String(body.topic||"").trim(),subject=String(body.subject||"").trim(),exam=String(body.exam||"TYT").trim();
+  const x=body.topicTestEvidence&&typeof body.topicTestEvidence==="object"?body.topicTestEvidence:null;
+  const topicTestEvidence=x?{totalTests:Number(x.totalTests||0),totalQuestions:Number(x.totalQuestions||0),correct:Number(x.correct||0),wrong:Number(x.wrong||0),blank:Number(x.blank||0),net:Number(x.net||0),accuracy:x.accuracy===null?null:Number(x.accuracy),lastTestAt:String(x.lastTestAt||""),trend:String(x.trend||"insufficient-data"),recentTests:(Array.isArray(x.recentTests)?x.recentTests:[]).slice(0,3).map(t=>({dateKey:String(t?.dateKey||""),questionCount:Number(t?.questionCount||0),accuracy:Number(t?.accuracy||0)}))}:null;
   if(!topic)return res.status(400).json({error:"Konu gerekli."});
   try{
     const skill=readSkill("SKILL.md");
     const response=await client.responses.create({
       model:ECONOMY_MODEL,store:false,reasoning:{effort:"none"},max_output_tokens:520,
       input:[
-        {role:"developer",content:`Sen YKS Uzman Hoca içindeki Kişisel Öğretmensin. Öğrenciye yalnız KISA KONU TEKRARI verirsin. Yeni soru, örnek soru, test sorusu veya seçenek ÜRETME. Soru kütüphanesi ayrı ve yalnız gerçek kaynak sorularından oluşur.\n\n${skill}\n\nKurallar:\n- Türkçe yaz.\n- Güncel MEB kazanım mantığına uygun ol.\n- Uzun ders anlatımı yapma.\n- key_points tam 3 kısa madde olsun.\n- common_mistake tek ve somut hata olsun.\n- exam_tip tek cümlelik sınav püf noktası olsun.\n- Hiçbir biçimde soru üretme.`},
-        {role:"user",content:JSON.stringify({exam,subject,topic,mastery:body.mastery,recentWrongCount:body.recentWrongCount})}
+        {role:"developer",content:`Sen YKS Uzman Hoca içindeki Kişisel Öğretmensin. Öğrenciye yalnız KISA KONU TEKRARI verirsin. Yeni soru, örnek soru, test sorusu veya seçenek ÜRETME. Soru kütüphanesi ayrı ve yalnız gerçek kaynak sorularından oluşur.\n\n${skill}\n\nKurallar:\n- Türkçe yaz.\n- Güncel MEB kazanım mantığına uygun ol.\n- Uzun ders anlatımı yapma.\n- key_points tam 3 kısa madde olsun.\n- common_mistake tek ve somut hata olsun.\n- exam_tip tek cümlelik sınav püf noktası olsun.\n- Hiçbir biçimde soru üretme.\n- topicTestEvidence toplu performans sinyalidir, kesin mastery değildir. Soru hacmi, son tarih, tekrar sayısı ve trendi birlikte değerlendir.\n- Tek testten kesin başarı/başarısızlık hükmü verme. Aggregate wrong sayısını belirli yanlış sorular veya Yanlışlarım kaydı gibi sunma.\n- Verilmeyen kaynak, test veya soru ayrıntısı uydurma; öneriyi yapıcı ve somut tut.`},
+        {role:"user",content:JSON.stringify({exam,subject,topic,mastery:body.mastery,recentWrongCount:body.recentWrongCount,topicTestEvidence})}
       ],
       text:{format:{type:"json_schema",name:"teacher_recap",strict:true,schema}}
     });

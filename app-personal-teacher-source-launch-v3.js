@@ -3,6 +3,7 @@
   const norm=s=>D()?.norm?.(s)||String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const today=()=>D()?.todayKey?.()||new Date().toLocaleDateString('sv-SE');
+  const topicTestInsight=ctx=>(D()?.getTopicTestInsights?.({days:60})||[]).find(x=>x.exam===ctx.exam&&norm(x.subject)===norm(ctx.subject)&&norm(x.topic)===norm(ctx.topic))||null;
   let timer=0,painting=false,recapBusy=false;
 
   function context(){
@@ -104,7 +105,7 @@
     slot.innerHTML='<div class="pt2-recap"><b>✍️ Hızlı tekrar hazırlanıyor…</b><p class="muted">Eksik noktalar seçiliyor.</p></div>';
     requestAnimationFrame(()=>slot.scrollIntoView({behavior:'smooth',block:'center'}));
 
-    const key=`${ctx.exam}|${ctx.subject}|${ctx.topic}`;
+    const insight=topicTestInsight(ctx),key=`${ctx.exam}|${ctx.subject}|${ctx.topic}|${JSON.stringify(insight?[insight.totalTests,insight.totalQuestions,insight.correct,insight.wrong,insight.blank,insight.lastTestAt,insight.trend]:[])}`;
     state.teacher??={};state.teacher.recapCache??={};
     let data=state.teacher.recapCache[key];
 
@@ -116,7 +117,8 @@
           body:JSON.stringify({
             exam:ctx.exam,subject:ctx.subject,topic:ctx.topic,
             mastery:Number(document.querySelector('#teacher .pt2-metric b')?.textContent?.replace('%',''))||0,
-            recentWrongCount:Number(state.teacher?.daily?.testSummary?.mistakes||0)
+            recentWrongCount:Number(state.teacher?.daily?.testSummary?.mistakes||0),
+            topicTestEvidence:insight
           })
         });
         const j=await r.json();

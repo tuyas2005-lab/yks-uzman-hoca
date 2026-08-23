@@ -7,7 +7,7 @@
   const solvedEvents=()=> (typeof state!=='undefined'&&Array.isArray(state.studyEvents)?state.studyEvents:window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId);
   const solvedIds=()=>new Set(solvedEvents().map(x=>x.meta.catalogId));
   const rowTrack=x=>x?.track||'main';
-  const needsTopicReview=x=>x?.verification?.topic==='needs-manual-review-text-extraction-loss';
+  const needsTopicReview=x=>String(x?.verification?.topic||'').startsWith('needs-manual-review');
 
   function trackEligible(x,q={}){
     if(q.track)return rowTrack(x)===q.track;

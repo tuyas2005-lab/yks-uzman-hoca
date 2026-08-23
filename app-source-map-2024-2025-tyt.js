@@ -14,6 +14,18 @@
     }}
   };
 
+  // Visually verified single-question crops for the 2024-2025 TYT Math
+  // official PDFs. Rows are indexed by questionNo - 1 and contain
+  // [page, x, y, width, height] in normalized PDF coordinates.
+  const MATH_CROPS={
+    2024:[[24,.055,.1606,.45,.154],[24,.055,.4062,.45,.3562],[24,.515,.1606,.43,.4065],[25,.055,.0951,.45,.2488],[25,.055,.4293,.45,.3],[25,.515,.0951,.43,.1794],[25,.515,.3771,.43,.5779],[26,.055,.0951,.45,.2669],[26,.515,.0951,.43,.257],[27,.055,.0951,.45,.2513],[27,.515,.0951,.43,.4513],[28,.055,.0951,.45,.3638],[28,.055,.5415,.45,.2219],[28,.515,.0951,.43,.1403],[28,.515,.3344,.43,.1594],[29,.055,.0951,.45,.2158],[29,.055,.4126,.45,.1994],[29,.515,.0951,.43,.3729],[30,.055,.0951,.45,.4023],[30,.515,.0951,.43,.1794],[30,.515,.3735,.43,.2549],[31,.055,.0951,.45,.3762],[31,.515,.0951,.43,.4059],[32,.055,.0951,.45,.2506],[32,.055,.4523,.45,.1664],[32,.515,.0951,.43,.3823],[33,.055,.0951,.45,.3668],[33,.515,.0951,.43,.2913],[33,.515,.4854,.43,.1403],[34,.055,.0951,.45,.1801],[34,.055,.3832,.45,.3374],[34,.515,.0951,.43,.2713],[34,.515,.4162,.43,.3929],[35,.055,.0951,.45,.2779],[35,.055,.3731,.45,.4484],[35,.515,.0951,.43,.4648],[36,.055,.0951,.45,.2619],[36,.055,.4232,.45,.281],[36,.515,.0951,.43,.2383],[36,.515,.3996,.43,.2913]],
+    2025:[[24,.055,.1606,.45,.3636],[24,.515,.1606,.43,.2911],[24,.515,.4829,.43,.2974],[25,.055,.0951,.45,.1807],[25,.055,.3102,.45,.1925],[25,.515,.0951,.43,.264],[25,.515,.4289,.43,.2219],[26,.055,.0951,.45,.8599],[26,.515,.0951,.43,.4748],[27,.055,.0951,.45,.3207],[27,.055,.4158,.45,.5392],[27,.515,.0951,.43,.13],[27,.515,.2949,.43,.4077],[28,.055,.0951,.45,.1108],[28,.055,.3077,.45,.1403],[28,.055,.5497,.45,.2488],[28,.515,.0951,.43,.1958],[28,.515,.3607,.43,.5943],[29,.055,.0951,.45,.3893],[29,.055,.5542,.45,.1533],[29,.515,.0951,.43,.3007],[30,.055,.0951,.45,.3529],[30,.055,.5178,.45,.2938],[30,.515,.0951,.43,.4681],[31,.055,.0951,.45,.3061],[31,.055,.4332,.45,.5218],[31,.515,.0951,.43,.3432],[32,.055,.0951,.45,.3979],[32,.055,.5242,.45,.163],[32,.515,.0951,.43,.1346],[32,.515,.3018,.43,.3338],[33,.055,.0951,.45,.1272],[33,.055,.2913,.45,.3174],[33,.515,.0951,.43,.2549],[33,.515,.4198,.43,.3539],[34,.055,.0951,.45,.3893],[34,.515,.0951,.43,.3235],[35,.055,.0951,.45,.3762],[35,.515,.0951,.43,.38],[35,.515,.5472,.43,.1239]]
+  };
+  const MATH_TOPICS={
+    2024:['rasyonel-sayilar','yuzde-kar-zarar-karisim-problemleri','problemler','rasyonel-sayilar','rasyonel-sayilar','mutlak-deger','bolme-ve-bolunebilme','basit-esitsizlikler','sayi-basamaklari','kumeler','mantik','fonksiyonlar','sayi-basamaklari','bolme-ve-bolunebilme','sayi-basamaklari','istatistik','problemler','problemler','yuzde-kar-zarar-karisim-problemleri','yas-problemleri','permutasyon-kombinasyon-binomial','problemler','grafik-ve-tablo-problemleri','oran-oranti','permutasyon-kombinasyon-binomial','permutasyon-kombinasyon-binomial','sayi-ve-kesir-problemleri','mantik','permutasyon-kombinasyon-binomial','olaslik','geometride-temel-kavramlar','dik-ve-ozel-ucgenler','ucgenler','ucgenler','ucgenler','cokgenler-ve-dortgenler','cokgenler-ve-dortgenler','cokgenler-ve-dortgenler','kati-cisimler','kati-cisimler'],
+    2025:['sayi-ve-kesir-problemleri','uslu-sayilar','uslu-sayilar','rasyonel-sayilar','koklu-sayilar',null,'basit-esitsizlikler','sayi-basamaklari','permutasyon-kombinasyon-binomial','kumeler','mantik','temel-kavramlar','fonksiyonlar','bolme-ve-bolunebilme','sayi-basamaklari','istatistik','problemler','sayi-ve-kesir-problemleri','yuzde-kar-zarar-karisim-problemleri','permutasyon-kombinasyon-binomial','yas-problemleri','hareket-ve-isci-problemleri','grafik-ve-tablo-problemleri','problemler','permutasyon-kombinasyon-binomial','problemler','problemler','problemler','permutasyon-kombinasyon-binomial','olaslik','geometride-temel-kavramlar','ucgenler','ucgenler','dik-ve-ozel-ucgenler','ucgenler','cokgenler-ve-dortgenler','cokgenler-ve-dortgenler','cokgenler-ve-dortgenler','kati-cisimler','kati-cisimler']
+  };
+
   const MANUAL={
     'osym-2025-tyt-tur-35':{pdfKey:'osym-2025-tyt',page:15,crop:{x:.065,y:.08,w:.43,h:.60}},
     'osym-2025-tyt-tur-36':{pdfKey:'osym-2025-tyt',page:15,parts:[{x:.065,y:.08,w:.43,h:.34},{x:.535,y:.09,w:.40,h:.25}]},
@@ -64,10 +76,26 @@
       item.access??={};item.access.page=page;item.access.pdfKey=SOURCES[year].pdfKey;item.verification??={};item.verification.exactPage='verified-visual-official-pdf';item.verification.page='verified';
       if(item.answerKey){item.answerVerified=true;if(!item.answer)item.answer=item.answerKey}
       const patch=REVIEW_PATCHES[item.id];if(patch){if(patch.topic)item.topic=patch.topic;if(patch.subtopics)item.subtopics=patch.subtopics;item.verification.topic='manual-visual-verified'}
+      if(section==='math'){
+        const n=Number(item.questionNo),row=MATH_CROPS[year]?.[n-1],topic=MATH_TOPICS[year]?.[n-1];
+        if(row){
+          const [cropPage,x,y,w,h]=row,crop={x,y,w,h},source={pdfKey:SOURCES[year].pdfKey,page:cropPage,crop};
+          if(topic){
+            item.canonicalTopicId=`tyt.matematik.${topic}`;
+            item.asset={status:'ready',kind:'cached-pdf-crop',...source};
+            item.verification.visualQa='pass-manual-official-pdf';
+            item.verification.canonicalTopic='verified-deterministic-metadata';
+          }else{
+            item.verification.topic='needs-manual-review-canonical-mapping';
+            item.verification.canonicalTopic='manual-review-required';
+          }
+          runtimeMap[item.id]=source;changed++;continue;
+        }
+      }
       const manual=MANUAL[item.id];if(manual){item.asset={status:'ready',kind:Array.isArray(manual.parts)?'cached-pdf-parts':'cached-pdf-crop',...manual};runtimeMap[item.id]=manual}else runtimeMap[item.id]={pdfKey:SOURCES[year].pdfKey,page};changed++;
     }
     if(changed){try{window.YKSRegisterSourceMap?.(runtimeMap)}catch{};setTimeout(()=>{try{window.renderQuestionIndex?.()}catch{}},0)}
-    window.YKS2024_2025SourceMap={sources:SOURCES,manual:MANUAL,count:changed};window.get2024_2025SourceReadiness=readiness;return changed>0;
+    window.YKS2024_2025SourceMap={sources:SOURCES,manual:MANUAL,mathCrops:MATH_CROPS,mathTopics:MATH_TOPICS,count:changed};window.get2024_2025SourceReadiness=readiness;return changed>0;
   }
   if(!activate()){let n=0;const t=setInterval(()=>{if(activate()||++n>40)clearInterval(t)},100)}window.activate2024_2025TytSourceMap=activate;
 })();

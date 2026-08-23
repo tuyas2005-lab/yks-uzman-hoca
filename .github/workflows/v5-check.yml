@@ -33,11 +33,16 @@ jobs:
           set -euo pipefail
           grep -q "StudyEvent-v5" app-data-v5.js
           grep -q "getLearningModel" app-data-v5.js
-          grep -q "YKSDataV5" app-mini-tests.js
+          grep -q "__miniTestLegacyRetired" app-mini-tests.js
+          grep -q "sourceOnly" app-mini-tests.js
+          if grep -q "YKSDataV5" app-mini-tests.js; then
+            echo 'Legacy Mini Test YKSDataV5 dependency must remain retired' >&2
+            exit 1
+          fi
           grep -q "YKSDataV5" app-personal-teacher.js
           grep -q "YKSDataV5" app-stats-v2.js
           grep -q "mergeCloudStates" app-cloud.js
-          if grep -R "GEMINI_API_KEY" . --exclude-dir=.git; then
+          if grep -R "GEMINI_API_KEY" . --exclude-dir=.git --exclude='v5-check.yml'; then
             echo 'Unexpected GEMINI_API_KEY reference found' >&2
             exit 1
           fi

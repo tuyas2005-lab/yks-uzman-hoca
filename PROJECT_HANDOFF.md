@@ -199,6 +199,17 @@ Production manuel deploy edilmemelidir.
 
 Vercel GitHub entegrasyonu kullanılmalıdır.
 
+## Kullanıcı Görsel Kabul Prensibi
+
+Kullanıcıya dönük önemli UI veya feature geliştirmelerinde otomatik testler
+ve Codex browser acceptance tek başına final kabul değildir.
+
+Production merge öncesinde mümkün olduğunda kullanıcı gerçek Vercel Preview
+üzerinde görsel ve etkileşimli kabul testi yapmalıdır.
+
+Production deployment sonrasında final canlı kullanıcı smoke uygulanmalı ve
+sonuç proje kapanışına kaydedilmelidir.
+
 ---
 
 # 5. GITHUB / VERCEL DURUMU
@@ -515,8 +526,11 @@ Teslim zinciri:
 
 Tamamlanan davranışlar:
 
+- Topic-test kayıtları canonical StudyEvent defterine yazılır ve merkezi
+  Learning Model tarafından tüketilir.
 - Aynı konuya ait testler soru hacmine göre weighted aggregation ile birleştirilir.
-- Tek testte kesin trend üretilmez; yeterli tekrar olduğunda gelişim trendi hesaplanır.
+- Tek testte kesin trend üretilmez; yeterli tekrar olduğunda deterministic
+  gelişim trendi hesaplanır.
 - Topic-test soru sayısı Daily Goal'a event başına +1 yerine gerçek soru adediyle katkı yapar.
 - Konu Takip; test sayısı, soru, doğru, yanlış, boş, net, accuracy ve trend kanıtını gösterir.
 - Kişisel Öğretmen topic-test evidence'i toplu performans sinyali olarak kullanır.
@@ -541,6 +555,9 @@ Production squash merge:
 - AYT EA: 63
 - Duplicate topicId: 0
 - Normalized alias collision: 0
+- Subject coverage: TYT 9/9, AYT SAY 4/4, AYT EA 4/4
+- Mevcut 5 canonical ID backward compatible kaldı
+- Ambiguous alias collision'ları context-specific alias'larla çözüldü
 
 Production doğrulaması:
 
@@ -548,8 +565,11 @@ Production doğrulaması:
 - Production deployment commit, main SHA ile eşleşiyor
 - Ana sayfa, `/api/status` ve `/api/app-config`: HTTP 200
 - TYT 9 ders ile AYT SAY/EA topic dropdown smoke: PASS
-- Kontrollü topic-test kayıt/silme, Daily Goal, Konu Takip ve Yanlışlarım aggregate guard: PASS
+- Kontrollü production topic-test CRUD smoke: PASS
+- Daily Goal ve Konu Takip evidence ekleme/kaldırma: PASS
+- Aggregate topic-test yanlışları fake Yanlışlarım sorusu üretmiyor
 - Production console/runtime kritik hata: 0
+- USER FINAL LIVE PRODUCTION VISUAL ACCEPTANCE: PASS
 
 ---
 
@@ -956,7 +976,19 @@ Production merge yetkisi otomatik agent'a verilmemelidir.
 
 ---
 
-# 19. ŞU ANDAKİ SONRAKİ İŞ
+# 19. AÇIK BACKLOG
+
+Bu maddeler yalnız backlog'dur; bu kapanış kapsamında geliştirme
+başlatılmamıştır:
+
+- Soru Çöz 2.1 Input Robustness
+- Mini Test `Mini Testler hazırlanıyor…` PWA/cache sorunu
+- GitHub Actions Node runtime deprecation
+- Geometry Model Consistency
+
+---
+
+# 20. ŞU ANDAKİ SONRAKİ İŞ
 
 Konu Bazlı Test Çalışması tamamlandı ve production'da kapatıldı.
 
@@ -965,7 +997,7 @@ tarafından ayrıca belirlenecektir.
 
 ---
 
-# 20. DEĞİŞMEZ ANA PRENSİPLER
+# 21. DEĞİŞMEZ ANA PRENSİPLER
 
 1. AI resmî soru üretmez.
 

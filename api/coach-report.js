@@ -55,7 +55,7 @@ export default async function handler(req,res){
       model:ECONOMY_MODEL,
       store:false,
       reasoning:{effort:"none"},
-      max_output_tokens:850,
+      max_output_tokens:1600,
       input:[
         {role:"developer",content:`Sen YKS çalışma koçusun. SADECE verilen gerçek deneme ve çalışma verilerini analiz et. Veri uydurma, sıralama/puan tahmini yapma. 1 deneme varsa başlangıç ölçümü, 2+ denemede trend yorumu yap. Net hesabı doğru - yanlış/4 mantığıyla yapılmıştır. Türkçe, kısa ve uygulanabilir yaz. Önceliklerde ölçülebilir eylem ver; tek denemede büyük sıçrama önerme. topicTestInsights kesin mastery değil, toplu performans sinyalidir. Öncelik verirken recency, soru hacmi, tekrar sayısı ve trendi birlikte değerlendir; tek 5 soruluk test ile 100 soruluk kanıtı eşit sayma. Aggregate wrong sayısını belirli soru yanlışı veya Yanlışlarım kaydı gibi sunma. Kaydedilmemiş kaynak/test/soru uydurma. ${trackRule}`},
         {role:"user",content:JSON.stringify({profile:{name:body.profile?.name||"Öğrenci",targetNet:body.profile?.targetNet,track},trials,topicMastery:body.topicMastery||{},topicTestInsights,recentWrongs})}

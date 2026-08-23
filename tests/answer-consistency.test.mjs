@@ -55,7 +55,7 @@ assert.equal(uncertainDecision.uncertain,true);
 
 assert.equal((source.match(/name:"yks_corrected_solution"/g)||[]).length,1,'pipeline en fazla tek correction pass tanımlamalı');
 assert.match(source,/body\.diagnostics===true/,'candidate/verifier ayrıntıları normal öğrenci yanıtına eklenmemeli');
-assert.equal((source.match(/reasoning:\{effort:image\?"medium":"low"\}/g)||[]).length,2,'görsel verifier ve correction kontrollü reasoning kullanmalı');
+assert.equal((source.match(/reasoning:\{effort:"low"\}/g)||[]).length,2,'verifier ve correction kontrollü düşük reasoning kullanmalı');
 assert.match(source,/questionContent\(text,image,"high"\)/,'correction görseli yüksek ayrıntıda yeniden okumalı');
 assert.match(source,/if\(!output\)throw new Error/,'kesilmiş structured output boş nesne olarak kabul edilmemeli');
 

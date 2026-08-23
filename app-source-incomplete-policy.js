@@ -7,7 +7,7 @@
   const solvedIds=()=>new Set((window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId).map(x=>x.meta.catalogId));
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const rowTrack=x=>x?.track||'main';
-  const needsTopicReview=x=>x?.verification?.topic==='needs-manual-review-text-extraction-loss';
+  const needsTopicReview=x=>String(x?.verification?.topic||'').startsWith('needs-manual-review');
 
   function trackEligible(x,q={}){if(q.track)return rowTrack(x)===q.track;if(q.includeAlternateTrack===true)return true;return rowTrack(x)!=='alternate-track'}
   function relevance(x,q={}){const query=norm([q.topic,q.curriculumOutcome,q.shortSolution].join(' ')),item=norm([x.topic,...(x.subtopics||[]),...(x.tags||[])].join(' '));let s=overlap(query,item)*18;const qt=norm(q.topic),xt=norm(x.topic);if(qt&&xt===qt)s+=90;else if(qt&&(xt.includes(qt)||qt.includes(xt)))s+=55;if(/üçgen/.test(qt)&&/üçgen/.test(item))s+=35;if(/trigonom/.test(qt)&&/trigonom/.test(item))s+=40;if(/benzer/.test(qt)&&/benzer/.test(item))s+=40;if(/pisagor|dik üçgen/.test(qt)&&/pisagor|dik üçgen/.test(item))s+=40;if(q.visualPreferred&&x.visual)s+=8;return s}

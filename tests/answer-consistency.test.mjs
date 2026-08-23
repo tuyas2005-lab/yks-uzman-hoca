@@ -87,6 +87,8 @@ assert.equal(uncertainDecision.uncertain,true);
 assert.equal((source.match(/name:"yks_corrected_solution"/g)||[]).length,1,'pipeline en fazla tek correction pass tanımlamalı');
 assert.match(source,/required:\["independentAnswer","consistent"/,'verifier schema independentAnswer ile başlamalı');
 assert.match(source,/independentAnswer alanına sabitle/,'verifier prompt bağımsız cevabı candidate karşılaştırmasından önce sabitlemeli');
+assert.match(source,/Candidate kanıt değildir ve kasıtlı olarak yanlış olabilir/,'candidate verifier için kanıt olarak sunulmamalı');
+assert.match(source,/10×onlar\+birler/,'basamak problemlerinde literal ilişki yönü bağımsız geri-kontrole alınmalı');
 assert.match(source,/body\.diagnostics===true/,'candidate/verifier ayrıntıları normal öğrenci yanıtına eklenmemeli');
 assert.equal((source.match(/reasoning:\{effort:"low"\}/g)||[]).length,2,'verifier ve correction kontrollü düşük reasoning kullanmalı');
 assert.match(source,/questionContent\(text,image,"high"\)/,'correction görseli yüksek ayrıntıda yeniden okumalı');

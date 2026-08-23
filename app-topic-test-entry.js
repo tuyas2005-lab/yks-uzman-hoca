@@ -18,10 +18,6 @@
   function tombstone(eventId){const event=api()?.patch?.(eventId,{meta:{deletedAt:new Date().toISOString(),deletedReason:'user-delete'}});return{ok:!!event,event}}
   function undo(eventId){const event=api()?.patch?.(eventId,{meta:{deletedAt:null,deletedReason:''}});return{ok:!!event,event}}
   const controller={topicOptions,subjectsFor,measureInput,saveInput,tombstone,undo,visibleRecords:topicTests};window.YKSTopicTestEntry=controller;
-  if(new URLSearchParams(location.search).get('acceptanceRestore')==='topic-test'){
-    const deleted=api()?.getEvents?.({relevant:false,includeDeleted:true})?.find(x=>x.source==='topic-test'&&x.meta?.testName==='Preview Acceptance TYT Matematik'&&x.meta?.deletedAt);
-    if(deleted)controller.undo(deleted.id);
-  }
 
   const root=document.getElementById('topicTestEntryRoot');if(!root)return;
   const css=document.createElement('style');css.textContent=`

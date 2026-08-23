@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r15-clean-startup-ui';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r16-topic-test-contract';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -10,6 +10,7 @@ const SHELL = [
   '/app-core.js',
   '/app-cloud.js',
   '/app-counselor.js',
+  '/data/yks-topic-taxonomy-v1.js',
   '/app-analysis-flow.js?v=2',
   '/app-data-v5.js?v=1',
   '/app-home-data.js?v=3',

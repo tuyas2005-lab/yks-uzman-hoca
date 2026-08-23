@@ -40,9 +40,10 @@
   const dateTR=v=>{try{return new Date(v+'T12:00:00').toLocaleDateString('tr-TR')}catch{return v||''}};
   const net=(d,w)=>Math.round((Number(d||0)-Number(w||0)/4)*100)/100;
   const sortedTrials=()=>[...(state.trials||[])].sort((a,b)=>String(a.date).localeCompare(String(b.date))||Number(a.id)-Number(b.id));
+  const topicTestInsights=()=>window.YKSDataV5?.getTopicTestInsights?.({limit:12,days:60})||[];
   const latest=()=>sortedTrials().at(-1)||null;
   const target=()=>Number(state.profile.targetNet||70);
-  const fingerprint=()=>JSON.stringify({t:(state.trials||[]).map(x=>[x.id,x.totalNet,x.date]),target:target(),topics:state.topicMastery});
+  const fingerprint=()=>JSON.stringify({t:(state.trials||[]).map(x=>[x.id,x.totalNet,x.date]),target:target(),topics:state.topicMastery,topicTests:topicTestInsights().map(x=>[x.topicId,x.totalTests,x.totalQuestions,x.correct,x.wrong,x.blank,x.lastTestAt,x.trend])});
   const reportStale=()=>state.coach?.report&&state.coach.fingerprint!==fingerprint();
 
   function subjectStats(type){
@@ -82,9 +83,9 @@
   }
 
   function quickDecisionHtml(sum,sub){
-    const weak=[...sub].sort((a,b)=>(a.last/a.total)-(b.last/b.total))[0],topic=topicEntries()[0];
+    const weak=[...sub].sort((a,b)=>(a.last/a.total)-(b.last/b.total))[0],insight=[...topicTestInsights()].sort((a,b)=>(a.accuracy??101)-(b.accuracy??101)||b.totalQuestions-a.totalQuestions)[0],topic=topicEntries()[0];
     let headline=sum.delta===null?'Bu deneme başlangıç ölçümün.':'Son denemede '+(sum.delta>=0?'yükseliş var.':'geri çekilme var.');
-    return `<h3>${headline}</h3><p>${sum.count<2?'Bir sonraki denemede amaç önce sağlam bir karşılaştırma verisi oluşturmak.':`Son ${Math.min(3,sum.count)} deneme ortalaman ${fmt(sum.avg)} net.`} ${weak?`Ders bazında en fazla gelişim alanı <b>${esc(weak.label)}</b> tarafında görünüyor.`:''}</p>${topic?`<div class="tip orange"><b>Öncelikli konu:</b> ${esc(topic[0])} • ustalık %${topic[1]}</div>`:''}`;
+    return `<h3>${headline}</h3><p>${sum.count<2?'Bir sonraki denemede amaç önce sağlam bir karşılaştırma verisi oluşturmak.':`Son ${Math.min(3,sum.count)} deneme ortalaman ${fmt(sum.avg)} net.`} ${weak?`Ders bazında en fazla gelişim alanı <b>${esc(weak.label)}</b> tarafında görünüyor.`:''}</p>${insight?`<div class="tip orange"><b>Konu testi sinyali:</b> ${esc(insight.topic)} • ${insight.totalTests} test / ${insight.totalQuestions} soru • %${insight.accuracy} • ${esc(insight.trend)}</div>`:(topic?`<div class="tip orange"><b>Öncelikli konu:</b> ${esc(topic[0])} • ustalık %${topic[1]}</div>`:'')}`;
   }
 
   function reportHtml(){
@@ -140,7 +141,7 @@
     const btn=root.querySelector('#ycReportBtn');if(!btn)return;btn.disabled=true;btn.textContent='Rapor hazırlanıyor…';
     try{
       const recentWrongs=(state.sessions||[]).filter(x=>!x.correct).slice(-12).map(x=>({subject:x.subject,topic:x.topic,date:x.date}));
-      const r=await fetch('/api/coach-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:{targetNet:target(),dailyQuestionGoal:state.profile.goal,dailyMinutes:state.profile.minutes},trials:sortedTrials(),topicMastery:state.topicMastery||{},recentWrongs})}),j=await r.json();if(!r.ok)throw new Error(j.error||'Rapor oluşturulamadı.');state.coach={report:j,fingerprint:fingerprint(),generatedAt:new Date().toISOString()};save();renderDashboard();
+      const r=await fetch('/api/coach-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:{targetNet:target(),dailyQuestionGoal:state.profile.goal,dailyMinutes:state.profile.minutes,track:state.profile.track},trials:sortedTrials(),topicMastery:state.topicMastery||{},topicTestInsights:topicTestInsights(),recentWrongs})}),j=await r.json();if(!r.ok)throw new Error(j.error||'Rapor oluşturulamadı.');state.coach={report:j,fingerprint:fingerprint(),generatedAt:new Date().toISOString()};save();renderDashboard();
     }catch(e){btn.disabled=false;btn.textContent='Tekrar Dene';alert('Koç raporu oluşturulamadı: '+e.message)}
   }
 

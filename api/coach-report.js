@@ -44,6 +44,7 @@ export default async function handler(req,res){
     if(track==="SAY")return /matematik|geometri|fizik|kimya|biyoloji/i.test(s);
     return /matematik|geometri|edebiyat|tarih|coğraf/i.test(s);
   });
+  const topicTestInsights=(Array.isArray(body.topicTestInsights)?body.topicTestInsights:[]).slice(0,12).map(x=>({topicId:String(x?.topicId||""),exam:String(x?.exam||""),subject:String(x?.subject||""),topic:String(x?.topic||""),totalTests:Number(x?.totalTests||0),totalQuestions:Number(x?.totalQuestions||0),correct:Number(x?.correct||0),wrong:Number(x?.wrong||0),blank:Number(x?.blank||0),net:Number(x?.net||0),accuracy:x?.accuracy===null?null:Number(x?.accuracy),lastTestAt:String(x?.lastTestAt||""),trend:String(x?.trend||"insufficient-data"),recentTests:(Array.isArray(x?.recentTests)?x.recentTests:[]).slice(0,3).map(t=>({dateKey:String(t?.dateKey||""),questionCount:Number(t?.questionCount||0),accuracy:Number(t?.accuracy||0)}))}));
   const trackRule=track==="SAY"
     ?"Öğrenci SAYISAL alanda. TYT'nin tüm dersleri ortak ve önemlidir. AYT planında yalnız Matematik/Geometri ile Fizik, Kimya ve Biyoloji önceliklendir. Alan dışı AYT görevi verme."
     :track==="EA"
@@ -54,10 +55,10 @@ export default async function handler(req,res){
       model:ECONOMY_MODEL,
       store:false,
       reasoning:{effort:"none"},
-      max_output_tokens:850,
+      max_output_tokens:1600,
       input:[
-        {role:"developer",content:`Sen YKS çalışma koçusun. SADECE verilen gerçek deneme ve çalışma verilerini analiz et. Veri uydurma, sıralama/puan tahmini yapma. 1 deneme varsa başlangıç ölçümü, 2+ denemede trend yorumu yap. Net hesabı doğru - yanlış/4 mantığıyla yapılmıştır. Türkçe, kısa ve uygulanabilir yaz. Önceliklerde ölçülebilir eylem ver; tek denemede büyük sıçrama önerme. ${trackRule}`},
-        {role:"user",content:JSON.stringify({profile:{name:body.profile?.name||"Öğrenci",targetNet:body.profile?.targetNet,track},trials,topicMastery:body.topicMastery||{},recentWrongs})}
+        {role:"developer",content:`Sen YKS çalışma koçusun. SADECE verilen gerçek deneme ve çalışma verilerini analiz et. Veri uydurma, sıralama/puan tahmini yapma. 1 deneme varsa başlangıç ölçümü, 2+ denemede trend yorumu yap. Net hesabı doğru - yanlış/4 mantığıyla yapılmıştır. Türkçe, kısa ve uygulanabilir yaz. Önceliklerde ölçülebilir eylem ver; tek denemede büyük sıçrama önerme. topicTestInsights kesin mastery değil, toplu performans sinyalidir. Öncelik verirken recency, soru hacmi, tekrar sayısı ve trendi birlikte değerlendir; tek 5 soruluk test ile 100 soruluk kanıtı eşit sayma. Aggregate wrong sayısını belirli soru yanlışı veya Yanlışlarım kaydı gibi sunma. Kaydedilmemiş kaynak/test/soru uydurma. ${trackRule}`},
+        {role:"user",content:JSON.stringify({profile:{name:body.profile?.name||"Öğrenci",targetNet:body.profile?.targetNet,track},trials,topicMastery:body.topicMastery||{},topicTestInsights,recentWrongs})}
       ],
       text:{format:{type:"json_schema",name:"yks_coach_report",strict:true,schema}}
     });

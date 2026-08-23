@@ -28,6 +28,7 @@
   `;document.head.appendChild(css);
 
   function metrics(){return window.getLearningSnapshot?.().metrics||window.YKSDataV5?.getLearningModel?.().topics||[]}
+  function topicTestInsight(m){return(window.YKSDataV5?.getTopicTestInsights?.({days:60})||[]).find(x=>x.topicId===m.topicKey||(x.exam===m.exam&&norm(x.subject)===norm(m.subject)&&norm(x.topic)===norm(m.topic)))||null}
   function scoreValue(m){return m.score===null||m.score===undefined?null:Number(m.score)}
   function subjectSummary(){
     const groups=new Map();
@@ -75,7 +76,7 @@
     if(filters.sort==='low')rows.sort((a,b)=>(scoreValue(a)??101)-(scoreValue(b)??101)||b.total-a.total);else if(filters.sort==='high')rows.sort((a,b)=>(scoreValue(b)??-1)-(scoreValue(a)??-1)||b.total-a.total);else if(filters.sort==='name')rows.sort((a,b)=>String(a.topic).localeCompare(String(b.topic),'tr'));else rows.sort((a,b)=>Number(b.priorityIndex||0)-Number(a.priorityIndex||0)||((scoreValue(a)??101)-(scoreValue(b)??101)));
     const sm=document.getElementById('topicFilterSummary');if(sm)sm.innerHTML=`<span><b>${rows.length}</b> konu gösteriliyor</span><span>Toplam ${all.length} konu</span>`;
     box.classList.add('topic-v5-list');
-    box.innerHTML=rows.length?rows.map(m=>{const s=scoreValue(m);return `<div class="topic-v5-row"><div class="topic-v5-title"><b>${escHtml(m.topic||'Konu belirtilmemiş')}</b><small>${escHtml(`${m.exam} ${m.subject}`)} • ${m.total} ölçüm • ${m.correct} doğru • ${m.wrong} yanlış</small><div class="topic-v5-meta"><span class="topic-v5-chip">${escHtml(m.confidence||'Ölçüm yok')}</span>${m.recentSignals?`<span class="topic-v5-chip signal">${m.recentSignals} zorlanma sinyali</span>`:''}</div></div><div class="bar ${s!==null&&s<60?'warning':''}"><i style="width:${s===null?5:Math.max(3,s)}%"></i></div><div class="topic-v5-score">${s===null?'—':`%${s}`}</div></div>`}).join(''):'<div class="topic-filter-empty">Seçtiğin filtrelere uygun konu bulunamadı.</div>';
+    box.innerHTML=rows.length?rows.map(m=>{const s=scoreValue(m),tt=topicTestInsight(m),evidence=tt?`${tt.totalQuestions} soru • ${tt.correct}D • ${tt.wrong}Y • ${tt.blank}B • ${tt.net.toLocaleString('tr-TR')} net • %${tt.accuracy}`:`${m.total} ölçüm • ${m.correct} doğru • ${m.wrong} yanlış`;return `<div class="topic-v5-row"><div class="topic-v5-title"><b>${escHtml(m.topic||'Konu belirtilmemiş')}</b><small>${escHtml(`${m.exam} ${m.subject}`)} • ${escHtml(evidence)}</small><div class="topic-v5-meta"><span class="topic-v5-chip">${escHtml(m.confidence||'Ölçüm yok')}</span>${tt?`<span class="topic-v5-chip">Son çalışma ${escHtml(tt.lastTestAt)} • ${tt.totalTests} test • ${escHtml(tt.trend)}</span>`:''}${m.recentSignals?`<span class="topic-v5-chip signal">${m.recentSignals} zorlanma sinyali</span>`:''}</div></div><div class="bar ${s!==null&&s<60?'warning':''}"><i style="width:${s===null?5:Math.max(3,s)}%"></i></div><div class="topic-v5-score">${s===null?'—':`%${s}`}</div></div>`}).join(''):'<div class="topic-filter-empty">Seçtiğin filtrelere uygun konu bulunamadı.</div>';
   }
 
   const baseHome=window.renderHome;

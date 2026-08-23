@@ -94,5 +94,5 @@
 
   };
   if(window.YKSDataV5)start();
-  else{const s=document.createElement('script');s.src='/app-data-v5.js?v=1';s.onload=start;document.body.appendChild(s)}
+  else{const s=document.createElement('script');s.src='/app-data-v5.js?v=2';s.onload=start;document.body.appendChild(s)}
 })();

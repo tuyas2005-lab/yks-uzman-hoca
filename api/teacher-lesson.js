@@ -26,6 +26,8 @@ export default async function handler(req,res){
   const topic=String(body.topic||"").trim();
   const subject=String(body.subject||"").trim();
   const exam=String(body.exam||"TYT").trim();
+  const rawEvidence=body.topicTestEvidence&&typeof body.topicTestEvidence==="object"?body.topicTestEvidence:null;
+  const topicTestEvidence=rawEvidence?{totalTests:Number(rawEvidence.totalTests||0),totalQuestions:Number(rawEvidence.totalQuestions||0),correct:Number(rawEvidence.correct||0),wrong:Number(rawEvidence.wrong||0),blank:Number(rawEvidence.blank||0),net:Number(rawEvidence.net||0),accuracy:rawEvidence.accuracy===null?null:Number(rawEvidence.accuracy),lastTestAt:String(rawEvidence.lastTestAt||""),lastTest:rawEvidence.lastTest?{questionCount:Number(rawEvidence.lastTest.questionCount||0),correct:Number(rawEvidence.lastTest.correct||0),wrong:Number(rawEvidence.lastTest.wrong||0),blank:Number(rawEvidence.lastTest.blank||0),accuracy:Number(rawEvidence.lastTest.accuracy||0)}:null,recentTests:(Array.isArray(rawEvidence.recentTests)?rawEvidence.recentTests:[]).slice(0,3).map(x=>({dateKey:String(x.dateKey||""),questionCount:Number(x.questionCount||0),correct:Number(x.correct||0),wrong:Number(x.wrong||0),blank:Number(x.blank||0),accuracy:Number(x.accuracy||0)})),trend:String(rawEvidence.trend||"insufficient-data")}:null;
   if(!topic) return res.status(400).json({error:"Konu gerekli."});
   const started=Date.now();
   try{
@@ -36,8 +38,8 @@ export default async function handler(req,res){
       reasoning:{effort:"none"},
       max_output_tokens:760,
       input:[
-        {role:"developer",content:`Sen YKS Uzman Hoca içindeki Kişisel Öğretmensin. Öğrenciyi 5 dakikada konuya geri döndüren çok kısa, öğretici bir tekrar hazırlarsın.\n\n${skill}\n\nKurallar:\n- Türkçe yaz.\n- Güncel MEB kazanım mantığına uygun ol.\n- Uzun ders anlatımı yapma; yalnız sınavda işe yarayan öz bilgi ver.\n- key_points tam 3 kısa madde olsun.\n- common_mistake tek ve somut bir hata olsun.\n- example_question kısa olsun, example_solution 2-4 cümleyi geçmesin.\n- check_question özgün ve 5 seçenekli olsun. Seçenekleri A), B) diye etiketleme; yalnız seçenek metinlerini döndür.\n- check_answer yalnız A, B, C, D veya E olsun.\n- Kullanıcıya ait başarı yüzdesini akademik tanı gibi yorumlama; yalnız çalışma önceliği olarak kullan.`},
-        {role:"user",content:JSON.stringify({exam,subject,topic,mastery:body.mastery,recentWrongCount:body.recentWrongCount})}
+        {role:"developer",content:`Sen YKS Uzman Hoca içindeki Kişisel Öğretmensin. Öğrenciyi 5 dakikada konuya geri döndüren çok kısa, öğretici bir tekrar hazırlarsın.\n\n${skill}\n\nKurallar:\n- Türkçe yaz.\n- Güncel MEB kazanım mantığına uygun ol.\n- Uzun ders anlatımı yapma; yalnız sınavda işe yarayan öz bilgi ver.\n- key_points tam 3 kısa madde olsun.\n- common_mistake tek ve somut bir hata olsun.\n- example_question kısa olsun, example_solution 2-4 cümleyi geçmesin.\n- check_question özgün ve 5 seçenekli olsun. Seçenekleri A), B) diye etiketleme; yalnız seçenek metinlerini döndür.\n- check_answer yalnız A, B, C, D veya E olsun.\n- Kullanıcıya ait başarı yüzdesini akademik tanı gibi yorumlama; yalnız çalışma önceliği olarak kullan.\n- topicTestEvidence toplu performans sinyalidir, kesin mastery değildir. Soru hacmi, son tarih, tekrar sayısı ve trendi birlikte değerlendir.\n- Tek testten kesin başarı/başarısızlık hükmü verme. Aggregate wrong sayısını belirli yanlış sorular veya Yanlışlarım kaydı gibi sunma.\n- Verilmeyen kaynak, test veya soru ayrıntısı uydurma; öneriyi yapıcı ve somut tut.`},
+        {role:"user",content:JSON.stringify({exam,subject,topic,mastery:body.mastery,recentWrongCount:body.recentWrongCount,topicTestEvidence})}
       ],
       text:{format:{type:"json_schema",name:"personal_teacher_lesson",strict:true,schema}}
     });

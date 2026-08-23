@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-17c352ea9580fae1064abea904b1b896df9570de
+5626d255f28002c8122cfac5cc304f17ed434a3e
 
 Commit:
 
-Fix source card catalog resolution
+Unify photo and text question solving
 
 Production:
 
@@ -435,21 +435,21 @@ Kaynak soru → StudyEvent → Yanlışlarım → retry → kapanış.
 
 DURUM:
 
-IN DEVELOPMENT
+TAMAMLANDI / PRODUCTION
 
-Mevcut ana sayfada bulunan:
+Ana sayfadaki:
 
 Soru Yükle
 +
 Soru Yaz
 
-iki ayrı giriş olmaktan çıkarılacaktır.
+iki ayrı giriş tek çalışma alanında birleştirildi.
 
 Tek:
 
 Soru Çöz
 
-çalışma alanı oluşturulacaktır.
+çalışma alanı oluşturuldu.
 
 Ekran:
 
@@ -464,13 +464,31 @@ Ana sayfadaki Hızlı Başla bölümünde iki kart yerine tek:
 
 Soru Çöz
 
-kartı olacaktır.
+kartı bulunur.
 
 Alt metin:
 
 Fotoğrafla veya yazarak sorunu çöz
 
-Sol navigasyondaki mevcut Soru Çöz aynı birleşik ekrana gitmelidir.
+Sol navigasyondaki Soru Çöz aynı birleşik ekrana gider.
+
+---
+
+## 2.1 — Soru Çöz 2.1 Answer Consistency
+
+DURUM:
+
+IN DEVELOPMENT
+
+İlk solve sonucu candidate olarak kabul edilir. Bağımsız verifier,
+soruyu yeniden çözer ve candidate answer ile short_solution uyumunu
+kontrol eder. Uyuşmazlıkta öğrenciye gösterimden önce en fazla bir
+correction pass uygulanır; doğrulama güvenilir değilse kontrollü
+belirsizlik mesajı döner.
+
+Backlog:
+
+Soru Çöz 2.1 Input Robustness
 
 ---
 
@@ -881,10 +899,7 @@ Production merge yetkisi otomatik agent'a verilmemelidir.
 
 Öncelikli sıradaki uygulama geliştirmesi:
 
-Soru Çöz 2.0
-
-Ancak PROJECT_HANDOFF.md repository'ye başarıyla eklendikten sonra
-başlatılmalıdır.
+Konu Bazlı Test Çalışması Girişi
 
 ---
 

@@ -61,6 +61,7 @@
 
   function resolveItem(card){
     const all=C()?.all?.()||[],id=String(card?.dataset?.catalogId||'').trim();
+    if(typeof window.YKSResolveSourceCatalogItem==='function')return window.YKSResolveSourceCatalogItem(all,{catalogId:id,text:card?.innerText||'',subject:card?.querySelector?.('.mts-main,.official-source-main')?.textContent||''});
     if(id)return all.find(x=>x.id===id)||null;
     const text=card?.innerText||'',normalized=normText(text),questionNo=(text.match(/\bSoru\s*(\d+)\b/i)||[])[1]||'',examInfo=text.match(/\b(20\d{2})\s+(TYT|AYT|YDT)\b/i);
     if(!questionNo||!examInfo)return null;

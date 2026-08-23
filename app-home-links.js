@@ -95,6 +95,7 @@
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=3'),
+    ()=>loadScript('/app-source-card-catalog-resolver.js?v=1'),
     ()=>loadScript('/app-source-question-viewer.js?v=5'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),

@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-528d2c3906603409e657641257be0ec540eac50d
+2886338a58603805a0b85e4e6155622f9eda9604
 
 Commit:
 
-Fix stale V5 architecture CI assertion
+Integrate topic tests into learning insights
 
 Production:
 
@@ -497,6 +497,33 @@ Candidate Solve
 Backlog:
 
 Soru Çöz 2.1 Input Robustness
+
+---
+
+## 2.2 — Konu Bazlı Test Çalışması Girişi
+
+DURUM:
+
+TAMAMLANDI / PRODUCTION
+
+Teslim zinciri:
+
+- Phase A — PR #18: canonical topic-test veri sözleşmesi
+- Phase B — PR #19: topic-test giriş UI'ı
+- Phase C — PR #20: öğrenme modeli, Kişisel Öğretmen ve YKS Koçu entegrasyonu
+- Production merge SHA: 2886338a58603805a0b85e4e6155622f9eda9604
+
+Tamamlanan davranışlar:
+
+- Aynı konuya ait testler soru hacmine göre weighted aggregation ile birleştirilir.
+- Tek testte kesin trend üretilmez; yeterli tekrar olduğunda gelişim trendi hesaplanır.
+- Topic-test soru sayısı Daily Goal'a event başına +1 yerine gerçek soru adediyle katkı yapar.
+- Konu Takip; test sayısı, soru, doğru, yanlış, boş, net, accuracy ve trend kanıtını gösterir.
+- Kişisel Öğretmen topic-test evidence'i toplu performans sinyali olarak kullanır.
+- YKS Koçu; recency, soru hacmi, tekrar sayısı, accuracy, net ve trendi plan kararına taşır.
+- Aggregate weakness ile question-level mistake ayrıdır; toplu yanlış sayısı Yanlışlarım'da sahte soru kartı oluşturmaz.
+- Authenticated Vercel Preview üzerinde gerçek Teacher ve Coach AI endpoint acceptance testleri PASS olmuştur.
+- Production smoke: kayıt, Daily Goal, Konu Takip, Teacher/Coach runtime zinciri ve Yanlışlarım koruması PASS.
 
 ---
 
@@ -905,9 +932,10 @@ Production merge yetkisi otomatik agent'a verilmemelidir.
 
 # 19. ŞU ANDAKİ SONRAKİ İŞ
 
-Öncelikli sıradaki uygulama geliştirmesi:
+Konu Bazlı Test Çalışması tamamlandı ve production'da kapatıldı.
 
-Konu Bazlı Test Çalışması — Phase C LEARNING INTEGRATION IN DEVELOPMENT
+Yeni Phase D başlatılmadı. Sonraki ana geliştirme ürün sahibi + ChatGPT
+tarafından ayrıca belirlenecektir.
 
 ---
 

@@ -23,7 +23,11 @@ const verificationSchema={
 const UNVERIFIED_ANSWER="Doğrulanamadı";
 const UNVERIFIED_SOLUTION="Bu sorunun cevabını güvenilir biçimde doğrulayamadım.";
 
-function parseJson(response){return JSON.parse(String(response?.output_text||"{}"))}
+function parseJson(response){
+  const output=String(response?.output_text||"").trim();
+  if(!output)throw new Error("Model yapılandırılmış yanıt döndürmedi.");
+  return JSON.parse(output);
+}
 function questionContent(text,image,imageDetail="auto"){
   const content=[{type:"input_text",text:text||"Görseldeki YKS sorusunu dikkatle oku. Önce doğru cevabı bul, sonra dersini, sınav türünü ve konusunu belirle; çok kısa bir çözüm yaz."}];
   if(image)content.push({type:"input_image",image_url:image,detail:imageDetail});
@@ -136,7 +140,7 @@ export default async function handler(req,res){
       const verificationInput=questionContent(text,image,"high");
       verificationInput.push({type:"input_text",text:`Aşağıdaki aday çözüm güvenilmezdir ve yalnız bağımsız çözümünden SONRA karşılaştırılmalıdır:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
       verificationResponse=await client.responses.create({
-        model:ECONOMY_MODEL,store:false,reasoning:{effort:image?"medium":"low"},max_output_tokens:520,
+        model:ECONOMY_MODEL,store:false,reasoning:{effort:image?"medium":"low"},max_output_tokens:image?1200:700,
         input:[
           {role:"developer",content:`YKS cevap doğrulayıcısısın. İlk modelin sonucunu onaylamak için değil, soruyu bağımsız yeniden çözmek için çalışırsın.\n1. Önce soru metnini ve varsa görseli aday cevaptan bağımsız çöz.\n2. Matematikte mümkünse aritmetik, denklem çözme, oran-yüzde hesabı, seçenek yerine koyma veya sonuç geri-kontrolü yap.\n3. Geometride çizimin ölçekli olduğunu varsayma; yalnız verilen açı, kenar, paralellik ve zorunlu açı ilişkilerini kullan. Gerekirse seçenekleri tek tek doğrula.\n4. Sonra aday answer doğru mu ve short_solution aynı cevabı gerçekten destekliyor mu kontrol et.\n5. Doğrudan çelişkide consistent=false olmalı. Örneğin answer E iken açıklama E seçeneğini yanlışlıyorsa tutarlı sayma.\n6. verifiedAnswer gerçek final cevap; verifiedShortSolution onu destekleyen en fazla 2-3 kısa cümle olsun.\n7. confidence=high yalnız cevap bağımsız hesap/çıkarımla doğrulandıysa kullan. Gerçekten doğrulayamıyorsan confidence=low kullan; tahmin yürütme.\n8. reason yalnız kısa doğrulama özeti olsun; gizli düşünme zinciri yazma.`},
           {role:"user",content:verificationInput}
@@ -157,7 +161,7 @@ export default async function handler(req,res){
         const correctionInput=questionContent(text,image,"high");
         correctionInput.push({type:"input_text",text:`İlk çözüm güvenilir bulunmadı. Bağımsız verifier özeti:\n${JSON.stringify({verifiedAnswer:verification.verifiedAnswer,verifiedShortSolution:verification.verifiedShortSolution,reason:verification.reason,confidence:verification.confidence})}\nGüvenilmeyen ilk çıktı:\n${JSON.stringify({answer:candidate.answer,short_solution:candidate.short_solution})}`});
         correctionResponse=await client.responses.create({
-          model:ECONOMY_MODEL,store:false,reasoning:{effort:image?"medium":"low"},max_output_tokens:440,
+          model:ECONOMY_MODEL,store:false,reasoning:{effort:image?"medium":"low"},max_output_tokens:image?1000:600,
           input:[
             {role:"developer",content:`YKS sorusu için düzeltilmiş final çözümü üret. Soruyu tekrar bağımsız kontrol et; güvenilmeyen ilk cevabı veya verifier cevabını körlemesine kopyalama. Matematikte sonucu hesap/yerine koyma ile, geometride yalnız verilen zorunlu ilişkilerle doğrula. answer ile short_solution mutlaka aynı sonucu savunmalı. short_solution en fazla 2-3 kısa cümle olsun. Cevap güvenilir biçimde doğrulanamıyorsa answer alanına ${JSON.stringify(UNVERIFIED_ANSWER)}, short_solution alanına ${JSON.stringify(UNVERIFIED_SOLUTION)} yaz.`},
             {role:"user",content:correctionInput}

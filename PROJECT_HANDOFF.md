@@ -199,6 +199,17 @@ Production manuel deploy edilmemelidir.
 
 Vercel GitHub entegrasyonu kullanılmalıdır.
 
+## Kullanıcı Görsel Kabul Prensibi
+
+Kullanıcıya dönük önemli UI veya feature geliştirmelerinde otomatik testler
+ve Codex browser acceptance tek başına final kabul değildir.
+
+Production merge öncesinde mümkün olduğunda kullanıcı gerçek Vercel Preview
+üzerinde görsel ve etkileşimli kabul testi yapmalıdır.
+
+Production deployment sonrasında final canlı kullanıcı smoke uygulanmalı ve
+sonuç proje kapanışına kaydedilmelidir.
+
 ---
 
 # 5. GITHUB / VERCEL DURUMU
@@ -213,11 +224,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-2886338a58603805a0b85e4e6155622f9eda9604
+7f864d9d13b05a0baa01733aa8904a25ff26c4ec
 
 Commit:
 
-Integrate topic tests into learning insights
+Fix topic test subject taxonomy
 
 Production:
 
@@ -515,8 +526,11 @@ Teslim zinciri:
 
 Tamamlanan davranışlar:
 
+- Topic-test kayıtları canonical StudyEvent defterine yazılır ve merkezi
+  Learning Model tarafından tüketilir.
 - Aynı konuya ait testler soru hacmine göre weighted aggregation ile birleştirilir.
-- Tek testte kesin trend üretilmez; yeterli tekrar olduğunda gelişim trendi hesaplanır.
+- Tek testte kesin trend üretilmez; yeterli tekrar olduğunda deterministic
+  gelişim trendi hesaplanır.
 - Topic-test soru sayısı Daily Goal'a event başına +1 yerine gerçek soru adediyle katkı yapar.
 - Konu Takip; test sayısı, soru, doğru, yanlış, boş, net, accuracy ve trend kanıtını gösterir.
 - Kişisel Öğretmen topic-test evidence'i toplu performans sinyali olarak kullanır.
@@ -524,6 +538,38 @@ Tamamlanan davranışlar:
 - Aggregate weakness ile question-level mistake ayrıdır; toplu yanlış sayısı Yanlışlarım'da sahte soru kartı oluşturmaz.
 - Authenticated Vercel Preview üzerinde gerçek Teacher ve Coach AI endpoint acceptance testleri PASS olmuştur.
 - Production smoke: kayıt, Daily Goal, Konu Takip, Teacher/Coach runtime zinciri ve Yanlışlarım koruması PASS.
+
+### Final Topic Taxonomy Hotfix — PR #22
+
+DURUM:
+
+TAMAMLANDI / PRODUCTION
+
+Production squash merge:
+
+- PR: `#22 — Fix topic test subject taxonomy`
+- Main SHA: `7f864d9d13b05a0baa01733aa8904a25ff26c4ec`
+- Canonical topic: 227 unique
+- TYT: 120
+- AYT SAY: 67
+- AYT EA: 63
+- Duplicate topicId: 0
+- Normalized alias collision: 0
+- Subject coverage: TYT 9/9, AYT SAY 4/4, AYT EA 4/4
+- Mevcut 5 canonical ID backward compatible kaldı
+- Ambiguous alias collision'ları context-specific alias'larla çözüldü
+
+Production doğrulaması:
+
+- GitHub → Vercel otomatik production deployment READY
+- Production deployment commit, main SHA ile eşleşiyor
+- Ana sayfa, `/api/status` ve `/api/app-config`: HTTP 200
+- TYT 9 ders ile AYT SAY/EA topic dropdown smoke: PASS
+- Kontrollü production topic-test CRUD smoke: PASS
+- Daily Goal ve Konu Takip evidence ekleme/kaldırma: PASS
+- Aggregate topic-test yanlışları fake Yanlışlarım sorusu üretmiyor
+- Production console/runtime kritik hata: 0
+- USER FINAL LIVE PRODUCTION VISUAL ACCEPTANCE: PASS
 
 ---
 
@@ -930,7 +976,19 @@ Production merge yetkisi otomatik agent'a verilmemelidir.
 
 ---
 
-# 19. ŞU ANDAKİ SONRAKİ İŞ
+# 19. AÇIK BACKLOG
+
+Bu maddeler yalnız backlog'dur; bu kapanış kapsamında geliştirme
+başlatılmamıştır:
+
+- Soru Çöz 2.1 Input Robustness
+- Mini Test `Mini Testler hazırlanıyor…` PWA/cache sorunu
+- GitHub Actions Node runtime deprecation
+- Geometry Model Consistency
+
+---
+
+# 20. ŞU ANDAKİ SONRAKİ İŞ
 
 Konu Bazlı Test Çalışması tamamlandı ve production'da kapatıldı.
 
@@ -939,7 +997,7 @@ tarafından ayrıca belirlenecektir.
 
 ---
 
-# 20. DEĞİŞMEZ ANA PRENSİPLER
+# 21. DEĞİŞMEZ ANA PRENSİPLER
 
 1. AI resmî soru üretmez.
 

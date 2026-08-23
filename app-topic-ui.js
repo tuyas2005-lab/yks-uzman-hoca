@@ -13,6 +13,7 @@
     #home #weakList .home-subject-signal{display:inline-flex;margin-top:3px;padding:2px 6px;border-radius:999px;background:#eeeaff;color:#5a42d3;font-size:9px;font-weight:800}
 
     /* Konu Takip detay ekranı */
+    .topic-v5-actions{display:flex;justify-content:flex-end;margin:0 0 12px}.topic-v5-actions button{min-height:44px}
     .topic-filter-bar{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(135px,.65fr));gap:9px;padding:12px;margin:0 0 14px;border:1px solid var(--line);background:var(--surface);border-radius:16px}
     .topic-filter-bar input,.topic-filter-bar select{height:42px;width:100%;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);padding:0 11px;font:inherit;font-size:13px}
     .topic-filter-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 10px;color:var(--muted);font-size:12px}
@@ -47,6 +48,7 @@
 
   function ensureFilterUi(){
     const box=document.getElementById('topicRows');if(!box)return null;
+    let actions=document.getElementById('topicV5Actions');if(!actions){actions=document.createElement('div');actions.id='topicV5Actions';actions.className='topic-v5-actions';actions.innerHTML='<button id="openTopicTestEntry" class="primary">＋ Test Sonucu Ekle</button>';box.parentNode.insertBefore(actions,box);actions.querySelector('button').onclick=()=>{go('topic-test-entry');window.YKSTopicTestEntry?.open?.()}}
     let bar=document.getElementById('topicFilterBar');
     if(!bar){
       bar=document.createElement('div');bar.id='topicFilterBar';bar.className='topic-filter-bar';bar.innerHTML=`<input id="topicSearch" type="search" placeholder="🔎 Konu veya ders ara..."><select id="topicExam"><option value="all">Tüm sınavlar</option><option value="TYT">TYT</option><option value="AYT">AYT</option></select><select id="topicSubject"><option value="all">Tüm dersler</option></select><select id="topicStatus"><option value="all">Tüm seviyeler</option><option value="critical">Kritik · %0–39</option><option value="developing">Gelişiyor · %40–69</option><option value="good">İyi · %70+</option><option value="unmeasured">Ölçülmemiş</option></select><select id="topicSort"><option value="priority">Önceliğe göre</option><option value="low">Başarı düşükten</option><option value="high">Başarı yüksekten</option><option value="name">Konu A–Z</option></select>`;

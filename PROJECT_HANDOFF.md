@@ -907,7 +907,7 @@ Production merge yetkisi otomatik agent'a verilmemelidir.
 
 Öncelikli sıradaki uygulama geliştirmesi:
 
-Konu Bazlı Test Çalışması Girişi — Phase A IN DEVELOPMENT
+Konu Bazlı Test Çalışması Girişi — Phase B IN DEVELOPMENT
 
 ---
 

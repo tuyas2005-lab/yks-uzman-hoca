@@ -15,6 +15,7 @@ function harness({online=true}={}){
   return{...context,get saves(){return saves}};
 }
 const input=(actionId='phase-b-1',extra={})=>({actionId,dateKey:'2026-08-23',exam:'TYT',subjectId:'matematik',topicId:'tyt.matematik.koklu-sayilar',resource:'345',testName:'Test 3',durationMinutes:27,total:20,correct:14,wrong:4,blank:2,...extra});
+const subjectIds=rows=>[...rows].map(x=>x.subjectId);
 
 {
   const h=harness(),saved=h.YKSTopicTestEntry.saveInput(input());
@@ -45,9 +46,21 @@ const input=(actionId='phase-b-1',extra={})=>({actionId,dateKey:'2026-08-23',exa
 }
 {
   const h=harness(),subjects=h.YKSTopicTestEntry.subjectsFor('TYT'),topics=h.YKSTopicTestEntry.topicOptions('TYT','matematik');
-  assert.ok(subjects.some(x=>x.subjectId==='matematik'));assert.ok(topics.some(x=>x.id==='tyt.matematik.koklu-sayilar'&&x.topic==='Köklü Sayılar'));
-  assert.equal(h.YKSTopicTestEntry.topicOptions('AYT','matematik').length,0);
+  assert.deepEqual(subjectIds(subjects),['turkce','matematik','fizik','kimya','biyoloji','tarih','cografya','felsefe','din']);
+  assert.ok(topics.some(x=>x.id==='tyt.matematik.koklu-sayilar'&&x.topic==='Köklü Sayılar'));
+  assert.equal(h.YKSTopicTestEntry.topicOptions('TYT','kimya').length,10);
+  assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','SAY')),['matematik','fizik','kimya','biyoloji']);
+  assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','EA')),['matematik','edebiyat','tarih1','cografya1']);
+  assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','')),['matematik','fizik','kimya','biyoloji','edebiyat','tarih1','cografya1']);
+  assert.equal(h.YKSTopicTestEntry.topicOptions('AYT','matematik').length,23);
   assert.equal(h.YKSTopicTestEntry.saveInput(input('unknown',{exam:'AYT',topicId:''})).ok,false);assert.equal(h.state.studyEvents.length,0);
+}
+{
+  const h=harness();
+  h.state.profile.track='SAY';assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT')),['matematik','fizik','kimya','biyoloji']);
+  h.state.profile.track='EA';assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT')),['matematik','edebiyat','tarih1','cografya1']);
+  assert.equal(h.YKSTopicTaxonomyV1.get('tyt.matematik.koklu-sayilar').subjectId,'matematik');
+  assert.equal(h.YKSTopicTaxonomyV1.find({exam:'TYT',subject:'Matematik',topic:'Köklü İfadeler'}).id,'tyt.matematik.koklu-sayilar');
 }
 
 console.log('TOPIC TEST ENTRY UI TEST MATRIX: PASS');

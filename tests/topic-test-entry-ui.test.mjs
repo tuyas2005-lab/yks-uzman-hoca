@@ -48,11 +48,11 @@ const subjectIds=rows=>[...rows].map(x=>x.subjectId);
   const h=harness(),subjects=h.YKSTopicTestEntry.subjectsFor('TYT'),topics=h.YKSTopicTestEntry.topicOptions('TYT','matematik');
   assert.deepEqual(subjectIds(subjects),['turkce','matematik','fizik','kimya','biyoloji','tarih','cografya','felsefe','din']);
   assert.ok(topics.some(x=>x.id==='tyt.matematik.koklu-sayilar'&&x.topic==='Köklü Sayılar'));
-  assert.equal(h.YKSTopicTestEntry.topicOptions('TYT','kimya').length,0);
+  assert.equal(h.YKSTopicTestEntry.topicOptions('TYT','kimya').length,10);
   assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','SAY')),['matematik','fizik','kimya','biyoloji']);
   assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','EA')),['matematik','edebiyat','tarih1','cografya1']);
-  assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','')),['matematik','fizik','kimya','biyoloji','edebiyat','tarih1','cografya1','tarih2','cografya2','felsefe','din']);
-  assert.equal(h.YKSTopicTestEntry.topicOptions('AYT','matematik').length,0);
+  assert.deepEqual(subjectIds(h.YKSTopicTestEntry.subjectsFor('AYT','')),['matematik','fizik','kimya','biyoloji','edebiyat','tarih1','cografya1']);
+  assert.equal(h.YKSTopicTestEntry.topicOptions('AYT','matematik').length,23);
   assert.equal(h.YKSTopicTestEntry.saveInput(input('unknown',{exam:'AYT',topicId:''})).ok,false);assert.equal(h.state.studyEvents.length,0);
 }
 {

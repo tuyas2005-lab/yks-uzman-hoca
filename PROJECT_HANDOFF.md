@@ -213,11 +213,11 @@ https://yks-uzman-hoca.vercel.app
 
 Güncel doğrulanmış main:
 
-2886338a58603805a0b85e4e6155622f9eda9604
+7f864d9d13b05a0baa01733aa8904a25ff26c4ec
 
 Commit:
 
-Integrate topic tests into learning insights
+Fix topic test subject taxonomy
 
 Production:
 
@@ -524,6 +524,32 @@ Tamamlanan davranışlar:
 - Aggregate weakness ile question-level mistake ayrıdır; toplu yanlış sayısı Yanlışlarım'da sahte soru kartı oluşturmaz.
 - Authenticated Vercel Preview üzerinde gerçek Teacher ve Coach AI endpoint acceptance testleri PASS olmuştur.
 - Production smoke: kayıt, Daily Goal, Konu Takip, Teacher/Coach runtime zinciri ve Yanlışlarım koruması PASS.
+
+### Final Topic Taxonomy Hotfix — PR #22
+
+DURUM:
+
+TAMAMLANDI / PRODUCTION
+
+Production squash merge:
+
+- PR: `#22 — Fix topic test subject taxonomy`
+- Main SHA: `7f864d9d13b05a0baa01733aa8904a25ff26c4ec`
+- Canonical topic: 227 unique
+- TYT: 120
+- AYT SAY: 67
+- AYT EA: 63
+- Duplicate topicId: 0
+- Normalized alias collision: 0
+
+Production doğrulaması:
+
+- GitHub → Vercel otomatik production deployment READY
+- Production deployment commit, main SHA ile eşleşiyor
+- Ana sayfa, `/api/status` ve `/api/app-config`: HTTP 200
+- TYT 9 ders ile AYT SAY/EA topic dropdown smoke: PASS
+- Kontrollü topic-test kayıt/silme, Daily Goal, Konu Takip ve Yanlışlarım aggregate guard: PASS
+- Production console/runtime kritik hata: 0
 
 ---
 

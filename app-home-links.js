@@ -35,14 +35,14 @@
     return questionRuntimeReady;
   };
 
-  function loadScript(src){
+  function loadScript(src,verify){
     if(loaded.has(src))return Promise.resolve();
     if(loading.has(src))return loading.get(src);
     const p=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
       s.src=src;
       s.async=true;
-      s.onload=()=>{loaded.add(src);loading.delete(src);resolve()};
+      s.onload=()=>{try{if(typeof verify==='function')verify();loaded.add(src);loading.delete(src);resolve()}catch(e){loading.delete(src);console.warn('Başlatılamadı:',src,e);reject(e)}};
       s.onerror=()=>{loading.delete(src);console.warn('Yüklenemedi:',src);reject(new Error(src))};
       document.body.appendChild(s);
     });
@@ -93,7 +93,7 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=2'),
+    ()=>loadScript('/data/question-catalog-v1.js?v=2',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]);
@@ -124,6 +124,8 @@
     ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
     ()=>loadScript('/app-source-retake-position.js?v=1')
   ],()=>{
+    const C=window.YKSQuestionCatalogV1,manual=C?.all?.().filter(x=>x?.sourceKind==='manual-crop').length||0,visible=C?.all?.().filter(x=>x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.status==='ready').length||0;
+    if(!C||manual!==1523||visible!==1289){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
     resolveQuestionRuntimeReady?.();
     if(typeof window.renderMiniTestHome==='function'){
       markReady('tests');

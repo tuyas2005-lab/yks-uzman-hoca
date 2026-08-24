@@ -1,7 +1,9 @@
 (()=>{
   let warmTimer=0,bindTimer=0,lastWarmKey='';
 
-  const resolve=card=>window.resolveSourceQuestionCard?.(card)||null;
+  const resolve=card=>window.resolveSourceQuestionCard?.(card)
+    ||window.YKSQuestionCatalogV1?.all?.().find(x=>x.id===String(card?.dataset?.catalogId||''))
+    ||null;
 
   async function openDirect(btn,card,item,mini){
     if(typeof window.whenQuestionRuntimeReady==='function'){

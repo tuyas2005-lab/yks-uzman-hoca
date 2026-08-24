@@ -52,7 +52,7 @@
     let blob=await canvasBlob(out,'image/webp',.9);if(!blob)blob=await canvasBlob(out,'image/jpeg',.9);if(!blob)throw new Error('Soru görseli oluşturulamadı.');blobMem.set(key,blob);if('caches'in window){try{const cache=await caches.open(CACHE_NAME);await cache.put(cacheRequest(item),new Response(blob,{headers:{'Content-Type':blob.type||'image/webp','Cache-Control':'public,max-age=31536000,immutable'}}))}catch{}}return blob
   }
   function ensureCropBlob(item){const key=cropCacheKey(item);if(cropPromises.has(key))return cropPromises.get(key);const p=(async()=>await readCachedBlob(item)||await buildCropBlob(item))().finally(()=>cropPromises.delete(key));cropPromises.set(key,p);return p}
-  async function getCropUrl(item){const key=cropCacheKey(item);if(urlMem.has(key))return urlMem.get(key);const blob=await ensureCropBlob(item),url=URL.createObjectURL(blob);urlMem.set(key,url);return url}
+  async function getCropUrl(item){const key=cropCacheKey(item);if(urlMem.has(key))return urlMem.get(key);if(item?.asset?.url){urlMem.set(key,item.asset.url);return item.asset.url}const blob=await ensureCropBlob(item),url=URL.createObjectURL(blob);urlMem.set(key,url);return url}
   async function prepareSourceQuestions(items=[]){return[]}
   function cleanupLegacyCropCaches(){if(!('caches'in window))return;caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('yks-source-question-crops-')&&k!==CACHE_NAME).map(k=>caches.delete(k)))).catch(()=>{})}
 
@@ -61,6 +61,7 @@
 
   function resolveItem(card){
     const all=C()?.all?.()||[],id=String(card?.dataset?.catalogId||'').trim();
+    if(typeof window.YKSResolveSourceCatalogItem==='function')return window.YKSResolveSourceCatalogItem(all,{catalogId:id,text:card?.innerText||'',subject:card?.querySelector?.('.mts-main,.official-source-main')?.textContent||''});
     if(id)return all.find(x=>x.id===id)||null;
     const text=card?.innerText||'',normalized=normText(text),questionNo=(text.match(/\bSoru\s*(\d+)\b/i)||[])[1]||'',examInfo=text.match(/\b(20\d{2})\s+(TYT|AYT|YDT)\b/i);
     if(!questionNo||!examInfo)return null;

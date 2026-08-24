@@ -129,7 +129,7 @@
       markReady('tests');
       if(activeScreen==='tests')window.renderMiniTestHome();
     }
-    if(activeScreen==='questionIndex')window.go?.('questionIndex');
+    if(activeScreen==='questionIndex')window.renderQuestionIndex?.();
   });
   groups.official=official;
 

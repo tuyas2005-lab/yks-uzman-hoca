@@ -94,7 +94,7 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=6',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
+    ()=>loadScript('/data/question-catalog-v1.js?v=7',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]),pool='/data/catalog/meb-manual-student-pool-1523.js',register='/data/catalog/meb-manual-student-pool-1523-register.js';
@@ -108,15 +108,6 @@
     ()=>loadScript('/app-source-question-viewer.js?v=6'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
-    ()=>loadScript('/app-source-map-2026-tyt-math-01-30.js?v=2'),
-    ()=>loadScript('/app-source-map-2026-tyt-fen.js?v=1'),
-    ()=>loadScript('/app-source-map-2026-tyt-social.js?v=1'),
-    ()=>loadScript('/app-source-map-2026-tyt-turkce.js?v=2'),
-    ()=>loadScript('/app-source-map-2026-ayt.js?v=1'),
-    ()=>loadScript('/app-source-map-2024-2025-tyt.js?v=1'),
-    ()=>loadScript('/app-source-map-2023-tyt-fen.js?v=1'),
-    ()=>loadScript('/app-source-map-2023-tyt-math-geometry.js?v=1'),
-    ()=>loadScript('/app-source-autocrop.js?v=2'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
     ()=>loadScript('/app-question-index.js?v=2'),
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
@@ -138,6 +129,17 @@
     if(activeScreen==='questionIndex')window.renderQuestionIndex?.();
   });
   groups.official=official;
+  groups.sourceEnhancements=makeGroup('sourceEnhancements',['tests','questionIndex'],[
+    ()=>loadScript('/app-source-map-2026-tyt-math-01-30.js?v=2'),
+    ()=>loadScript('/app-source-map-2026-tyt-fen.js?v=1'),
+    ()=>loadScript('/app-source-map-2026-tyt-social.js?v=1'),
+    ()=>loadScript('/app-source-map-2026-tyt-turkce.js?v=2'),
+    ()=>loadScript('/app-source-map-2026-ayt.js?v=1'),
+    ()=>loadScript('/app-source-map-2024-2025-tyt.js?v=1'),
+    ()=>loadScript('/app-source-map-2023-tyt-fen.js?v=1'),
+    ()=>loadScript('/app-source-map-2023-tyt-math-geometry.js?v=1'),
+    ()=>loadScript('/app-source-autocrop.js?v=2')
+  ],()=>{});
 
   groups.wrongs=makeGroup('wrongs',['wrong'],[
     ()=>loadScript('/app-wrongs-v2.js?v=1'),

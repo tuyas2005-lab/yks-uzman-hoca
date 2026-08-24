@@ -26,4 +26,7 @@ test('runtime catalog keeps legacy records but exposes only ready MEB rows to se
   assert.equal(visible.some(x=>x.provider==='OSYM'),false);
   assert.equal(visible.some(x=>x.status==='pending-official-answer-verification'),false);
   assert.equal(visible.every(x=>x.asset?.kind==='static-crop'),true);
+  const target=C.all().find(x=>x.id==='meb-3-adim-tyt-mat-veri-1-1-01');
+  assert.deepEqual({manualCrop:target.manualCrop,answerVerified:target.answerVerified,status:target.status,answerKey:target.answerKey,assetStatus:target.asset.status,assetKind:target.asset.kind,assetUrl:target.asset.url},
+    {manualCrop:true,answerVerified:true,status:'student-ready',answerKey:'E',assetStatus:'ready',assetKind:'static-crop',assetUrl:'/assets/meb-3-adim-tyt-math-v10-full/meb-3-adim-tyt-mat-veri-1-1-01.jpg'});
 });

@@ -12,7 +12,8 @@
     if(typeof window.openSourceQuestion!=='function'){
       alert('Soru görüntüleyici başlatılamadı. Lütfen tekrar dene.');return;
     }
-    const ready=typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item);
+    const manualStatic=item?.manualCrop===true&&item?.answerVerified===true&&item?.status==='student-ready'&&item?.asset?.kind==='static-crop'&&item?.asset?.status==='ready';
+    const ready=manualStatic||(typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item));
     const preparable=typeof window.isSourceQuestionPreparable==='function'&&window.isSourceQuestionPreparable(item);
     if(!ready&&!preparable){
       alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;

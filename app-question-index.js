@@ -18,7 +18,7 @@
   const homeTitle=document.querySelector('#home .section-title:nth-of-type(2)');if(homeTitle&&!document.getElementById('qiHomeLink')){const b=document.createElement('button');b.id='qiHomeLink';b.className='qi-home-link';b.textContent='🗂️ Soru İndeksi';b.onclick=()=>window.go('questionIndex');homeTitle.appendChild(b)}
   screen.querySelector('#qiBack').onclick=()=>window.go('home');
 
-  function items(){const map=new Map();(C()?.all?.()||[]).forEach(x=>x?.id&&!map.has(x.id)&&map.set(x.id,x));return[...map.values()]}
+  function items(){const map=new Map();(C()?.all?.()||[]).filter(x=>typeof window.isStudentVisibleQuestion!=='function'||window.isStudentVisibleQuestion(x)).forEach(x=>x?.id&&!map.has(x.id)&&map.set(x.id,x));return[...map.values()]}
   function solvedIds(){if(C()?.getSolvedIds)return C().getSolvedIds();return new Set((window.state?.studyEvents||[]).filter(x=>x?.source==='source-question-result'&&x?.meta?.catalogId).map(x=>x.meta.catalogId))}
   function baseForOptions(){let a=items();if(f.exam!=='all')a=a.filter(x=>x.exam===f.exam);if(f.subject!=='all')a=a.filter(x=>x.subject===f.subject);return a}
   function filtered(){let a=items();if(f.exam!=='all')a=a.filter(x=>x.exam===f.exam);if(f.subject!=='all')a=a.filter(x=>x.subject===f.subject);if(f.topic!=='all')a=a.filter(x=>x.topic===f.topic);if(f.provider!=='all')a=a.filter(x=>(x.providerLabel||x.provider)===f.provider);if(f.year!=='all')a=a.filter(x=>String(x.year||'—')===f.year);if(f.q.trim()){const z=f.q.toLocaleLowerCase('tr-TR');a=a.filter(x=>[x.exam,x.subject,x.topic,...(x.subtopics||[]),...(x.tags||[]),x.collection,x.providerLabel].join(' ').toLocaleLowerCase('tr-TR').includes(z))}return a}

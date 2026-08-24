@@ -8,6 +8,7 @@
   const solvedIds=()=>new Set(solvedEvents().map(x=>x.meta.catalogId));
   const rowTrack=x=>x?.track||'main';
   const needsTopicReview=x=>String(x?.verification?.topic||'').startsWith('needs-manual-review');
+  const studentVisible=x=>typeof window.isStudentVisibleQuestion==='function'?window.isStudentVisibleQuestion(x):true;
 
   function trackEligible(x,q={}){
     if(q.track)return rowTrack(x)===q.track;
@@ -36,7 +37,7 @@
 
   function eligible(q={}){
     const done=solvedIds();
-    return C.all().filter(x=>!done.has(x.id))
+    return C.all().filter(studentVisible).filter(x=>!done.has(x.id))
       .filter(x=>trackEligible(x,q))
       .filter(x=>topicEligible(x,q))
       .filter(x=>!q.exam||String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase())
@@ -54,7 +55,7 @@
   }
 
   function progress(q={}){
-    const all=C.all()
+    const all=C.all().filter(studentVisible)
       .filter(x=>trackEligible(x,q))
       .filter(x=>topicEligible(x,q))
       .filter(x=>!q.exam||String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase())

@@ -22,7 +22,9 @@
     '/data/catalog/2024-tyt-geometry.js',
     '/data/catalog/2024-tyt-social.js',
     '/data/catalog/2024-tyt-fen.js',
-    '/data/catalog/2023-tyt-fen.js'
+    '/data/catalog/2023-tyt-fen.js',
+    '/data/catalog/meb-manual-student-pool-1523.js',
+    '/data/catalog/meb-manual-student-pool-1523-register.js'
   ];
   window.YKSQuestionCatalogManifest={version:2,scope:{include:['TYT','AYT'],exclude:['YDT']},policy:'library-only-newest-first',updatedAt:'2026-08-20'};
 })();

@@ -51,8 +51,8 @@
     let oy=0;for(const r of regions){const ox=Math.round((maxW-r.sw)/2);ctx.drawImage(full,r.sx,r.sy,r.sw,r.sh,ox,oy,r.sw,r.sh);oy+=r.sh+gap}
     let blob=await canvasBlob(out,'image/webp',.9);if(!blob)blob=await canvasBlob(out,'image/jpeg',.9);if(!blob)throw new Error('Soru görseli oluşturulamadı.');blobMem.set(key,blob);if('caches'in window){try{const cache=await caches.open(CACHE_NAME);await cache.put(cacheRequest(item),new Response(blob,{headers:{'Content-Type':blob.type||'image/webp','Cache-Control':'public,max-age=31536000,immutable'}}))}catch{}}return blob
   }
-  function ensureCropBlob(item){const key=cropCacheKey(item);if(cropPromises.has(key))return cropPromises.get(key);const p=(async()=>await readCachedBlob(item)||await buildCropBlob(item))().finally(()=>cropPromises.delete(key));cropPromises.set(key,p);return p}
-  async function getCropUrl(item){const key=cropCacheKey(item);if(urlMem.has(key))return urlMem.get(key);const blob=await ensureCropBlob(item),url=URL.createObjectURL(blob);urlMem.set(key,url);return url}
+  function ensureCropBlob(item){const key=cropCacheKey(item);if(cropPromises.has(key))return cropPromises.get(key);const p=(async()=>{if(item?.asset?.kind==='static-crop'){const r=await fetch(item.asset.url);if(!r.ok)throw new Error('Statik soru görseli yüklenemedi.');return await r.blob()}return await readCachedBlob(item)||await buildCropBlob(item)})().finally(()=>cropPromises.delete(key));cropPromises.set(key,p);return p}
+  async function getCropUrl(item){if(item?.asset?.kind==='static-crop')return item.asset.url;const key=cropCacheKey(item);if(urlMem.has(key))return urlMem.get(key);const blob=await ensureCropBlob(item),url=URL.createObjectURL(blob);urlMem.set(key,url);return url}
   async function prepareSourceQuestions(items=[]){return[]}
   function cleanupLegacyCropCaches(){if(!('caches'in window))return;caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('yks-source-question-crops-')&&k!==CACHE_NAME).map(k=>caches.delete(k)))).catch(()=>{})}
 

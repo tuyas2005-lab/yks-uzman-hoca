@@ -116,6 +116,7 @@
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
     ()=>loadScript('/app-question-index.js?v=2'),
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
+    ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
     ()=>loadScript('/app-mini-tests-source.js?v=5'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),

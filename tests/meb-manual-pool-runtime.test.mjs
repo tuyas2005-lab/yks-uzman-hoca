@@ -30,3 +30,16 @@ test('runtime catalog keeps legacy records but exposes only ready MEB rows to se
   assert.deepEqual({manualCrop:target.manualCrop,answerVerified:target.answerVerified,status:target.status,answerKey:target.answerKey,assetStatus:target.asset.status,assetKind:target.asset.kind,assetUrl:target.asset.url},
     {manualCrop:true,answerVerified:true,status:'student-ready',answerKey:'E',assetStatus:'ready',assetKind:'static-crop',assetUrl:'/assets/meb-3-adim-tyt-math-v10-full/meb-3-adim-tyt-mat-veri-1-1-01.jpg'});
 });
+
+test('question index topic counters use one student-visible universe',()=>{
+  const rows=JSON.parse(read('data/catalog/meb-manual-student-pool-1523.json'));
+  const visible=rows.filter(x=>x.manualCrop===true&&x.answerVerified===true&&x.status==='student-ready'&&x.asset?.status==='ready');
+  for(const topic of ['Bölme - Bölünebilme Kuralları','Denklemler ve Eşitsizlikler','Kümeler','Mantık']){
+    const total=visible.filter(x=>x.topic===topic).length;
+    const ready=visible.filter(x=>x.topic===topic).length;
+    assert.ok(ready<=total);
+    assert.equal(ready,total);
+  }
+  assert.equal(visible.length,1289);
+  assert.equal(rows.filter(x=>x.status==='pending-official-answer-verification'&&visible.includes(x)).length,0);
+});

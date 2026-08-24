@@ -1,4 +1,7 @@
 (()=>{
+  const trace=String(location.search||'').includes('diag=init')?((label,data)=>console.warn(`[QI-TRACE] ${label}`,data||'')):()=>{};
+  if(String(location.search||'').includes('diag=init'))window.addEventListener('error',e=>console.warn('[QI-TRACE] WINDOW_ERROR',e.message||e.error||e));
+  trace('APP_BOOT',{t:performance.now()});
   const n=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const gatedScreens=['tests','wrong','teacher','coach','stats'];
   gatedScreens.forEach(id=>document.getElementById(id)?.classList.add('module-gated'));
@@ -38,12 +41,13 @@
   function loadScript(src){
     if(loaded.has(src))return Promise.resolve();
     if(loading.has(src))return loading.get(src);
+    trace('SCRIPT_REQUEST_START',{src,t:performance.now()});
     const p=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
       s.src=src;
       s.async=true;
-      s.onload=()=>{loaded.add(src);loading.delete(src);resolve()};
-      s.onerror=()=>{loading.delete(src);console.warn('Yüklenemedi:',src);reject(new Error(src))};
+      s.onload=()=>{loaded.add(src);loading.delete(src);trace('SCRIPT_REQUEST_DONE',{src,t:performance.now(),catalog:!!window.YKSQuestionCatalogV1,pool:!!window.MEBManualStudentPool1523});resolve()};
+      s.onerror=()=>{loading.delete(src);trace('SCRIPT_REQUEST_ERROR',{src,t:performance.now()});console.warn('Yüklenemedi:',src);reject(new Error(src))};
       document.body.appendChild(s);
     });
     loading.set(src,p);
@@ -93,11 +97,13 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=2'),
+    ()=>loadScript('/data/question-catalog-v1.js?v=2').then(()=>{trace('CATALOG_BOOTSTRAP_AFTER_LOAD',{t:performance.now(),catalog:!!window.YKSQuestionCatalogV1});if(!window.YKSQuestionCatalogV1)throw new Error('question-catalog-v1 loaded without YKSQuestionCatalogV1')}).then(()=>trace('CATALOG_BOOTSTRAP_READY',{t:performance.now()})),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]);
+      trace('CATALOG_REQUEST_START',{t:performance.now(),count:files.length});
       if(files.length)await Promise.all(files.map(src=>loadScript(src)));
+      trace('CATALOG_REQUEST_DONE',{t:performance.now(),catalog:!!window.YKSQuestionCatalogV1,pool:!!window.MEBManualStudentPool1523});
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
@@ -124,12 +130,13 @@
     ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
     ()=>loadScript('/app-source-retake-position.js?v=1')
   ],()=>{
+    trace('OFFICIAL_READY_RESOLVED',{t:performance.now(),catalog:!!window.YKSQuestionCatalogV1,count:window.YKSQuestionCatalogV1?.all?.().length||0});
     resolveQuestionRuntimeReady?.();
     if(typeof window.renderMiniTestHome==='function'){
       markReady('tests');
       if(activeScreen==='tests')window.renderMiniTestHome();
     }
-    if(activeScreen==='questionIndex')window.renderQuestionIndex?.();
+    if(activeScreen==='questionIndex'){trace('INDEX_INIT_START',{t:performance.now()});window.renderQuestionIndex?.();trace('INDEX_RENDER_END',{t:performance.now(),rows:document.querySelectorAll('#qiRoot tbody tr').length})}
   });
   groups.official=official;
 

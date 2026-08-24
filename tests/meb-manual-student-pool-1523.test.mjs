@@ -18,11 +18,11 @@ test('MEB manual pool package integrity', () => {
   assert.equal(pending.filter(x => x.answerKey !== null || x.answerVerified !== false).length, 0);
 });
 
-test('MEB manual pool assets exist in the public static-crop locations', () => {
+test('MEB manual pool assets exist in the root static-crop locations', () => {
   const dirs = {
-    'MEB 3 Adım TYT Matematik': 'public/assets/meb-3-adim-tyt-math-v10-full',
-    'MEB Dört Dörtlük TYT Matematik': 'public/assets/meb-dort-dortluk-tyt-math-v11',
-    'MEB Dört Dörtlük TYT Matematik Konu Pekiştirme Testleri': 'public/assets/meb-dort-dortluk-tyt-math-v11'
+    'MEB 3 Adım TYT Matematik': 'assets/meb-3-adim-tyt-math-v10-full',
+    'MEB Dört Dörtlük TYT Matematik': 'assets/meb-dort-dortluk-tyt-math-v11',
+    'MEB Dört Dörtlük TYT Matematik Konu Pekiştirme Testleri': 'assets/meb-dort-dortluk-tyt-math-v11'
   };
   for (const row of rows) {
     const dir = dirs[row.sourceSeries];

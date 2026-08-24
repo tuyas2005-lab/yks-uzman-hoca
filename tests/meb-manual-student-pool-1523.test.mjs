@@ -6,12 +6,12 @@ import path from 'node:path';
 const root = process.cwd();
 const rows = JSON.parse(fs.readFileSync(path.join(root, 'data/catalog/meb-manual-student-pool-1523.json'), 'utf8'));
 const ready = rows.filter(x => x.status === 'student-ready' && x.answerVerified === true && x.manualCrop === true);
-const pending = rows.filter(x => x.status === 'pending-official-answer-verification');
+const pending = rows.filter(x => x.status !== 'student-ready');
 
 test('MEB manual pool package integrity', () => {
   assert.equal(rows.length, 1523);
-  assert.equal(ready.length, 1289);
-  assert.equal(pending.length, 234);
+  assert.equal(ready.length, 1521);
+  assert.equal(pending.length, 2);
   assert.equal(new Set(rows.map(x => x.id)).size, rows.length);
   assert.equal(new Set(rows.map(x => x.sourceFingerprint)).size, rows.length);
   assert.equal(ready.filter(x => !x.answerKey).length, 0);
@@ -33,6 +33,6 @@ test('MEB manual pool assets exist in the root static-crop locations', () => {
 
 test('student visibility is limited to ready verified manual MEB rows', () => {
   const visible = rows.filter(x => x.provider === 'MEB_OGM' && x.status === 'student-ready' && x.manualCrop === true && x.answerVerified === true);
-  assert.equal(visible.length, 1289);
-  assert.equal(rows.filter(x => x.status === 'pending-official-answer-verification').filter(x => visible.includes(x)).length, 0);
+  assert.equal(visible.length, 1521);
+  assert.equal(rows.filter(x => x.status !== 'student-ready').filter(x => visible.includes(x)).length, 0);
 });

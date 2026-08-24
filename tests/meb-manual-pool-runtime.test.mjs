@@ -22,7 +22,7 @@ test('runtime catalog keeps legacy records but exposes only ready MEB rows to se
   assert.ok(C.all().some(x=>x.provider==='OSYM'));
   assert.equal(C.all().filter(x=>x.provider==='MEB_OGM'&&x.sourceKind==='manual-crop').length,1523);
   const visible=C.findNextBatch({exam:'TYT',subject:'Matematik'},2000);
-  assert.equal(visible.length,1289);
+  assert.equal(visible.length,1521);
   assert.equal(visible.some(x=>x.provider==='OSYM'),false);
   assert.equal(visible.some(x=>x.status==='pending-official-answer-verification'),false);
   assert.equal(visible.every(x=>x.asset?.kind==='static-crop'),true);
@@ -40,10 +40,10 @@ test('question index topic counters use one student-visible universe',()=>{
     assert.ok(ready<=total);
     assert.equal(ready,total);
   }
-  assert.equal(visible.length,1289);
-  assert.equal(rows.filter(x=>x.status==='pending-official-answer-verification'&&visible.includes(x)).length,0);
+  assert.equal(visible.length,1521);
+  assert.equal(rows.filter(x=>x.status!=='student-ready'&&visible.includes(x)).length,0);
   assert.equal(rows.length,1523);
-  assert.equal(visible.length,1289);
+  assert.equal(visible.length,1521);
   assert.match(read('app-question-index.js'),/manualPool=\[\...\(C\(\)\.allRecords\?\./);
   assert.match(read('app-question-index-counter-fix.js'),/filter\(visible\)/);
   assert.match(read('app-question-index-counter-fix.js'),/textContent\.trim\(\)!==label/);

@@ -21,12 +21,18 @@
   function pick(q,count){
     const done=C()?.getSolvedIds?.()||new Set();
     const ready=typeof window.isSourceQuestionReady==='function'?window.isSourceQuestionReady:null;
+    // Static MEB crops are already gated by isStudentVisibleQuestion in all().
+    // Keep Mini Test independent of viewer-install timing while retaining the
+    // existing readiness gate for non-static source rows.
+    const rowReady=x=>x?.asset?.kind==='static-crop'
+      ? (typeof window.isStudentVisibleQuestion!=='function'||window.isStudentVisibleQuestion(x))
+      : (!ready||ready(x));
     let rows=all().filter(x=>
       String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase()&&
       norm(x.subject)===norm(q.subject)&&
       norm(x.topic)===norm(q.topic)&&
       !done.has(x.id)&&
-      (!ready||ready(x))
+      rowReady(x)
     );
     if(q.year&&q.year!=='latest')rows=rows.filter(x=>String(x.year||'')===String(q.year));
     if(!rows.length)return[];

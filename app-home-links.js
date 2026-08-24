@@ -93,7 +93,7 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=3',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
+    ()=>loadScript('/data/question-catalog-v1.js?v=4',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]);
@@ -202,10 +202,11 @@
       b.onclick=()=>{
         activeScreen='questionIndex';
         document.querySelectorAll('[data-go]').forEach(x=>x.classList.toggle('active',x===b));
-        b.querySelector('span').textContent=official.ready?'Soru İndeksi':'Soru İndeksi hazırlanıyor…';
+        const setLabel=text=>{const label=b.querySelector('span');if(label)label.textContent=text;else b.textContent='🗂️ '+text};
+        setLabel(official.ready?'Soru İndeksi':'Soru İndeksi hazırlanıyor…');
         pump(official);
         const wait=()=>{
-          if(official.ready){b.querySelector('span').textContent='Soru İndeksi';window.go?.('questionIndex');return}
+          if(official.ready){setLabel('Soru İndeksi');window.go?.('questionIndex');return}
           if(activeScreen==='questionIndex')setTimeout(wait,180);
         };
         wait();

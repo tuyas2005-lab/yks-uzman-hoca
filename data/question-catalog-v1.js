@@ -1,6 +1,4 @@
 (()=>{
-  console.log('[CATALOG-TRACE] base script entered');
-  window.__YKS_CATALOG_TRACE_ENTERED=true;
   const ITEMS=[
     {id:'osym-2025-tyt-mat-32',provider:'OSYM',providerLabel:'ÖSYM',collection:'2025 TYT Temel Soru Kitapçığı',year:2025,exam:'TYT',subject:'Matematik',topic:'Üçgenler',subtopics:['üçgen eşitsizliği','kenar uzunlukları'],tags:['üçgen','kenar','tam sayı','çeşitkenar'],difficulty:'Orta',visual:false,questionNo:'32',sourceKind:'official',priority:100,access:{mode:'official-url',url:'https://dokuman.osym.gov.tr/pdfdokuman/2025/YKS/TSK/yks_tyt_2025_kitapcik_d250.pdf#page=33',page:33}},
     {id:'osym-2025-tyt-mat-33',provider:'OSYM',providerLabel:'ÖSYM',collection:'2025 TYT Temel Soru Kitapçığı',year:2025,exam:'TYT',subject:'Matematik',topic:'Üçgenler',subtopics:['üçgende açılar','ikizkenar üçgen'],tags:['üçgen','açı','ikizkenar','şekilli'],difficulty:'Orta',visual:true,questionNo:'33',sourceKind:'official',priority:100,access:{mode:'official-url',url:'https://dokuman.osym.gov.tr/pdfdokuman/2025/YKS/TSK/yks_tyt_2025_kitapcik_d250.pdf#page=33',page:33}},
@@ -39,8 +37,5 @@
       return{...x,_score:score};
     }).sort((a,b)=>b._score-a._score||Number(b.year||0)-Number(a.year||0)).slice(0,limit);
   }
-  console.log('[CATALOG-TRACE] assigning global');
   window.YKSQuestionCatalogV1={version:1,items:ITEMS,all,register,findSimilar,schema:{accessModes:['official-url','uploaded-pdf'],uploadedPdfShape:{assetId:'string',page:'number',bbox:'optional [x,y,w,h]'}}};
-  console.log('[CATALOG-TRACE] global assigned',!!window.YKSQuestionCatalogV1);
-  window.__YKS_CATALOG_TRACE_ASSIGNED=true;
 })();

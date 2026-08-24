@@ -3,9 +3,12 @@
 
   const resolve=card=>window.resolveSourceQuestionCard?.(card)||null;
 
-  function openDirect(btn,card,item,mini){
+  async function openDirect(btn,card,item,mini){
+    if(typeof window.whenQuestionRuntimeReady==='function'){
+      await window.whenQuestionRuntimeReady();
+    }
     if(typeof window.openSourceQuestion!=='function'){
-      alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return;
+      alert('Soru görüntüleyici başlatılamadı. Lütfen tekrar dene.');return;
     }
     const ready=typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item);
     const preparable=typeof window.isSourceQuestionPreparable==='function'&&window.isSourceQuestionPreparable(item);

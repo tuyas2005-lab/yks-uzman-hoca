@@ -28,6 +28,12 @@
   let activeScreen=document.querySelector('.screen.active')?.id||'home';
   const loaded=new Set();
   const loading=new Map();
+  let resolveQuestionRuntimeReady;
+  const questionRuntimeReady=new Promise(resolve=>{resolveQuestionRuntimeReady=resolve});
+  window.whenQuestionRuntimeReady=()=>{
+    if(window.YKSQuestionCatalogV1&&typeof window.openSourceQuestion==='function')return Promise.resolve();
+    return questionRuntimeReady;
+  };
 
   function loadScript(src){
     if(loaded.has(src))return Promise.resolve();
@@ -117,6 +123,7 @@
     ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
     ()=>loadScript('/app-source-retake-position.js?v=1')
   ],()=>{
+    resolveQuestionRuntimeReady?.();
     if(typeof window.renderMiniTestHome==='function'){
       markReady('tests');
       if(activeScreen==='tests')window.renderMiniTestHome();

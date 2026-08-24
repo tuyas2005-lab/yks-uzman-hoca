@@ -51,4 +51,6 @@ test('question index topic counters use one student-visible universe',()=>{
   assert.doesNotMatch(read('app-home-links.js'),/if\(activeScreen==='questionIndex'\)window\.go\?\./);
   assert.match(read('app-home-links.js'),/await loadScript\(pool\);\s*await loadScript\(register\)/);
   assert.match(read('app-home-links.js'),/g\.name==='official'\?Promise\.resolve\(\)\.then/);
+  assert.doesNotMatch(read('app-home-links.js'),/visible!==1289/);
+  assert.match(read('app-home-links.js'),/manual!==visible\+unresolved/);
 });

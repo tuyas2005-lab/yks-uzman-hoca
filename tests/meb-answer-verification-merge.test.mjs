@@ -14,6 +14,7 @@ test('Dört Dörtlük answer verification merge preserves topics and exposes onl
   assert.equal(catalog.length, 1523);
   assert.equal(catalog.filter(row => row.status === 'student-ready').length, 1521);
   assert.equal(catalog.filter(row => row.status !== 'student-ready').length, 2);
+  assert.equal(catalog.filter(row => row.status === 'student-ready').length + catalog.filter(row => row.status !== 'student-ready').length, 1523);
   assert.equal(catalog.filter(row => row.status === 'student-ready' && (!row.answerVerified || !/^[A-E]$/.test(row.answerKey))).length, 0);
   for (const row of review) {
     const current = catalog.find(item => item.id === row.id);

@@ -46,4 +46,5 @@ test('question index topic counters use one student-visible universe',()=>{
   assert.equal(visible.length,1289);
   assert.match(read('app-question-index.js'),/manualPool=\[\...\(C\(\)\.allRecords\?\./);
   assert.match(read('app-question-index-counter-fix.js'),/filter\(visible\)/);
+  assert.match(read('app-question-index-counter-fix.js'),/textContent\.trim\(\)!==label/);
 });

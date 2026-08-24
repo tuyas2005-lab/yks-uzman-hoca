@@ -78,10 +78,11 @@
       return;
     }
     g.running=true;
-    scheduleJob(g.jobs[g.index]).catch(e=>console.warn(g.name+' yükleme',e)).finally(()=>{
+    const job=g.name==='official'?Promise.resolve().then(g.jobs[g.index]):scheduleJob(g.jobs[g.index]);
+    job.catch(e=>console.warn(g.name+' yükleme',e)).finally(()=>{
       g.index++;
       g.running=false;
-      setTimeout(()=>pump(g),120);
+      setTimeout(()=>pump(g),g.name==='official'?0:120);
     });
   }
   function resumeFor(id){
@@ -93,7 +94,7 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=5',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
+    ()=>loadScript('/data/question-catalog-v1.js?v=6',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]),pool='/data/catalog/meb-manual-student-pool-1523.js',register='/data/catalog/meb-manual-student-pool-1523-register.js';

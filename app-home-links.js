@@ -89,13 +89,13 @@
   const official=makeGroup('official',['tests','questionIndex'],[
     ()=>loadScript('/data/question-catalog-v1.js?v=2'),
     async()=>{
-      await loadScript('/data/catalog/catalog-manifest.js?v=2');
+      await loadScript('/data/catalog/catalog-manifest.js?v=3');
       const files=(window.YKSQuestionCatalogFiles||[]).map(src=>()=>loadScript(src));
       if(files.length)official.jobs.splice(official.index+1,0,...files);
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
-    ()=>loadScript('/data/question-catalog-policy-v2.js?v=3'),
-    ()=>loadScript('/app-source-question-viewer.js?v=5'),
+    ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
+    ()=>loadScript('/app-source-question-viewer.js?v=6'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
     ()=>loadScript('/app-source-map-2026-tyt-math-01-30.js?v=2'),
@@ -108,10 +108,10 @@
     ()=>loadScript('/app-source-map-2023-tyt-math-geometry.js?v=1'),
     ()=>loadScript('/app-source-autocrop.js?v=2'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
-    ()=>loadScript('/app-question-index.js?v=1'),
+    ()=>loadScript('/app-question-index.js?v=2'),
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
-    ()=>loadScript('/app-mini-tests-source.js?v=4'),
+    ()=>loadScript('/app-mini-tests-source.js?v=5'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=2'),

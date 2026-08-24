@@ -29,7 +29,9 @@
   const screen=document.createElement('section');screen.id='sourceQuestion';screen.className='screen';screen.innerHTML='<div class="screen-head"><button class="back" id="sqBack">←</button><h1>Kaynak Soru</h1></div><div id="sqRoot" class="sq-wrap"></div>';document.querySelector('main.content')?.appendChild(screen);screen.querySelector('#sqBack').onclick=closeViewer;
 
   function decorate(){const c=C();if(!c)return false;for(const x of c.all?.()||[]){if(x?.answerKey&&!x.answer)x.answer=x.answerKey;const a=READY[x.id];if(a){x.asset={status:'ready',kind:'cached-pdf-crop',...a};x.answerVerified=true}else{x.asset??={status:'pending'}}}return true}
-  const isReady=x=>!!(x?.answerKey&&x?.answerVerified&&x?.asset?.status==='ready');
+  const isManualStaticCropReady=x=>x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.kind==='static-crop'&&x?.asset?.status==='ready'&&!!x?.asset?.url;
+  window.isManualStaticCropReady=isManualStaticCropReady;
+  const isReady=x=>isManualStaticCropReady(x)||!!(x?.answerKey&&x?.answerVerified&&x?.asset?.status==='ready');
   function hash32(input){let h=2166136261;for(let i=0;i<input.length;i++){h^=input.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)}
   function cropCacheKey(item){const a=item?.asset||{},parts=Array.isArray(a.parts)&&a.parts.length?a.parts:(a.crop?[a.crop]:[]),signature=JSON.stringify([CROP_ENGINE_VERSION,a.kind||'',a.pdfKey||'',Number(a.page||0),parts]);return`${item?.id||'unknown'}-${hash32(signature)}`}
   const cacheRequest=item=>new Request(`/__yks_source_crop__/${encodeURIComponent(cropCacheKey(item))}.webp`);

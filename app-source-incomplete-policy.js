@@ -13,8 +13,9 @@
   function relevance(x,q={}){const query=norm([q.topic,q.curriculumOutcome,q.shortSolution].join(' ')),item=norm([x.topic,...(x.subtopics||[]),...(x.tags||[])].join(' '));let s=overlap(query,item)*18;const qt=norm(q.topic),xt=norm(x.topic);if(qt&&xt===qt)s+=90;else if(qt&&(xt.includes(qt)||qt.includes(xt)))s+=55;if(/üçgen/.test(qt)&&/üçgen/.test(item))s+=35;if(/trigonom/.test(qt)&&/trigonom/.test(item))s+=40;if(/benzer/.test(qt)&&/benzer/.test(item))s+=40;if(/pisagor|dik üçgen/.test(qt)&&/pisagor|dik üçgen/.test(item))s+=40;if(q.visualPreferred&&x.visual)s+=8;return s}
 
   function itemState(item){
-    const hasGeometry=!!(item?.asset?.crop||(Array.isArray(item?.asset?.parts)&&item.asset.parts.length));
-    const imageReady=!!(item?.asset?.status==='ready'&&hasGeometry);
+    const imageReady=typeof window.isManualStaticCropReady==='function'
+      ? window.isManualStaticCropReady(item)
+      : !!(item?.asset?.status==='ready'&&(item?.asset?.url||item?.asset?.crop||(Array.isArray(item?.asset?.parts)&&item.asset.parts.length)));
     const answerReady=!!(item?.answerKey&&(item?.answerVerified||item?.verification?.answerKey==='official'));
     const preparable=!!(!imageReady&&answerReady&&item?.asset?.status==='preparable'&&item?.asset?.kind==='auto-text-crop'&&item?.asset?.pdfKey&&item?.asset?.page);
     return{imageReady,answerReady,preparable,complete:imageReady&&answerReady};

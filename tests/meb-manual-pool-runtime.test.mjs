@@ -42,4 +42,8 @@ test('question index topic counters use one student-visible universe',()=>{
   }
   assert.equal(visible.length,1289);
   assert.equal(rows.filter(x=>x.status==='pending-official-answer-verification'&&visible.includes(x)).length,0);
+  assert.equal(rows.length,1523);
+  assert.equal(visible.length,1289);
+  assert.match(read('app-question-index.js'),/manualPool=\[\...\(C\(\)\.allRecords\?\./);
+  assert.match(read('app-question-index-counter-fix.js'),/filter\(visible\)/);
 });

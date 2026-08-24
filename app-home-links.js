@@ -28,15 +28,21 @@
   let activeScreen=document.querySelector('.screen.active')?.id||'home';
   const loaded=new Set();
   const loading=new Map();
+  let resolveQuestionRuntimeReady;
+  const questionRuntimeReady=new Promise(resolve=>{resolveQuestionRuntimeReady=resolve});
+  window.whenQuestionRuntimeReady=()=>{
+    if(window.YKSQuestionCatalogV1&&typeof window.openSourceQuestion==='function')return Promise.resolve();
+    return questionRuntimeReady;
+  };
 
-  function loadScript(src){
+  function loadScript(src,verify){
     if(loaded.has(src))return Promise.resolve();
     if(loading.has(src))return loading.get(src);
     const p=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
       s.src=src;
       s.async=true;
-      s.onload=()=>{loaded.add(src);loading.delete(src);resolve()};
+      s.onload=()=>{try{if(typeof verify==='function')verify();loaded.add(src);loading.delete(src);resolve()}catch(e){loading.delete(src);console.warn('Başlatılamadı:',src,e);reject(e)}};
       s.onerror=()=>{loading.delete(src);console.warn('Yüklenemedi:',src);reject(new Error(src))};
       document.body.appendChild(s);
     });
@@ -72,10 +78,11 @@
       return;
     }
     g.running=true;
-    scheduleJob(g.jobs[g.index]).catch(e=>console.warn(g.name+' yükleme',e)).finally(()=>{
+    const job=g.name==='official'?Promise.resolve().then(g.jobs[g.index]):scheduleJob(g.jobs[g.index]);
+    job.catch(e=>console.warn(g.name+' yükleme',e)).finally(()=>{
       g.index++;
       g.running=false;
-      setTimeout(()=>pump(g),120);
+      setTimeout(()=>pump(g),g.name==='official'?0:120);
     });
   }
   function resumeFor(id){
@@ -87,17 +94,42 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=2'),
+    ()=>loadScript('/data/question-catalog-v1.js?v=7',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
-      await loadScript('/data/catalog/catalog-manifest.js?v=2');
-      const files=(window.YKSQuestionCatalogFiles||[]).map(src=>()=>loadScript(src));
-      if(files.length)official.jobs.splice(official.index+1,0,...files);
+      await loadScript('/data/catalog/catalog-manifest.js?v=3');
+      const files=(window.YKSQuestionCatalogFiles||[]),pool='/data/catalog/meb-manual-student-pool-1523.js',register='/data/catalog/meb-manual-student-pool-1523-register.js';
+      const other=files.filter(src=>src!==pool&&src!==register);
+      if(other.length)await Promise.all(other.map(src=>loadScript(src)));
+      await loadScript(pool);
+      await loadScript(register);
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
-    ()=>loadScript('/data/question-catalog-policy-v2.js?v=3'),
-    ()=>loadScript('/app-source-question-viewer.js?v=5'),
+    ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
+    ()=>loadScript('/app-source-question-viewer.js?v=6'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
+    ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
+    ()=>loadScript('/app-question-index.js?v=2'),
+    ()=>loadScript('/app-question-index-homefix.js?v=1'),
+    ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
+    ()=>loadScript('/app-official-question-pilot.js?v=4'),
+    ()=>loadScript('/app-mini-tests-source.js?v=5'),
+    ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
+    ()=>loadScript('/app-source-direct-open.js?v=2'),
+    ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
+    ()=>loadScript('/app-source-retake-position.js?v=1')
+  ],()=>{
+    const C=window.YKSQuestionCatalogV1,all=C?.all?.()||[],manual=all.filter(x=>x?.sourceKind==='manual-crop').length,visible=all.filter(x=>x?.sourceKind==='manual-crop'&&x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.status==='ready').length,unresolved=manual-visible;
+    if(!C||manual!==1523||manual!==visible+unresolved||unresolved!==2){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
+    resolveQuestionRuntimeReady?.();
+    if(typeof window.renderMiniTestHome==='function'){
+      markReady('tests');
+      if(activeScreen==='tests')window.renderMiniTestHome();
+    }
+    if(activeScreen==='questionIndex')window.renderQuestionIndex?.();
+  });
+  groups.official=official;
+  groups.sourceEnhancements=makeGroup('sourceEnhancements',['tests','questionIndex'],[
     ()=>loadScript('/app-source-map-2026-tyt-math-01-30.js?v=2'),
     ()=>loadScript('/app-source-map-2026-tyt-fen.js?v=1'),
     ()=>loadScript('/app-source-map-2026-tyt-social.js?v=1'),
@@ -106,24 +138,8 @@
     ()=>loadScript('/app-source-map-2024-2025-tyt.js?v=1'),
     ()=>loadScript('/app-source-map-2023-tyt-fen.js?v=1'),
     ()=>loadScript('/app-source-map-2023-tyt-math-geometry.js?v=1'),
-    ()=>loadScript('/app-source-autocrop.js?v=2'),
-    ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
-    ()=>loadScript('/app-question-index.js?v=1'),
-    ()=>loadScript('/app-question-index-homefix.js?v=1'),
-    ()=>loadScript('/app-official-question-pilot.js?v=4'),
-    ()=>loadScript('/app-mini-tests-source.js?v=4'),
-    ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
-    ()=>loadScript('/app-source-direct-open.js?v=2'),
-    ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
-    ()=>loadScript('/app-source-retake-position.js?v=1')
-  ],()=>{
-    if(typeof window.renderMiniTestHome==='function'){
-      markReady('tests');
-      if(activeScreen==='tests')window.renderMiniTestHome();
-    }
-    if(activeScreen==='questionIndex')window.go?.('questionIndex');
-  });
-  groups.official=official;
+    ()=>loadScript('/app-source-autocrop.js?v=2')
+  ],()=>{});
 
   groups.wrongs=makeGroup('wrongs',['wrong'],[
     ()=>loadScript('/app-wrongs-v2.js?v=1'),
@@ -192,10 +208,11 @@
       b.onclick=()=>{
         activeScreen='questionIndex';
         document.querySelectorAll('[data-go]').forEach(x=>x.classList.toggle('active',x===b));
-        b.querySelector('span').textContent=official.ready?'Soru İndeksi':'Soru İndeksi hazırlanıyor…';
+        const setLabel=text=>{const label=b.querySelector('span');if(label)label.textContent=text;else b.textContent='🗂️ '+text};
+        setLabel(official.ready?'Soru İndeksi':'Soru İndeksi hazırlanıyor…');
         pump(official);
         const wait=()=>{
-          if(official.ready){b.querySelector('span').textContent='Soru İndeksi';window.go?.('questionIndex');return}
+          if(official.ready){setLabel('Soru İndeksi');window.go?.('questionIndex');return}
           if(activeScreen==='questionIndex')setTimeout(wait,180);
         };
         wait();

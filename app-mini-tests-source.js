@@ -10,7 +10,7 @@
     .mts-hero{padding:18px;border:1px solid #ddd7ff;border-radius:20px;background:linear-gradient(135deg,#f5f2ff,#fff);margin-bottom:14px}.mts-hero h2{margin:0 0 6px}.mts-hero p{margin:0;color:var(--muted);line-height:1.5}.mts-card{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:16px}.mts-card h3{margin:0 0 6px}.mts-main-card{max-width:none}.mts-form{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:13px}.mts-form label{display:grid;gap:6px;font-weight:800;font-size:12px}.mts-form select{height:42px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);padding:0 10px}.mts-list{display:grid;gap:11px}.mts-q{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface)}.mts-q.done{border-color:#cfd9d4;background:#fbfdfc}.mts-main{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.mts-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.mts-chip{font-size:10px;font-weight:850;padding:4px 7px;border-radius:999px;background:#f1efff;color:#553fc8}.mts-chip.year{background:#fff4df;color:#8b5c11}.mts-chip.visual{background:#eef8f3;color:#287250}.mts-open{border:0;background:#6b4ce6;color:#fff;border-radius:11px;padding:10px 12px;font-weight:850}.mts-progress{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.mts-empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}.mts-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mts-summary>div{padding:14px;border:1px solid var(--line);border-radius:14px}.mts-summary b{display:block;font-size:24px}.mts-history{display:grid}.mts-h{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.mts-h:last-child{border-bottom:0}.mts-h-title{font-weight:900}.mts-h-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.mts-h-meta span{font-size:11px;color:var(--muted)}.mts-h-topic{font-size:12px;font-weight:800;margin-top:4px;color:var(--ink)}.mts-short-note{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#fff7e8;border:1px solid #efd9ae;color:#7c5a16;font-size:12px;font-weight:750}@media(max-width:900px){.mts-form{grid-template-columns:1fr 1fr}}@media(max-width:600px){.mts-form{grid-template-columns:1fr}.mts-main{grid-template-columns:1fr}.mts-open{width:100%}.mts-summary{grid-template-columns:1fr}}
   `;document.head.appendChild(style);
 
-  function all(){const m=new Map();(C()?.all?.()||[]).forEach(x=>x?.id&&!m.has(x.id)&&m.set(x.id,x));return[...m.values()]}
+  function all(){const m=new Map();(C()?.all?.()||[]).filter(x=>typeof window.isStudentVisibleQuestion!=='function'||window.isStudentVisibleQuestion(x)).forEach(x=>x?.id&&!m.has(x.id)&&m.set(x.id,x));return[...m.values()]}
   function options(){const a=all(),exams=uniq(a.map(x=>x.exam)).sort(),subs=uniq(a.filter(x=>!selection.exam||x.exam===selection.exam).map(x=>x.subject)).sort((a,b)=>a.localeCompare(b,'tr')),scoped=a.filter(x=>x.exam===selection.exam&&x.subject===selection.subject),years=uniq(scoped.map(x=>Number(x.year||0)).filter(Boolean)).sort((a,b)=>b-a).map(String),topicBase=scoped.filter(x=>selection.year==='latest'||String(x.year||'')===String(selection.year)),tops=uniq(topicBase.map(x=>x.topic)).sort((a,b)=>a.localeCompare(b,'tr'));return{exams,subs,years,tops}}
   function opt(vals,current){return vals.map(v=>`<option value=\"${esc(v)}\" ${String(v)===String(current)?'selected':''}>${esc(v)}</option>`).join('')}
   function normalizeSelection(){const o=options();if(!o.exams.includes(selection.exam))selection.exam=o.exams[0]||'';const o1=options();if(!o1.subs.includes(selection.subject))selection.subject=o1.subs[0]||'';const o2=options();if(selection.year!=='latest'&&!o2.years.includes(String(selection.year)))selection.year='latest';const o3=options();if(!o3.tops.includes(selection.topic))selection.topic=o3.tops[0]||'';return options()}
@@ -21,12 +21,18 @@
   function pick(q,count){
     const done=C()?.getSolvedIds?.()||new Set();
     const ready=typeof window.isSourceQuestionReady==='function'?window.isSourceQuestionReady:null;
+    // Static MEB crops are already gated by isStudentVisibleQuestion in all().
+    // Keep Mini Test independent of viewer-install timing while retaining the
+    // existing readiness gate for non-static source rows.
+    const rowReady=x=>x?.asset?.kind==='static-crop'
+      ? (typeof window.isStudentVisibleQuestion!=='function'||window.isStudentVisibleQuestion(x))
+      : (!ready||ready(x));
     let rows=all().filter(x=>
       String(x.exam||'').toUpperCase()===String(q.exam||'').toUpperCase()&&
       norm(x.subject)===norm(q.subject)&&
       norm(x.topic)===norm(q.topic)&&
       !done.has(x.id)&&
-      (!ready||ready(x))
+      rowReady(x)
     );
     if(q.year&&q.year!=='latest')rows=rows.filter(x=>String(x.year||'')===String(q.year));
     if(!rows.length)return[];

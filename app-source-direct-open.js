@@ -1,13 +1,21 @@
 (()=>{
   let warmTimer=0,bindTimer=0,lastWarmKey='';
 
-  const resolve=card=>window.resolveSourceQuestionCard?.(card)||null;
+  const resolve=card=>window.resolveSourceQuestionCard?.(card)
+    ||window.YKSQuestionCatalogV1?.all?.().find(x=>x.id===String(card?.dataset?.catalogId||''))
+    ||null;
 
-  function openDirect(btn,card,item,mini){
-    if(typeof window.openSourceQuestion!=='function'){
-      alert('Tek-soru görüntüleyici henüz yüklenmedi. Sayfayı bir kez yenileyip tekrar dene.');return;
+  async function openDirect(btn,card,item,mini){
+    if(typeof window.whenQuestionRuntimeReady==='function'){
+      await window.whenQuestionRuntimeReady();
     }
-    const ready=typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item);
+    if(typeof window.openSourceQuestion!=='function'){
+      alert('Soru görüntüleyici başlatılamadı. Lütfen tekrar dene.');return;
+    }
+    const manualStatic=typeof window.isManualStaticCropReady==='function'
+      ? window.isManualStaticCropReady(item)
+      : item?.manualCrop===true&&item?.answerVerified===true&&item?.status==='student-ready'&&item?.asset?.kind==='static-crop'&&item?.asset?.status==='ready'&&!!item?.asset?.url;
+    const ready=manualStatic||(typeof window.isSourceQuestionReady==='function'&&window.isSourceQuestionReady(item));
     const preparable=typeof window.isSourceQuestionPreparable==='function'&&window.isSourceQuestionPreparable(item);
     if(!ready&&!preparable){
       alert('Bu soru henüz tek-soru görüntüsü olarak hazırlanmadı.');return;

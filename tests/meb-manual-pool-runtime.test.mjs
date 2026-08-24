@@ -33,7 +33,7 @@ test('runtime catalog keeps legacy records but exposes only ready MEB rows to se
 
 test('question index topic counters use one student-visible universe',()=>{
   const rows=JSON.parse(read('data/catalog/meb-manual-student-pool-1523.json'));
-  const visible=rows.filter(x=>x.manualCrop===true&&x.answerVerified===true&&x.status==='student-ready'&&x.asset?.status==='ready');
+  const visible=rows.filter(x=>x.manualCrop===true&&x.answerVerified===true&&x.status==='student-ready');
   for(const topic of ['Bölme - Bölünebilme Kuralları','Denklemler ve Eşitsizlikler','Kümeler','Mantık']){
     const total=visible.filter(x=>x.topic===topic).length;
     const ready=visible.filter(x=>x.topic===topic).length;

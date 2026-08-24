@@ -17,7 +17,7 @@ const SHELL = [
   '/app-topic-ui.js?v=4',
   '/app-topic-test-entry.js?v=1',
   '/app-ui-cleanup-v1.js?v=2',
-  '/app-home-links.js?v=5',
+  '/app-home-links.js?v=6',
   '/app-startup-polish.js?v=2',
   '/app-personal-teacher-source-launch-v3.js?v=3'
 ];

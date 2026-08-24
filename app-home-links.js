@@ -96,8 +96,8 @@
     ()=>loadScript('/data/question-catalog-v1.js?v=2'),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
-      const files=(window.YKSQuestionCatalogFiles||[]).map(src=>()=>loadScript(src));
-      if(files.length)official.jobs.splice(official.index+1,0,...files);
+      const files=(window.YKSQuestionCatalogFiles||[]);
+      if(files.length)await Promise.all(files.map(src=>loadScript(src)));
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),

@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r19-topic-test-learning';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r20-topic-test-learning';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

@@ -93,11 +93,14 @@
   }
 
   const official=makeGroup('official',['tests','questionIndex'],[
-    ()=>loadScript('/data/question-catalog-v1.js?v=4',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
+    ()=>loadScript('/data/question-catalog-v1.js?v=5',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');
-      const files=(window.YKSQuestionCatalogFiles||[]);
-      if(files.length)await Promise.all(files.map(src=>loadScript(src)));
+      const files=(window.YKSQuestionCatalogFiles||[]),pool='/data/catalog/meb-manual-student-pool-1523.js',register='/data/catalog/meb-manual-student-pool-1523-register.js';
+      const other=files.filter(src=>src!==pool&&src!==register);
+      if(other.length)await Promise.all(other.map(src=>loadScript(src)));
+      await loadScript(pool);
+      await loadScript(register);
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),

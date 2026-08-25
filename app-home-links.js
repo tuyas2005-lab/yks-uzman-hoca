@@ -113,7 +113,7 @@
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
     ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
-    ()=>loadScript('/app-mini-tests-source.js?v=9'),
+    ()=>loadScript('/app-mini-tests-source.js?v=10'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=4'),
@@ -161,7 +161,7 @@
     ()=>loadScript('/app-low-cost.js?v=2'),
     ()=>loadScript('/app-low-cost-fix.js?v=2'),
     ()=>loadScript('/app-teacher-performance.js?v=2'),
-    ()=>loadScript('/app-personal-teacher-v2.js?v=2'),
+    ()=>loadScript('/app-personal-teacher-v2.js?v=3'),
     // Teacher policy v3 requires getStudentStrategy. Load the shared strategy
     // engine in the teacher path too, so opening Teacher before Coach cannot
     // leave the legacy v2 renderer active after the policy install timeout.

@@ -22,6 +22,14 @@
 
   document.addEventListener('click',e=>{
     const task=teacherTask();if(!task)return;
+    const viewerReturn=e.target.closest('#sqReturn');
+    const completedSetButton=document.getElementById('mtsFinish');
+    if(viewerReturn&&completedSetButton){
+      e.preventDefault();e.stopImmediatePropagation();
+      completedSetButton.click();
+      setTimeout(returnTeacher,70);
+      return
+    }
     const setBack=e.target.closest('#mtsSetBack');
     if(setBack){e.preventDefault();e.stopImmediatePropagation();returnTeacher();return}
     const button=e.target.closest('[data-mts-open]:not(.mts-open)');

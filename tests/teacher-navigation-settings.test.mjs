@@ -20,7 +20,15 @@ test('teacher-directed source flow returns to teacher in one action',()=>{
   assert.match(nav,/window\.go\?\.\('teacher'\)/);
   assert.match(nav,/teacherDirected:true/);
   assert.doesNotMatch(nav,/closest\('#sqBack,#sqReturn'\)/);
-  assert.match(loader,/app-teacher-source-nav\.js\?v=2/);
+  assert.match(loader,/app-teacher-source-nav\.js\?v=3/);
+});
+
+test('last teacher question finalizes the set before returning to teacher',()=>{
+  const nav=read('app-teacher-source-nav.js');
+  assert.match(nav,/closest\('#sqReturn'\)/);
+  assert.match(nav,/getElementById\('mtsFinish'\)/);
+  assert.match(nav,/completedSetButton\.click\(\)/);
+  assert.match(nav,/setTimeout\(returnTeacher,70\)/);
 });
 
 test('source solve buttons have a tactile blue 3D treatment',()=>{

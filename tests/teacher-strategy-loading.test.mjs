@@ -16,7 +16,7 @@ function groupJobs(name) {
 test('Teacher loads the shared Strategy Engine before policy v3', () => {
   const teacher = groupJobs('teacher');
   const strategy = teacher.indexOf("loadScript('/app-strategy-engine.js?v=3')");
-  const policy = teacher.indexOf("loadScript('/app-personal-teacher-policy-v3.js?v=7')");
+  const policy = teacher.indexOf("loadScript('/app-personal-teacher-policy-v3.js?v=8')");
 
   assert.notEqual(strategy, -1, 'Teacher must load Strategy Engine directly');
   assert.notEqual(policy, -1, 'Teacher policy v3 must remain in the Teacher group');
@@ -37,5 +37,5 @@ test('Startup and service worker use the new loader cache key', () => {
   assert.match(startup, /\/app-home-links\.js\?v=18/);
   assert.doesNotMatch(startup, /\/app-home-links\.js\?v=17/);
   assert.match(serviceWorker, /\/app-home-links\.js\?v=18/);
-  assert.match(serviceWorker, /r40-session-memory/);
+  assert.match(serviceWorker, /r41-session-memory-migration/);
 });

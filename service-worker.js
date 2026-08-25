@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r40-session-memory';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r41-session-memory-migration';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

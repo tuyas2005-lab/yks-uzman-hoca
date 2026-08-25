@@ -33,7 +33,7 @@
   }
   function todayQuestions(){return Number(D()?.getLearningModel?.()?.todayCount||0)}
   function reviewsToday(){return (state.studyEvents||[]).filter(x=>x?.source==='wrong-review'&&x?.dateKey===today()).length}
-  function memoryFor(f){const id=window.YKSTeacherPilotV1?.resolveTopic?.(f)?.id;return id?state.teacher?.topicMemory?.[id]||null:null}
+  function memoryFor(f){const id=window.YKSTeacherPilotV1?.resolveTopic?.(f)?.id;if(!id)return null;const saved=state.teacher?.topicMemory?.[id];if(saved)return saved;const outcome=(state.studyEvents||[]).filter(x=>x?.source==='teacher-session-outcome'&&(x.topicKey===id||x.meta?.topicId===id)).sort((a,b)=>Number(b.timestamp||0)-Number(a.timestamp||0))[0];if(!outcome)return null;const m=outcome.meta||{},sessionId=m.sessionId||'',mistakes=Number(m.wrongCount||0)+Number(m.unableCount||0),wrongRows=(state.studyEvents||[]).filter(x=>x?.meta?.teacherSessionId===sessionId&&x?.meta?.wrongKind);return{topicId:id,exam:f.exam,subject:f.subject,topic:f.topic,lastSessionDate:outcome.dateKey||'',previousMode:m.adaptation?.previousMode||'',nextMode:m.adaptation?.nextMode||'',nextReview:m.nextReview||{},closureComplete:mistakes===0||(wrongRows.length>=mistakes&&wrongRows.every(x=>x.meta?.wrongClosed===true)),lastAccuracy:m.accuracy,lastCompletedAt:m.completedAt||outcome.timestamp||0,derivedFromOutcome:true}}
   function selfMiniInsight(f){return(state.miniTests?.history||[]).filter(x=>x?.studentInitiated&&x.exam===f.exam&&norm(x.subject)===norm(f.subject)&&norm(x.topic)===norm(f.topic)).sort((a,b)=>Number(b.completedAt||b.id||0)-Number(a.completedAt||a.id||0))[0]||null}
   function baseMode(f){
     const existing=state.teacher.daily,P=window.YKSTeacherPilotV1,mem=memoryFor(f);

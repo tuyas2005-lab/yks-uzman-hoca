@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r42-self-mini-redecision';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r43-effective-next-mode';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

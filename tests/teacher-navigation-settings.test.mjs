@@ -17,10 +17,19 @@ test('teacher-directed source flow returns to teacher in one action',()=>{
   const nav=read('app-teacher-source-nav.js');
   const loader=read('app-home-links.js');
   assert.match(nav,/closest\('#mtsSetBack'\)/);
-  assert.match(nav,/closest\('#sqBack,#sqReturn'\)/);
   assert.match(nav,/window\.go\?\.\('teacher'\)/);
   assert.match(nav,/teacherDirected:true/);
-  assert.match(loader,/app-teacher-source-nav\.js\?v=1/);
+  assert.doesNotMatch(nav,/closest\('#sqBack,#sqReturn'\)/);
+  assert.match(loader,/app-teacher-source-nav\.js\?v=2/);
+});
+
+test('source solve buttons have a tactile blue 3D treatment',()=>{
+  const nav=read('app-teacher-source-nav.js');
+  assert.match(nav,/#tests \[data-mts-open\]/);
+  assert.match(nav,/linear-gradient\(180deg/);
+  assert.match(nav,/color:#fff/);
+  assert.match(nav,/box-shadow:0 5px 0/);
+  assert.match(nav,/:active\{transform:translateY\(4px\)/);
 });
 
 test('settings persistence owner loads directly on profile and saves goal without track blocking',()=>{

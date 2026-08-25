@@ -114,7 +114,7 @@
     ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
     ()=>loadScript('/app-mini-tests-source.js?v=14'),
-    ()=>loadScript('/app-teacher-source-nav.js?v=1'),
+    ()=>loadScript('/app-teacher-source-nav.js?v=2'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=4'),

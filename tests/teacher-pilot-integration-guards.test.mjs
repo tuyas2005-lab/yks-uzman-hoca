@@ -68,7 +68,7 @@ test('student teacher page contains only real-question and real-wrong actions',(
   assert.match(policy,/Gerçek sorular ve gerçek yanlışlar/);
   assert.match(policy,/return !!\(d\.testDone&&d\.wrongDone\)/);
   assert.doesNotMatch(policy,/Koç payı|Karar Kanıtları|ürün sahibi|auditHtml/);
-  assert.match(policy,/performanceHtml\?`<details/);
+  assert.match(policy,/performanceHtml\?`<div class="pt2-details"><details/);
   assert.match(teacherUi,/window\.__teacherPolicyPending=true/);
   assert.match(teacherUi,/Kişisel Öğretmen hazırlanıyor/);
   assert.match(policy,/window\.__teacherPolicyPending=false/);

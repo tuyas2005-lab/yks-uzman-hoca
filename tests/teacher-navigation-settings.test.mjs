@@ -71,3 +71,14 @@ test('completed teacher session presents a strong next-task action',()=>{
   assert.match(ui,/\.pt2-next\{/);
   assert.match(ui,/min-height:54px/);
 });
+
+test('home has one clear teacher entry and no duplicated teacher plan',()=>{
+  const home=read('index.html');
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const loader=read('app-home-links.js');
+  assert.match(home,/Kişisel Öğretmenin/);
+  assert.match(home,/Öğretmenle Çalış →/);
+  assert.doesNotMatch(home,/Hocandan Bugünkü Öneri|Öneriyi Aç|id="teacherTip"|id="dailyPlan"/);
+  assert.doesNotMatch(loader,/app-home-teacher-flow\.js/);
+  assert.doesNotMatch(policy,/Başka bir konu seç|data-pt3-topic/);
+});

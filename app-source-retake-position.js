@@ -93,7 +93,7 @@
     if(!event)return null;
     if(actionId)actionResults.set(actionId,event);
     if(kind==='correct'&&canonical){
-      if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,'retry-correct',{eventId:event.id});
+      if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,ctx?.teacherWrongClosure?'teacher-retry-correct':'retry-correct',{eventId:event.id});
       else console.error('Canonical yanlış kapatma API hazır değil; yanlış açık bırakıldı.',canonical.id);
     }
     if(kind==='correct'&&!canonical){

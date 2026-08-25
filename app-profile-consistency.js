@@ -38,7 +38,7 @@
   function resetTeacherIfGoalModeStale(){
     const d=state.teacher?.daily;if(!d||d.date!==today())return false;
     const goal=Math.max(1,Number(state.profile?.goal||10)),done=todayQuestions();
-    const noProgress=!d.testDone&&!d.recapDone&&!d.wrongDone;
+    const noProgress=!d.testDone&&!d.wrongDone;
     if((d.mode==='complete'&&done<goal)||(d.mode!=='complete'&&done>=goal&&noProgress)){
       state.teacher.daily=null;return true;
     }
@@ -54,10 +54,9 @@
   }
 
   function saveAll(e){
-    e?.preventDefault?.();e?.stopImmediatePropagation?.();
+    e?.preventDefault?.();
     const p=state.profile??={};
     const track=el('yksTrack')?.value||p.track||'';
-    if(!track){showStatus('YKS alanını seçmeden ayarlar kaydedilemez.',false);return}
     const oldGoal=Number(p.goal||10),oldTrack=p.track||'';
     const goal=Math.max(1,Math.min(100,num('goal',oldGoal)));
     p.name=(el('name')?.value||p.name||'Eda').trim()||'Eda';
@@ -66,9 +65,9 @@
     p.tone=el('tone')?.value||p.tone||'Destekleyici';
     p.targetNet=Math.max(0,Math.min(120,num('targetNetSetting',Number(p.targetNet||70))));
     p.appearance=el('appearance')?.value==='dark'?'dark':'light';
-    p.track=track;
+    if(track)p.track=track;
 
-    const goalChanged=goal!==oldGoal,trackChanged=track!==oldTrack;
+    const goalChanged=goal!==oldGoal,trackChanged=!!track&&track!==oldTrack;
     if(trackChanged){
       try{window.reconcileYksFieldData?.()}catch{}
       state.teacher??={};state.teacher.selectedTopic='';state.teacher.daily=null;
@@ -88,7 +87,8 @@
     const btn=el('saveSettings');if(!btn){setTimeout(installSave,80);return}
     if(btn.dataset.profileConsistency==='1'){hydrate();return}
     btn.dataset.profileConsistency='1';
-    btn.addEventListener('click',saveAll,true);
+    btn.onclick=null;
+    btn.addEventListener('click',saveAll);
     hydrate();
   }
 

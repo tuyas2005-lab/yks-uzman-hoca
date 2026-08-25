@@ -46,15 +46,9 @@
       ];
     }
     const testedToday=(focus.events||[]).filter(x=>x.source==='mini-test'&&x.dateKey===k).reduce((a,x)=>a+Number(x.questionCount||1),0)>=5;
-    const diagnostic=focus.total<3;
     return[
-      diagnostic
-        ?{id:'test:'+focus.topic,title:`5 soru seviye ölçümü • ${focus.topic}`,desc:'Veri az; önce seviyeyi ölç',done:testedToday,go:'tests',topic:focus.topic,subject:`${focus.exam} ${focus.subject}`}
-        :{id:'recap:'+focus.topic,title:`5 dk hızlı tekrar • ${focus.topic}`,desc:'Kişisel Öğretmen önerisi',done:teacherDaily?.date===k&&teacherDaily?.topic===focus.topic&&!!teacherDaily?.recapDone,go:'teacher',topic:focus.topic,subject:`${focus.exam} ${focus.subject}`},
-      diagnostic
-        ?{id:'recap:'+focus.topic,title:`Sonuca göre hızlı tekrar • ${focus.topic}`,desc:'Ölçümden sonra yalnız eksik noktaya dön',done:teacherDaily?.date===k&&teacherDaily?.topic===focus.topic&&!!teacherDaily?.recapDone,go:'teacher',topic:focus.topic,subject:`${focus.exam} ${focus.subject}`}
-        :{id:'test:'+focus.topic,title:`5 soru mini test • ${focus.topic}`,desc:'Başarı yüzdesini güncelle',done:testedToday,go:'tests',topic:focus.topic,subject:`${focus.exam} ${focus.subject}`},
-      {id:'wrong',title:recentWrong?`Son yanlışlarını tekrar et • ${Math.min(3,recentWrong)} öncelik`:'Yanlışlarını kontrol et',desc:'Hatalı kazanımları kapat',done:teacherDaily?.date===k&&!!teacherDaily?.wrongOpened,go:'wrong'}
+      {id:'test:'+focus.topic,title:`Gerçek kaynak soruları • ${focus.topic}`,desc:focus.total<3?'Veri az; önce seviyeyi ölç':'Öğretmenin seçtiği zorlukta çalış',done:testedToday,go:'tests',topic:focus.topic,subject:`${focus.exam} ${focus.subject}`},
+      {id:'wrong',title:recentWrong?`Gerçek yanlışlarını kapat • ${Math.min(3,recentWrong)} öncelik`:'Yanlış çıkarsa düzelt',desc:'Yalnız soru bazında kaydedilmiş hataları kapat',done:teacherDaily?.date===k&&!!teacherDaily?.wrongDone,go:'wrong'}
     ];
   }
 
@@ -66,7 +60,7 @@
     if(window.goalText)goalText.textContent=`${done} / ${p.goal||0} soru tamamlandı`;if(window.goalBar)goalBar.style.width=`${p.goal?Math.min(100,done/p.goal*100):0}%`;if(window.goalMotivation)goalMotivation.textContent=left?`Sadece ${left} soru kaldı 💪`:'🎉 Bugünkü hedef tamam!';
     const focus=currentFocus(s);
     if(window.teacherTip){
-      if(focus){const evidence=focus.total?`${focus.total} ölçümde ${focus.score===null?'başarı henüz oluşmadı':`başarı %${focus.score}`}`:'henüz doğru/yanlış ölçümü yok';const signal=focus.recentSignals?` Son 7 günde ${focus.recentSignals} zorlanma sinyali var.`:'';teacherTip.textContent=`${focus.topic}: ${evidence}.${signal} ${focus.total<3?'Önce 5 soruluk seviye ölçümü öneriyorum.':'Kısa tekrar + 5 soru öneriyorum.'}`}
+      if(focus){const evidence=focus.total?`${focus.total} ölçümde ${focus.score===null?'başarı henüz oluşmadı':`başarı %${focus.score}`}`:'henüz doğru/yanlış ölçümü yok';const signal=focus.recentSignals?` Son 7 günde ${focus.recentSignals} zorlanma sinyali var.`:'';teacherTip.textContent=`${focus.topic}: ${evidence}.${signal} ${focus.total<3?'Önce 5 gerçek kaynak sorusuyla seviyeni ölçelim.':'Öğretmenin seçtiği gerçek kaynak sorularıyla devam edelim.'}`}
       else teacherTip.textContent='Henüz yeterli konu verisi yok. Bir Mini Test veya soru çözümüyle çalışma modelini başlatalım.';
     }
     const w=document.getElementById('weakList');if(w){w.innerHTML=s.metrics.length?s.metrics.slice(0,4).map(m=>`<div class="weak-row"><span><b>${esc(m.topic)}</b>${m.recentSignals?'<span class="weak-owner-chip">Zorlanma sinyali</span>':''}<small class="weak-evidence">${m.total} ölçüm • ${m.correct} doğru • ${m.wrong} yanlış • ${m.confidence}${m.recentSignals?` • ${m.recentSignals} sinyal`:''}</small></span><div class="bar ${m.score!==null&&m.score<60?'warning':''}"><i style="width:${m.score===null?5:Math.max(3,m.score)}%"></i></div><b>${m.score===null?'—':`%${m.score}`}</b></div>`).join(''):`<div class="home-empty">Henüz ölçülmüş konu yok. Mini Test veya soru çözümündeki geri bildirimlerle otomatik oluşacak.</div>`}

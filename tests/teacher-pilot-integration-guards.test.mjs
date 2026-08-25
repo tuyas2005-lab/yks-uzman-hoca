@@ -8,6 +8,8 @@ const mini=fs.readFileSync(new URL('../app-mini-tests-source.js',import.meta.url
 const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-v2.js',import.meta.url),'utf8');
 const sourceViewer=fs.readFileSync(new URL('../app-source-question-viewer.js',import.meta.url),'utf8');
 const teacherWrongScope=fs.readFileSync(new URL('../app-teacher-wrong-scope.js',import.meta.url),'utf8');
+const sourceRetake=fs.readFileSync(new URL('../app-source-retake-position.js',import.meta.url),'utf8');
+const wrongClosure=fs.readFileSync(new URL('../app-wrong-closure-v2.js',import.meta.url),'utf8');
 const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'utf8');
 
 test('empty student starts from a canonical pilot topic',()=>{
@@ -24,7 +26,8 @@ test('teacher query resolves pool alias before catalog selection and blocks non-
   assert.match(launch,/function sourceHealth\(ctx\)/);
   assert.match(launch,/getSolvedIds/);
   assert.match(launch,/P\.resolveItem\?\.\(x\)\?\.id===pilot\.id/);
-  assert.match(launch,/Kaynak sağlığı — ürün sahibi/);
+  assert.match(launch,/if\(h\.overall==='green'\)\{current\?\.remove\(\);return\}/);
+  assert.match(launch,/Bu konuda kaynak azalıyor/);
   assert.match(launch,/neededForGreen/);
 });
 
@@ -41,10 +44,21 @@ test('same daily plan uses a deterministic launch revision',()=>{
   assert.doesNotMatch(launch,/sessionId=.*Date\.now/);
 });
 
-test('source health card remains open across observer adaptation',()=>{
+test('source health warning stays hidden while healthy and preserves open state when shown',()=>{
   assert.match(launch,/current\?\.dataset\.pt3Signature===signature/);
   assert.match(launch,/const wasOpen=!!current\?\.open/);
   assert.match(launch,/card\.open=wasOpen/);
+});
+
+test('student teacher page contains only real-question and real-wrong actions',()=>{
+  assert.doesNotMatch(policy,/Hızlı Tekrar|Hızlı Onarım|Kısa Pekiştirme|pt2Recap|teacher-recap/);
+  assert.match(policy,/Gerçek sorular ve gerçek yanlışlar/);
+  assert.match(policy,/return !!\(d\.testDone&&d\.wrongDone\)/);
+  assert.doesNotMatch(policy,/Koç payı|Karar Kanıtları|ürün sahibi|auditHtml/);
+  assert.match(policy,/performanceHtml\?`<details/);
+  assert.match(teacherUi,/window\.__teacherPolicyPending=true/);
+  assert.match(teacherUi,/Kişisel Öğretmen hazırlanıyor/);
+  assert.match(policy,/window\.__teacherPolicyPending=false/);
 });
 
 test('teacher and mini test preserve usable phone touch layout',()=>{
@@ -75,6 +89,14 @@ test('teacher wrong task completes only after real four-evidence closure',()=>{
   assert.doesNotMatch(teacherWrongScope,/wrongDone=rows\.every\(x=>seen\.has\(x\.id\)\)/);
 });
 
+test('teacher-directed retry closes the original wrong and refreshes its task state',()=>{
+  assert.match(teacherWrongScope,/teacherWrongClosure:true/);
+  assert.match(sourceRetake,/ctx\?\.teacherWrongClosure\?'teacher-retry-correct':'retry-correct'/);
+  assert.match(wrongClosure,/method==='teacher-retry-correct'/);
+  assert.match(wrongClosure,/wrongRecord:false,wrongClosed:true/);
+  assert.match(wrongClosure,/wrongCloseLabel:'Öğretmen görevinde yeniden doğru çözüldü'/);
+});
+
 test('teacher persists session memory and observes student initiated mini tests',()=>{
   assert.match(mini,/state\.teacher\.topicMemory\[task\.topicId\]/);
   assert.match(mini,/studentInitiated:!teacherSet/);
@@ -82,8 +104,8 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(mini,/retention30Passed/);
   assert.match(mini,/state\.teacher\.lastPraise=\{\.\.\.completionReward\.meta/);
   assert.match(policy,/resumeMode/);
-  assert.match(policy,/Öğrencinin kendi çözdüğü Mini Test/);
-  assert.match(policy,/Oturum hafızası/);
+  assert.match(policy,/Kendi çözdüğün Mini Test/);
+  assert.match(policy,/Sonraki kontrol/);
   assert.match(policy,/source==='teacher-session-outcome'/);
   assert.match(policy,/derivedFromOutcome:true/);
   assert.match(policy,/selfAt>Number\(memory\?\.studentEvidenceAt\|\|memory\?\.lastCompletedAt\|\|0\)/);
@@ -91,11 +113,9 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(policy,/newerOpenWrong/);
   assert.match(policy,/reopenedByWrongId/);
   assert.match(policy,/transitionMode\?\.\(previous,raw\?\.mode/);
-  assert.match(policy,/uygulanacak sıradaki mod/);
+  assert.match(policy,/Kapanmamış yanlış varsa öğretmen tarihi beklemez/);
   assert.match(policy,/modeInfo\[nextMemoryMode\]/);
-  assert.match(policy,/Öğretmen karar geçmişi — ürün sahibi/);
-  assert.match(policy,/buildAuditTrail/);
-  assert.match(policy,/Seçilen soru kimlikleri/);
+  assert.doesNotMatch(policy,/Öğretmen karar geçmişi — ürün sahibi/);
   assert.match(policy,/d\.decisionEvidence=/);
   assert.match(policy,/d\.reasonText=reason\(f,d\)/);
   assert.match(teacherWrongScope,/mem\.closureComplete=!!d\.wrongDone/);

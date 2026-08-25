@@ -105,6 +105,7 @@
   }
   function install(tries=0){
     if(!window.getStudentStrategy){if(tries<80)setTimeout(()=>install(tries+1),80);return}
+    window.__teacherPolicyPending=false;
     window.renderTeacher=render;try{renderTeacher=render}catch{};if(root.classList.contains('active'))render();setTimeout(()=>{try{window.renderHome?.()}catch{}},40);
   }
   install();

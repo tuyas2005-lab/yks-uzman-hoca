@@ -10,7 +10,7 @@ function renderAll(){name.value=state.profile.name;goal.value=state.profile.goal
 function startupIdle(fn,timeout=2500){if('requestIdleCallback'in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,700)}
 function loadStartupScript(src,onload){const s=document.createElement('script');s.src=src;s.async=true;const done=()=>onload?.();s.onload=done;s.onerror=()=>{console.warn('Başlangıç modülü yüklenemedi:',src);done()};document.body.appendChild(s);return s}
 function loadStartupModules(){
-  const queue=['/app-analysis-flow.js?v=2','/app-data-v5.js?v=2','/app-teacher-pilot-v1.js?v=9','/app-home-data.js?v=4','/app-topic-ui.js?v=4','/app-topic-test-entry.js?v=1','/app-ui-cleanup-v1.js?v=2','/app-home-links.js?v=24','/app-startup-polish.js?v=2'];
+  const queue=['/app-analysis-flow.js?v=2','/app-data-v5.js?v=2','/app-teacher-pilot-v1.js?v=9','/app-home-data.js?v=4','/app-topic-ui.js?v=4','/app-topic-test-entry.js?v=1','/app-ui-cleanup-v1.js?v=2','/app-home-links.js?v=25','/app-startup-polish.js?v=2'];
   let i=0;
   const next=()=>{if(i>=queue.length)return;const src=queue[i++];loadStartupScript(src,()=>setTimeout(next,20))};
   next();

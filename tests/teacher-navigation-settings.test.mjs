@@ -7,10 +7,20 @@ const read=name=>fs.readFileSync(new URL(`../${name}`,import.meta.url),'utf8');
 test('teacher guidance is visually separated as a teacher instruction',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   const ui=read('app-personal-teacher-v2.js');
-  assert.match(policy,/Öğretmeninin bugünkü talimatı/);
+  assert.match(policy,/Öğretmeninden bugünkü not/);
   assert.match(policy,/pt2-guidance/);
   assert.match(ui,/\.pt2-guidance\{/);
   assert.match(ui,/font-size:15px/);
+});
+
+test('teacher-facing copy sounds human while raw statistics stay in evaluation',()=>{
+  const policy=read('app-personal-teacher-policy-v3.js');
+  assert.match(policy,/bazı sorularda takıldığını görüyorum; bu çok normal/);
+  assert.match(policy,/sana ne eksik ne de fazla çalışma vereyim/);
+  assert.match(policy,/Hazırsan şimdi seni biraz zorlayacağım/);
+  assert.match(policy,/rawName=String\(state\.profile\?\.name/);
+  assert.doesNotMatch(policy,/return`\$\{f\.topic\}: \$\{score\}/);
+  assert.match(policy,/Öğretmenin Değerlendirmesi/);
 });
 
 test('teacher-directed source flow returns to teacher in one action',()=>{

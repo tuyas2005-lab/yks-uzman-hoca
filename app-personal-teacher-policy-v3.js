@@ -7,14 +7,14 @@
   state.teacher??={};state.miniTests??={history:[]};
 
   const modeInfo={
-    diagnostic:{label:'Önce ölç',title:'Veriyi netleştir',count:5},
-    foundation:{label:'Temel kur',title:'Temelden güven oluştur',count:5},
-    repair:{label:'Onarım',title:'Eksik noktayı kapat',count:5},
-    reinforce:{label:'Pekiştir',title:'Bilgiyi sağlamlaştır',count:5},
-    challenge:{label:'Meydan okuma',title:'Zorluğu kontrollü artır',count:5},
-    spaced:{label:'Aralıklı tekrar',title:'Unutmadan kısa kontrol',count:3},
-    maintain:{label:'Koru',title:'Kısa kontrol yeterli',count:3},
-    complete:{label:'Hedef tamam',title:'Bugün yeni yük yok',count:0}
+    diagnostic:{label:'Önce tanıyalım',title:'Önce seni biraz tanıyayım',count:5},
+    foundation:{label:'Birlikte başlayalım',title:'Temeli birlikte kuralım',count:5},
+    repair:{label:'Birlikte düzeltelim',title:'Takıldığın yeri birlikte açalım',count:5},
+    reinforce:{label:'İyice sağlamlaştıralım',title:'Şimdi bilgini sağlamlaştıralım',count:5},
+    challenge:{label:'Kendini göster',title:'Hazırsan biraz zorlayalım',count:5},
+    spaced:{label:'Kısa bir yoklama',title:'Unutmadığından emin olalım',count:3},
+    maintain:{label:'Formunu koru',title:'Kısa bir kontrol yapalım',count:3},
+    complete:{label:'Bugünlük tamam',title:'Bugünkü emeğin yeterli',count:0}
   };
 
   function candidates(){
@@ -83,30 +83,30 @@
   function rewardSummary(){const points=(state.studyEvents||[]).filter(x=>x?.source==='reward-earned').reduce((a,x)=>a+Math.max(0,Number(x.meta?.points||0)),0),titles=[[1500,'YKS Savaşçısı'],[900,'Konu Ustası'],[500,'Güçlü Takipçi'],[250,'Kararlı Öğrenci'],[100,'Düzenli Öğrenci'],[0,'Başlangıç']];return{points,title:titles.find(x=>points>=x[0])?.[1]||'Başlangıç'}}
   function praiseText(id){return id==='mistake-recovered'?'Yanlışından dönmen çok değerli; öğrenme tam burada güçleniyor.':id==='challenge-solved'?'Zor sorudan kaçmadın ve başardın; seviyen yükseliyor.':id==='honest-feedback'?'“Yapamadım” demen doğru bir öğrenme davranışı; şimdi eksik noktayı birlikte kapatabiliriz.':id==='teacher-task-completed'?'Öğretmen görevini tamamladın; düzenli emeğin kayda geçti.':'Çabanı görüyorum; bu adım emek puanına işlendi.'}
   function reason(f,d){
-    const score=f.score==null?'ölçüm yok':`başarı %${f.score}`,wr=Number(f.recentWrong||0),sig=Number(f.recentSignals||0),stale=Number(f.staleDays||0),goal=Number(state.profile?.goal||10),done=todayQuestions();
-    if(d.mode==='complete')return`Bugünkü soru hedefi ${done}/${goal}. Yeni görev eklemiyorum; istersen yalnız yanlışlarını tekrar edebilirsin.`;
-    if(d.mode==='diagnostic')return`${f.topic} için yalnız ${f.total||0} ölçüm var. Tahmin yürütmek yerine önce gerçek kaynak sorularıyla seviyeyi ölçeceğim.`;
-    if(d.mode==='repair')return`${f.topic}: ${score}${wr?` • ${wr} yakın yanlış`:''}${sig?` • ${sig} zorlanma sinyali`:''}. Benzer gerçek kaynak sorularıyla eksik noktayı ölçecek, çıkan yanlışları tek tek kapatacağız.`;
-    if(d.mode==='foundation')return`${f.topic}: ${score}. Temel eksik görünüyor; ağırlıklı kolay gerçek kaynak sorularıyla güvenli bir başlangıç yapacağız.`;
-    if(d.mode==='reinforce')return`${f.topic}: ${score}. Temel oluşmuş; 5 gerçek kaynak sorusuyla pekiştirip yalnız çıkan yanlışları kapatacağız.`;
-    if(d.mode==='challenge')return`${f.topic}: ${score}. Güçlü ve güncel performans kanıtlandı; orta ve zor sorularla kontrollü meydan okuma zamanı.`;
-    if(d.mode==='spaced')return`${f.topic} iyi durumda ancak ${stale} gündür ölçülmedi. 3 soruluk aralıklı kontrol yeterli.`;
-    return`${f.topic} güncel ölçümlerde iyi durumda. Uzun çalışma yerine 3 soruluk kısa kontrol yeterli.`;
+    const rawName=String(state.profile?.name||'').trim(),name=rawName&&!/^öğrenci$/i.test(rawName)?rawName.split(/\s+/)[0]:'',hello=name?`${name}, `:'';
+    if(d.mode==='complete')return`${hello}bugün için planladığımız çalışmayı tamamladın. Emeğin yeterli; şimdi gönül rahatlığıyla dinlenebilir ya da istersen yanlışlarına kısaca göz atabilirsin.`;
+    if(d.mode==='diagnostic')return`${hello}bu konuda seni henüz yeterince tanımıyorum. Önce birkaç gerçek soru çözelim; böylece sana ne eksik ne de fazla çalışma vereyim.`;
+    if(d.mode==='repair')return`${hello}bazı sorularda takıldığını görüyorum; bu çok normal. Şimdi benzer soruları birlikte ele alalım, zorlandığın noktaları acele etmeden tek tek düzeltelim.`;
+    if(d.mode==='foundation')return`${hello}burada önce sağlam bir başlangıç yapmamız iyi olacak. Kolaydan başlayıp adım adım ilerleyelim; her doğruyla güvenin biraz daha artsın.`;
+    if(d.mode==='reinforce')return`${hello}temel yerine oturmaya başlamış. Şimdi birkaç gerçek soruyla bilgini iyice sağlamlaştıralım; takıldığın bir yer olursa hemen birlikte dönüp bakalım.`;
+    if(d.mode==='challenge')return`${hello}bu konuda iyi ilerliyorsun. Hazırsan şimdi seni biraz zorlayacağım; yapabildiklerini görmek sana da iyi gelecek.`;
+    if(d.mode==='spaced')return`${hello}bu konuyu daha önce güzel çalıştın. Unutmadığından emin olmak için kısa bir yoklama yapalım; üç soru bize yeter.`;
+    return`${hello}bu konu sende iyi görünüyor. Uzun uzun çalışmana gerek yok; üç kısa soruyla formunu koruyalım.`;
   }
   function task(n,title,desc,done,active,id,label,disabled=false){const cls=done?'done':active?'active':'locked',status=done?'Tamamlandı':active?'Sıradaki':'Bekliyor';return `<div class="pt2-task ${cls}"><div class="pt2-num">${done?'✓':n}</div><div><h4>${esc(title)}</h4><p>${esc(desc)}</p></div><div><span class="pt2-status">${status}</span>${id?`<button id="${id}" class="${active?'primary':'ghost'}" ${disabled?'disabled':''} style="margin-left:8px">${esc(label)}</button>`:''}</div></div>`}
   function stepsHtml(f,d,count){
-    const mistakes=Number(d.testSummary?.mistakes||0),sourceDesc=count?`${count} çözülmemiş, doğrulanmış kaynak sorusuyla çalış.`:`Bu konu için en az 3 çözülmemiş hazır kaynak sorusu yok; AI soru üretmeyecek.`,testLabel=count?`${count} Soruluk Seti Başlat`:'Kaynak Bekleniyor';
+    const mistakes=Number(d.testSummary?.mistakes||0),sourceDesc=count?`Sen ${count} gerçek soruyu çöz; ben sonucuna göre bir sonraki adımı belirleyeyim.`:`Bu konu için henüz yeterli hazır soru yok. Yeni soru geldiğinde öğretmenin çalışmana ekleyecek.`,testLabel=count?`${count} Soruluk Seti Başlat`:'Kaynak Bekleniyor';
     if(d.mode==='complete')return task(1,'Bugünkü hedef tamamlandı','Yeni soru yükü eklenmedi. İstersen Yanlışlarım bölümünden serbest tekrar yapabilirsin.',true,false,'pt2Wrong','Yanlışları Aç',false);
     return [
       task(1,d.mode==='spaced'?'3 Soruluk Aralıklı Kontrol':d.mode==='maintain'?'3 Soruluk Kısa Kontrol':'Kaynak Sorularıyla Çalış',sourceDesc,d.testDone,!d.testDone,'pt2Test',testLabel,!count),
-      task(2,'Yanlışları Kapat',d.testDone?(mistakes?`${mistakes} yanlış/yapamadım kaydını tek-soru ekranından yeniden incele.`:'Bu sette yanlış yok; görev otomatik tamamlandı.'):'Kaynak seti bittikten sonra yalnız gerçek hata varsa açılır.',d.wrongDone,d.testDone&&!d.wrongDone,'pt2Wrong',d.wrongDone?'Yanlışları Aç':'Yanlışlarımı Aç',!d.testDone||!mistakes)
+      task(2,'Yanlışları Birlikte Düzeltelim',d.testDone?(mistakes?`Takıldığın ${mistakes} soruya yeniden dönelim. Bu kez nerede zorlandığını birlikte bulacağız.`:'Harika, bu sette düzeltmemiz gereken bir yanlış çıkmadı.'):'Önce soruları çöz; takıldığın yer olursa burada birlikte ele alacağız.',d.wrongDone,d.testDone&&!d.wrongDone,'pt2Wrong',d.wrongDone?'Yanlışları Aç':'Yanlışlarıma Dön',!d.testDone||!mistakes)
     ].join('');
   }
   function render(){
     const f=focus(),d=ensureDaily(f),info=modeInfo[d.mode]||modeInfo.diagnostic,count=usableCount(f,d),perf=recent(f),topicTest=topicTestInsight(f),selfMini=selfMiniInsight(f),memory=memoryFor(f),nextMemoryMode=memory?(window.YKSTeacherPilotV1?.resumeMode?.({previousMode:memory.previousMode,nextMode:memory.nextMode,nextReviewDate:memory.nextReview?.dateKey,today:today(),closureComplete:memory.closureComplete})||memory.nextMode):'',tasks=stepsHtml(f,d,count),total=(tasks.match(/class="pt2-task/g)||[]).length,done=(tasks.match(/class="pt2-task done/g)||[]).length,goal=Number(state.profile?.goal||10),todayQ=todayQuestions(),performanceHtml=topicTest?topicTest.recentTests.map(x=>`<span class="pt2-perf">${x.questionCount} soru • ${x.correct}D ${x.wrong}Y ${x.blank}B • %${x.accuracy} • ${esc(x.dateKey)}</span>`).join(''):perf.map(x=>`<span class="pt2-perf ${x.result==='correct'?'ok':'bad'}">${x.result==='correct'?'✓':'✕'} ${new Date(x.timestamp||Date.now()).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})}</span>`).join('');
     root.innerHTML=`<div class="screen-head"><button class="back" data-go="home">←</button><h1>Kişisel Öğretmenim</h1></div><div class="pt2"><div class="pt2-hero"><div><div class="pt2-chips"><span class="pt2-chip">${esc(`${f.exam} ${f.subject}`)}</span><span class="pt2-chip green">${esc(info.label)}</span></div><h2>${esc(f.topic)}</h2><p><b>${esc(info.title)}.</b> ${esc(reason(f,d))}</p></div><div class="pt2-progress"><b>${done}/${total}</b><small>bugünkü plan</small><div class="pt2-bar"><i style="width:${total?Math.round(done/total*100):100}%"></i></div></div></div><div class="pt2-main"><div class="pt2-card"><div class="pt2-head"><h3>Bugünkü Çalışma</h3><small>Gerçek sorular ve gerçek yanlışlar</small></div><div class="pt2-tasks">${tasks}</div></div><div class="pt2-card"><div class="pt2-head"><h3>Öğretmenin Değerlendirmesi</h3></div><div class="pt2-metrics"><div class="pt2-metric"><b>${f.score==null?'—':`%${f.score}`}</b><small>ölçümlü başarı</small></div><div class="pt2-metric"><b>${Number(f.recentWrong||0)}</b><small>yakın yanlış</small></div><div class="pt2-metric"><b>${todayQ}/${goal}</b><small>bugünkü soru yükü</small></div></div>${selfMini?`<div class="pt2-note"><b>Kendi çözdüğün Mini Test:</b> ${Number(selfMini.count)||0} soru • ${Number(selfMini.correct)||0}D ${Number(selfMini.wrong)||0}Y ${Number(selfMini.unable)||0} yapamadım • %${Number(selfMini.percent)||0}. Öğretmenin bu sonucu sonraki kararında kullanacak.</div>`:''}${topicTest?`<div class="pt2-note"><b>Son konu testlerin:</b> ${topicTest.totalTests} test • ${topicTest.totalQuestions} soru • ${topicTest.correct}D ${topicTest.wrong}Y ${topicTest.blank}B • %${topicTest.accuracy}.</div>`:''}${memory?.nextReview?.dateKey?`<div class="pt2-note"><b>Sonraki kontrol:</b> ${esc(memory.nextReview.dateKey)} • ${esc(modeInfo[nextMemoryMode]?.label||nextMemoryMode)}. Kapanmamış yanlış varsa öğretmen tarihi beklemez.</div>`:''}</div></div><div class="pt2-details"><details><summary>Başka bir konu seç</summary><div class="pt2-topics">${candidates().slice(0,5).map(x=>`<button class="pt2-topic ${norm(x.topic)===norm(f.topic)?'active':''}" data-pt3-topic="${esc(x.topic)}"><span><b>${esc(x.topic)}</b><br><small class="muted">${esc(`${x.exam} ${x.subject}`)}</small></span><span>${x.score==null?'—':`%${x.score}`}</span></button>`).join('')}</div></details>${performanceHtml?`<details><summary>Son çalışmalarımı göster</summary><div class="pt2-perfs">${performanceHtml}</div></details>`:''}</div></div>`;
     const guidanceText=root.querySelector('.pt2-hero h2 + p');
-    if(guidanceText){const guidance=document.createElement('div');guidance.className='pt2-guidance';guidance.innerHTML='<span class="pt2-guidance-label">Öğretmeninin bugünkü talimatı</span>';guidance.appendChild(guidanceText);root.querySelector('.pt2-hero h2')?.insertAdjacentElement('afterend',guidance)}
+    if(guidanceText){const guidance=document.createElement('div');guidance.className='pt2-guidance';guidance.innerHTML='<span class="pt2-guidance-label">Öğretmeninden bugünkü not</span>';guidance.appendChild(guidanceText);root.querySelector('.pt2-hero h2')?.insertAdjacentElement('afterend',guidance)}
     const reward=rewardSummary(),praise=state.teacher?.lastPraise,card=document.createElement('div');card.className='pt2-note';card.innerHTML=`<b>⭐ ${reward.points} Emek Puanı • ${esc(reward.title)}</b><br>${praise?esc(praiseText(praise.praiseId)):'İlk gerçek çalışma davranışından sonra öğretmenin takdiri burada görünecek.'}`;root.querySelector('.pt2-hero')?.insertAdjacentElement('afterend',card);
     if(d.sessionDone&&d.mode!=='complete'){
       const next=nextTopicAfter(f),goalReached=todayQ>=goal,box=document.createElement('div');box.className='pt2-next';box.innerHTML=`<div class="pt2-next-copy"><span class="pt2-next-icon">✓</span><div><h3>${goalReached?'Bugünkü hedefini tamamladın!':'Harika, bu görevi tamamladın!'}</h3><p>${goalReached?'Öğretmenin bugün yeni soru yükü vermeyecek. Çalışmanı başarıyla sonlandırabilirsin.':next?`Sıradaki çalışma: <b>${esc(`${next.exam} ${next.subject} • ${next.topic}`)}</b>. Öğretmenin yeni planı hazır.`:'Bugünkü öğretmen çalışmasını başarıyla tamamladın.'}</p></div></div><button id="pt2Continue">${goalReached?'Bugünkü Çalışmayı Tamamla →':next?'Sıradaki Göreve Geç →':'Çalışmayı Tamamla →'}</button>`;root.querySelector('.pt2-main')?.insertAdjacentElement('afterend',box);box.querySelector('#pt2Continue').onclick=()=>continueTeacherDay(f,next,goalReached)

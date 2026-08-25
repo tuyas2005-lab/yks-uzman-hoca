@@ -5,6 +5,7 @@ import vm from 'node:vm';
 const closureCode=fs.readFileSync(new URL('../app-wrong-closure-v2.js',import.meta.url),'utf8');
 const attemptCode=fs.readFileSync(new URL('../app-source-retake-position.js',import.meta.url),'utf8');
 const catalogPolicyCode=fs.readFileSync(new URL('../data/question-catalog-policy-v2.js',import.meta.url),'utf8');
+const teacherPilotCode=fs.readFileSync(new URL('../app-teacher-pilot-v1.js',import.meta.url),'utf8');
 
 const item={
   id:'osym-loop-test-1',provider:'OSYM',providerLabel:'ÖSYM',collection:'2026 TYT',year:2026,
@@ -54,9 +55,22 @@ function createHarness(seed=[]){
     }
   };
   vm.createContext(context);
+  vm.runInContext(teacherPilotCode,context,{filename:'app-teacher-pilot-v1.js'});
   vm.runInContext(closureCode,context,{filename:'app-wrong-closure-v2.js'});
   vm.runInContext(attemptCode,context,{filename:'app-source-retake-position.js'});
   return context;
+}
+
+{
+  const h=createHarness();
+  const polygon={...item,id:'meb-pilot-polygon-1',provider:'MEB_OGM',topic:'Çokgen ve Dörtgenlerin Özellikleri',difficulty:'ORTA'};
+  h.state.miniTests={teacherTask:{sessionId:'session-polygon-1',decisionId:'decision-polygon-1',itemIds:[polygon.id]}};
+  const event=h.recordSourceQuestionAttempt(polygon,'correct','C',{type:'mini',actionId:'teacher-polygon-correct'});
+  assert.equal(event.topicKey,'tyt.matematik.cokgenler-ve-dortgenler','pool topic must be recorded with canonical pilot topicKey');
+  assert.equal(event.meta.topicId,event.topicKey,'canonical topic identity must also survive in meta');
+  assert.equal(event.meta.teacherTask,true);
+  assert.equal(event.meta.teacherSessionId,'session-polygon-1');
+  assert.equal(event.meta.teacherDecisionId,'decision-polygon-1');
 }
 
 const attempts=state=>state.studyEvents.filter(x=>x.source==='source-question-result');

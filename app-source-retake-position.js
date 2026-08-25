@@ -92,16 +92,17 @@
     if(!event)return null;
     if(actionId)actionResults.set(actionId,event);
     if(kind==='correct'&&canonical){
-      if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,'retry-correct');
+      if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,'retry-correct',{eventId:event.id});
       else console.error('Canonical yanlış kapatma API hazır değil; yanlış açık bırakıldı.',canonical.id);
     }
     if(kind==='correct'&&!canonical){
-      const open=(state.studyEvents||[]).filter(x=>x?.meta?.wrongRecord===true&&!x?.meta?.wrongClosed&&x.meta?.catalogId!==item.id&&x.exam===item.exam&&x.subject===item.subject&&x.topic===item.topic);
+      const normSkill=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim(),skills=new Set((item.subtopics||[]).map(normSkill).filter(Boolean));
+      const open=(state.studyEvents||[]).filter(x=>{if(!(x?.meta?.wrongRecord===true&&!x?.meta?.wrongClosed&&x.meta?.catalogId!==item.id&&x.exam===item.exam&&x.subject===item.subject&&x.topic===item.topic))return false;const wrongSkills=String(x.meta?.solution?.curriculumOutcome||x.curriculumOutcome||'').split('•').map(normSkill).filter(Boolean);return skills.size&&wrongSkills.length?[...skills].some(s=>wrongSkills.includes(s)):true});
       open.forEach(x=>window.markWrongLearningEvidence?.(x.id,{wrongSimilarCorrectAt:at,wrongSimilarCorrectEventId:event.id,wrongSimilarCatalogId:item.id}))
     }
     if(meta.teacherTask&&window.YKSTeacherPilotV1){
       const P=window.YKSTeacherPilotV1,difficulty=String(item.difficulty||'').toLocaleUpperCase('tr-TR'),behaviors={attempt:true,correct:kind==='correct',mediumCorrect:kind==='correct'&&difficulty==='ORTA',hardCorrect:kind==='correct'&&difficulty==='ZOR',unableHonest:kind==='unable',wrongRecovered:kind==='correct'&&!!canonical};
-      try{const reward=P.buildRewardEvent({rewardId:`${meta.teacherSessionId}:${item.id}:${isRetry?'retry':'first'}`,sessionId:meta.teacherSessionId,dateKey:D()?.todayKey?.(),topicId:meta.topicId,behaviors});const saved=P.recordOnce(reward);state.teacher??={};state.teacher.lastPraise={...reward.meta,duplicate:saved.duplicate,at:Date.now()}}catch(e){console.warn('Öğretmen ödülü kaydedilemedi',e)}
+      try{const reward=P.buildRewardEvent({rewardId:`${meta.teacherSessionId}:${event.id}`,sessionId:meta.teacherSessionId,dateKey:D()?.todayKey?.(),topicId:meta.topicId,behaviors});const saved=P.recordOnce(reward);state.teacher??={};state.teacher.lastPraise={...reward.meta,duplicate:saved.duplicate,at:Date.now()}}catch(e){console.warn('Öğretmen ödülü kaydedilemedi',e)}
     }
     try{window.refreshSourceSetTracking?.();window.renderWrongV2?.();window.renderStats?.();window.renderHome?.()}catch{}
     return event;

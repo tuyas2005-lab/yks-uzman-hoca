@@ -3,6 +3,7 @@
   const norm=s=>D()?.norm?.(s)||String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const today=()=>D()?.todayKey?.()||new Date().toLocaleDateString('sv-SE');
+  const hash=s=>{let h=2166136261;for(const c of String(s||'')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};
   const topicTestInsight=ctx=>(D()?.getTopicTestInsights?.({days:60})||[]).find(x=>x.exam===ctx.exam&&norm(x.subject)===norm(ctx.subject)&&norm(x.topic)===norm(ctx.topic))||null;
   let timer=0,painting=false,recapBusy=false;
 
@@ -16,9 +17,10 @@
 
   function plan(ctx){
     const desired=Number(state.teacher?.daily?.desiredCount||5)>=5?5:3;
-    let exact=[];try{exact=C()?.findNextBatch?.({...ctx,visualPreferred:true},30)||[]}catch{}
-    const mode=state.teacher?.daily?.mode||'diagnostic',cfg=window.YKSTeacherPilotV1?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selected=window.YKSTeacherPilotV1?.selectByDifficulty?.(exact,{...cfg,count:desired})||exact.slice(0,desired),count=desired===5?(selected.length>=5?5:selected.length>=3?3:0):(selected.length>=3?3:0);
-    return{items:count?selected.slice(0,count):[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{}}
+    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx);if(!pilot)return{items:[],count:0,desired,mode:'blocked',shortages:{PILOT:desired},distributionExact:false};
+    const poolTopic=pilot.poolTopics?.[0]||pilot.displayTitle;let exact=[];try{exact=C()?.findNextBatch?.({...ctx,topic:poolTopic,visualPreferred:true},30)||[]}catch{}
+    const mode=state.teacher?.daily?.mode||'diagnostic',cfg=P?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selection=P?.difficultySelection?.(exact,{...cfg,count:desired})||{items:[],shortages:{UNKNOWN:desired},distributionExact:false},count=selection.distributionExact?desired:0;
+    return{...selection,items:count?selection.items:[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{},pilot,poolTopic}
   }
 
   function adapt(){
@@ -33,11 +35,12 @@
         if(h)h.textContent=d.desiredCount===3?'Kaynak Sorularla Kısa Kontrol':'Kaynak Sorularla Ölçüm'
       }
       const p=plan(ctx),btn=root.querySelector('#pt3Test'),t=btn?.closest('.pt2-task');
+      if(!p.distributionExact&&p.pilot&&Object.keys(p.shortages||{}).length){try{const P=window.YKSTeacherPilotV1,warningId=`${today()}-${p.pilot.id}-${p.mode}-${hash(JSON.stringify(p.shortages))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:p.difficultyCounts,available:p.actualDifficultyCounts,shortages:p.shortages,severity:'orange'}))}catch(e){console.warn('Teacher Pool uyarısı kaydedilemedi',e)}}
       if(btn&&!t?.classList.contains('done')){
         btn.textContent=p.count?`${p.count} Soruluk Seti Başlat`:'Kaynak Yok';
         btn.disabled=!p.count||t.classList.contains('locked');
         const desc=t?.querySelector('p');
-        if(desc)desc.textContent=p.count?`${p.count} çözülmemiş, indekslenmiş ve aynı konudan kaynak sorusuyla çalış. Eksik hazırlanmış kayıt varsa soru ekranında açıkça gösterilir.`:'Bu konu için indekslenmiş kaynak sorusu yok. AI soru üretmeyecek.'
+        if(desc)desc.textContent=p.count?`${p.count} çözülmemiş, indekslenmiş ve aynı konudan kaynak sorusuyla çalış.`:p.mode==='blocked'?'Bu konu Limited Pilot kapsamında değil; öğretmen görev açmayacak.':`İstenen zorluk dağılımında kaynak eksik (${Object.entries(p.shortages||{}).map(([k,v])=>`${k} ${v}`).join(', ')}). Daha kolay soruyla sessizce doldurulmayacak.`
       }
       if(d.mode==='complete'){
         const w=root.querySelector('#pt2Wrong');
@@ -61,8 +64,8 @@
   }
 
   function launch(ctx,p){
-    if(!p.count)return;
-    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),stamp=Date.now(),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${stamp}`,decisionId=`${sessionId}-decision`,daily=state.teacher?.daily||{};
+    if(!p.count||!p.distributionExact)return;
+    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),daily=state.teacher?.daily||{},revision=hash(`${daily.mode||'diagnostic'}|${p.items.map(x=>x.id).join('|')}`),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${revision}`,decisionId=`${sessionId}-decision`;
     if(P&&topic){
       const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan'],evidence:{dailyMode:daily.mode||'',expectedCount:p.count},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
       P.recordOnce(event)

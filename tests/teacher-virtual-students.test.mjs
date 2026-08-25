@@ -53,4 +53,8 @@ test('mode configurations select controlled source difficulty',()=>{
   const foundation=P.selectByDifficulty(items,P.modeConfig.foundation),challenge=P.selectByDifficulty(items,P.modeConfig.challenge);
   assert.deepEqual(Array.from(foundation,x=>x.difficulty),['KOLAY','KOLAY','KOLAY','KOLAY','ORTA']);
   assert.deepEqual(Array.from(challenge,x=>x.difficulty),['ORTA','ORTA','ZOR','ZOR','ZOR']);
+  const shortage=P.difficultySelection(items.filter(x=>x.difficulty==='KOLAY'),P.modeConfig.challenge);
+  assert.equal(shortage.distributionExact,false);assert.deepEqual({...shortage.shortages},{ORTA:2,ZOR:3});assert.equal(shortage.items.length,0,'challenge kolay sorularla sessizce doldurulmamalı');
+  assert.equal(P.transitionMode('repair','challenge'),'reinforce','tek başarılı onarım doğrudan challenge açmamalı');
+  assert.equal(P.transitionMode('reinforce','challenge'),'maintain','challenge farklı zamanda güçlü kanıt gerektirmeli');
 });

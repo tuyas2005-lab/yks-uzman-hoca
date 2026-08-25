@@ -21,15 +21,15 @@
     const s=window.getStudentStrategy?.();
     if(s?.topics?.length){
       const list=(s.focus?[s.focus.primary,...(s.focus.alternatives||[])]:s.topics).filter(Boolean),seen=new Set();
-      return list.filter(x=>{const k=`${x.exam}|${x.subject}|${x.topic}`;if(seen.has(k))return false;seen.add(k);return true}).slice(0,8);
+      return list.filter(x=>window.YKSTeacherPilotV1?.resolveTopic?.(x)).filter(x=>{const k=`${x.exam}|${x.subject}|${x.topic}`;if(seen.has(k))return false;seen.add(k);return true}).slice(0,8);
     }
-    return (D()?.getLearningModel?.()?.topics||[]).map(x=>({...x,priority:(100-(x.score??70))+(x.recentWrong||0)*8+(x.recentSignals||0)*10})).sort((a,b)=>b.priority-a.priority);
+    return (D()?.getLearningModel?.()?.topics||[]).filter(x=>window.YKSTeacherPilotV1?.resolveTopic?.(x)).map(x=>({...x,priority:(100-(x.score??70))+(x.recentWrong||0)*8+(x.recentSignals||0)*10})).sort((a,b)=>b.priority-a.priority);
   }
   function focus(){
     const list=candidates(),manual=state.strategy?.manualTopicDate===today()?state.strategy?.manualTopic:'',daily=state.teacher.daily;
     const wanted=manual||((daily?.date===today()&&!daily?.sessionDone)?daily.topic:'')||state.teacher.selectedTopic;
     if(wanted){const hit=list.find(x=>norm(x.topic)===norm(wanted));if(hit)return hit}
-    return list[0]||{exam:'TYT',subject:'Matematik',topic:'Genel tekrar',score:null,total:0,wrong:0,recentWrong:0,recentSignals:0,staleDays:999,confidence:'Veri yok'};
+    return list[0]||{exam:'TYT',subject:'Matematik',topic:'Problemler',topicKey:'tyt.matematik.problemler',score:null,total:0,wrong:0,recentWrong:0,recentSignals:0,staleDays:999,confidence:'Veri yok'};
   }
   function todayQuestions(){return Number(D()?.getLearningModel?.()?.todayCount||0)}
   function reviewsToday(){return (state.studyEvents||[]).filter(x=>x?.source==='wrong-review'&&x?.dateKey===today()).length}

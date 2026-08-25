@@ -50,7 +50,7 @@
     const d=state.teacher.daily;if(!d)return;d.teacherReviewedWrongIds=d.teacherReviewedWrongIds||[];
     if(!d.teacherReviewedWrongIds.includes(x.id))d.teacherReviewedWrongIds.push(x.id);
     const exists=(state.studyEvents||[]).some(e=>e?.source==='wrong-review'&&e?.dateKey===today()&&e?.meta?.reviewOf===x.id);
-    if(!exists){try{D()?.record?.({source:'wrong-review',exam:x.exam,subject:x.subject,topic:x.topic,curriculumOutcome:x.curriculumOutcome||x.meta?.solution?.curriculumOutcome||'',result:'unknown',difficulty:x.difficulty,interaction:'reviewed',questionCount:0,signals:['reviewed-wrong'],meta:{reviewOf:x.id,teacherTask:true,teacherTopic:scope?.topic||'',reviewedAt:Date.now()}},{persistNow:true})}catch{}}
+    if(!exists){try{const reviewedAt=Date.now(),event=D()?.record?.({source:'wrong-review',exam:x.exam,subject:x.subject,topic:x.topic,curriculumOutcome:x.curriculumOutcome||x.meta?.solution?.curriculumOutcome||'',result:'unknown',difficulty:x.difficulty,interaction:'reviewed',questionCount:0,signals:['reviewed-wrong'],meta:{reviewOf:x.id,teacherTask:true,teacherTopic:scope?.topic||'',reviewedAt}},{persistNow:true});window.markWrongLearningEvidence?.(x.id,{wrongReviewedAt:reviewedAt,wrongReviewEventId:event?.id||''})}catch{}}
     const done=syncDone(scope);if(!done)d.wrongReviewBaseline=reviewTotalToday();persist();
   }
   function openRow(x,scope){

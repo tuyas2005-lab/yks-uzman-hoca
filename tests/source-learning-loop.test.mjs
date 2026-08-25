@@ -78,6 +78,17 @@ const openWrongs=state=>state.studyEvents.filter(x=>x.meta?.wrongRecord===true&&
 const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
 
 {
+  const h=createHarness();h.state.miniTests={teacherTask:{sessionId:'reward-session',decisionId:'reward-decision',itemIds:[item.id]}};
+  h.recordSourceQuestionAttempt(item,'wrong','A',{type:'mini',actionId:'reward-first-wrong'});
+  h.recordSourceQuestionAttempt(item,'wrong','B',{type:'wrong',actionId:'reward-retry-wrong'});
+  h.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',actionId:'reward-retry-correct'});
+  const rewards=h.state.studyEvents.filter(x=>x.source==='reward-earned');
+  assert.equal(rewards.length,3,'her gerçek attempt benzersiz event kimliğiyle ayrı ödül kaydı üretmeli');
+  assert.equal(new Set(rewards.map(x=>x.id)).size,3,'retry wrong ve retry correct aynı ödül kimliğini paylaşmamalı');
+  assert.ok(rewards.at(-1).meta.awards.some(x=>x.key==='wrongRecovered'),'doğru retry geri kazanım ödülünü kaybetmemeli');
+}
+
+{
   const h=createHarness();
   const before=attempts(h.state).length;
   const [first,duplicate]=await Promise.all([
@@ -148,7 +159,7 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.equal(restoredOriginal.meta.wrongClosed,false);
   assert.equal(attempts(reloaded.state).filter(x=>x.meta?.retryOf===original.id).length,3,'retry ilişkileri yenileme sonrası korunmalı');
 
-  reloaded.markWrongLearningEvidence(original.id,{wrongReviewedAt:Date.now()});
+  reloaded.markWrongLearningEvidence(original.id,{wrongReviewedAt:Date.now(),wrongReason:'İşlem hatası',wrongReasonAt:Date.now()});
   reloaded.recordSourceQuestionAttempt({...item,id:'meb-manual-similar-3',questionNo:'3'},'correct','C',{type:'mini',actionId:'similar-correct-after-reopen'});
   const correctAfterReopen=reloaded.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',wrongId:original.id,actionId:'retry-correct-after-reopen'});
   assert.equal(attempts(reloaded.state).length,7,'reopen sonrası yeni benzer soru ve doğru retry saklanmalı');

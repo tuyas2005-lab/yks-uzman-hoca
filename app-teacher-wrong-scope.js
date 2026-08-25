@@ -57,7 +57,7 @@
   function openRow(x,scope){
     recordReview(x,scope);renderScope();
     const item=(C()?.all?.()||[]).find(z=>z.id===x.meta?.catalogId);
-    if(item&&typeof window.openSourceQuestion==='function'&&(!window.isSourceQuestionReady||window.isSourceQuestionReady(item))){window.openSourceQuestion(item,{type:'wrong',wrongId:x.id,returnScreen:'wrong'});return}
+    if(item&&typeof window.openSourceQuestion==='function'&&(!window.isSourceQuestionReady||window.isSourceQuestionReady(item))){window.openSourceQuestion(item,{type:'wrong',wrongId:x.id,teacherWrongClosure:true,returnScreen:'wrong'});return}
     const btn=document.querySelector(`#wrong2Host [data-wrong-id="${CSS.escape(x.id)}"]`);if(btn)btn.click();
   }
   function cleanup(){const host=document.getElementById('wrong2Host');if(host)host.style.display='';document.getElementById('teacherWrongScopeHost')?.remove()}

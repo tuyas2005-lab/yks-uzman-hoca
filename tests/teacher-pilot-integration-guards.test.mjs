@@ -8,6 +8,8 @@ const mini=fs.readFileSync(new URL('../app-mini-tests-source.js',import.meta.url
 const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-v2.js',import.meta.url),'utf8');
 const sourceViewer=fs.readFileSync(new URL('../app-source-question-viewer.js',import.meta.url),'utf8');
 const teacherWrongScope=fs.readFileSync(new URL('../app-teacher-wrong-scope.js',import.meta.url),'utf8');
+const sourceRetake=fs.readFileSync(new URL('../app-source-retake-position.js',import.meta.url),'utf8');
+const wrongClosure=fs.readFileSync(new URL('../app-wrong-closure-v2.js',import.meta.url),'utf8');
 const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'utf8');
 
 test('empty student starts from a canonical pilot topic',()=>{
@@ -85,6 +87,14 @@ test('teacher wrong task completes only after real four-evidence closure',()=>{
   assert.match(teacherWrongScope,/data-tws-reason/);
   assert.match(teacherWrongScope,/markWrongLearningEvidence/);
   assert.doesNotMatch(teacherWrongScope,/wrongDone=rows\.every\(x=>seen\.has\(x\.id\)\)/);
+});
+
+test('teacher-directed retry closes the original wrong and refreshes its task state',()=>{
+  assert.match(teacherWrongScope,/teacherWrongClosure:true/);
+  assert.match(sourceRetake,/ctx\?\.teacherWrongClosure\?'teacher-retry-correct':'retry-correct'/);
+  assert.match(wrongClosure,/method==='teacher-retry-correct'/);
+  assert.match(wrongClosure,/wrongRecord:false,wrongClosed:true/);
+  assert.match(wrongClosure,/wrongCloseLabel:'Öğretmen görevinde yeniden doğru çözüldü'/);
 });
 
 test('teacher persists session memory and observes student initiated mini tests',()=>{

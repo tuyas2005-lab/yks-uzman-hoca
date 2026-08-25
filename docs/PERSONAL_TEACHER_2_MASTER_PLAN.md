@@ -615,5 +615,6 @@ Seviye 5 için 30 günlük kalıcılık kanıtı gerekir.
 | Yanlış ve süresi gelen tekrar önceliği | Tamamlandı | Route öncelik testleri |
 | Öğrenme modelinden kanıt toplama | Tamamlandı | `buildTopicProgressEvidence`, gerçek event geçmişi |
 | Öğrenci konu geçiş kapısı | Tamamlandı | Tamamlanma eylemi `decideTopicRoute` sonucuna bağlı |
-| Öğrenci gelişim rotası arayüzü | Bekliyor | Preview tasarım kabulü |
+| Öğrenci gelişim rotası arayüzü | Tamamlandı | Beş seviyeli sade yolculuk kartı |
+| Preview tasarım kabulü | Bekliyor | Telefon/tablet ürün sahibi kontrolü |
 | Merge / production | Bekliyor | Kullanıcı onayı sonrası |

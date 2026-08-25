@@ -25,6 +25,18 @@ test('effort points are promoted beside the daily plan without a duplicate note'
   assert.match(ui,/@media\(max-width:600px\).*\.pt2-hero-side\{display:grid/);
 });
 
+test('teacher shows a compact five-level topic growth journey',()=>{
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const ui=read('app-personal-teacher-v2.js');
+  assert.match(policy,/growthLabels=\['Başlangıç','Temel','Gelişiyor','Güçlü','Kalıcı'\]/);
+  assert.match(policy,/buildTopicProgressEvidence/);
+  assert.match(policy,/assessTopicProgress/);
+  assert.match(policy,/class="pt2-growth"/);
+  assert.match(policy,/BU KONUDAKİ YOLCULUĞUN/);
+  assert.match(ui,/\.pt2-growth-steps\{display:grid;grid-template-columns:repeat\(5/);
+  assert.match(ui,/@media\(max-width:600px\).*\.pt2-growth\{padding:14px 10px\}/);
+});
+
 test('teacher-facing copy sounds human while raw statistics stay in evaluation',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   assert.match(policy,/bazı sorularda takıldığını görüyorum; bu çok normal/);

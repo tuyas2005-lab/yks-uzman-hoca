@@ -23,6 +23,8 @@ test('teacher query resolves pool alias before catalog selection and blocks non-
 test('mini test consumes exact teacher item ids instead of repicking',()=>{
   assert.match(mini,/teacherTask\.itemIds\.map\(id=>map\.get\(id\)\)/);
   assert.match(mini,/current\.every\(x=>task\.itemIds\?\.includes\(x\.id\)\)/);
+  assert.match(mini,/function renderTeacherTaskOrHome\(\)/);
+  assert.match(mini,/startSet\(\{exam:selection\.exam,subject:selection\.subject,year:'latest',topic:selection\.topic\},selection\.count\)/);
 });
 
 test('same daily plan uses a deterministic launch revision',()=>{

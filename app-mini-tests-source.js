@@ -4,7 +4,7 @@
   const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot',"'":'&#039;'}[c]));
   const uniq=arr=>[...new Set(arr.filter(Boolean))];
   const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
-  let current=[],results=new Map(),activeQuery=null,activeCount=0,selection={exam:'TYT',subject:'Matematik',year:'latest',topic:'',count:5};
+  let current=[],results=new Map(),activeQuery=null,activeCount=0,autoStartedTeacherSession='',selection={exam:'TYT',subject:'Matematik',year:'latest',topic:'',count:5};
 
   const style=document.createElement('style');style.textContent=`
     .mts-hero{padding:18px;border:1px solid #ddd7ff;border-radius:20px;background:linear-gradient(135deg,#f5f2ff,#fff);margin-bottom:14px}.mts-hero h2{margin:0 0 6px}.mts-hero p{margin:0;color:var(--muted);line-height:1.5}.mts-card{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:16px}.mts-card h3{margin:0 0 6px}.mts-main-card{max-width:none}.mts-form{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:13px}.mts-form label{display:grid;gap:6px;font-weight:800;font-size:12px}.mts-form select{height:42px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);padding:0 10px}.mts-list{display:grid;gap:11px}.mts-q{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface)}.mts-q.done{border-color:#cfd9d4;background:#fbfdfc}.mts-main{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.mts-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.mts-chip{font-size:10px;font-weight:850;padding:4px 7px;border-radius:999px;background:#f1efff;color:#553fc8}.mts-chip.year{background:#fff4df;color:#8b5c11}.mts-chip.visual{background:#eef8f3;color:#287250}.mts-open{border:0;background:#6b4ce6;color:#fff;border-radius:11px;padding:10px 12px;font-weight:850}.mts-progress{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.mts-empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}.mts-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mts-summary>div{padding:14px;border:1px solid var(--line);border-radius:14px}.mts-summary b{display:block;font-size:24px}.mts-history{display:grid}.mts-h{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.mts-h:last-child{border-bottom:0}.mts-h-title{font-weight:900}.mts-h-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.mts-h-meta span{font-size:11px;color:var(--muted)}.mts-h-topic{font-size:12px;font-weight:800;margin-top:4px;color:var(--ink)}.mts-short-note{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#fff7e8;border:1px solid #efd9ae;color:#7c5a16;font-size:12px;font-weight:750}@media(max-width:900px){.mts-form{grid-template-columns:1fr 1fr}}@media(max-width:600px){.mts-form{grid-template-columns:1fr}.mts-main{grid-template-columns:1fr}.mts-open{width:100%}.mts-summary{grid-template-columns:1fr}}
@@ -60,8 +60,19 @@
     return true;
   }
 
-  window.renderMiniTestHome=renderHome;
+  function renderTeacherTaskOrHome(){
+    const task=state.miniTests?.teacherTask;
+    if(task?.sessionId&&task.itemIds?.length&&autoStartedTeacherSession!==task.sessionId){
+      autoStartedTeacherSession=task.sessionId;
+      selection={exam:task.exam||'TYT',subject:task.subject||'Matematik',year:'latest',topic:task.topic||'',count:Number(task.expectedCount)||task.itemIds.length||5};
+      startSet({exam:selection.exam,subject:selection.subject,year:'latest',topic:selection.topic},selection.count);
+      return
+    }
+    renderHome()
+  }
+
+  window.renderMiniTestHome=renderTeacherTaskOrHome;
   window.syncMiniTestSourceAttempt=syncSourceAttempt;
-  const base=window.go;if(typeof base==='function'&&!window.__sourceMiniGo){window.go=function(id){const r=base(id);if(id==='tests')setTimeout(renderHome,0);return r};try{go=window.go}catch{};window.__sourceMiniGo=true}
-  if(root.classList.contains('active'))renderHome();
+  const base=window.go;if(typeof base==='function'&&!window.__sourceMiniGo){window.go=function(id){const r=base(id);if(id==='tests')setTimeout(renderTeacherTaskOrHome,0);return r};try{go=window.go}catch{};window.__sourceMiniGo=true}
+  if(root.classList.contains('active'))renderTeacherTaskOrHome();
 })();

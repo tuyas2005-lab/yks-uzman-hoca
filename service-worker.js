@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r32-teacher-canonical-start';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r33-teacher-task-handoff';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

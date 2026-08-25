@@ -24,7 +24,8 @@ test('teacher query resolves pool alias before catalog selection and blocks non-
   assert.match(launch,/function sourceHealth\(ctx\)/);
   assert.match(launch,/getSolvedIds/);
   assert.match(launch,/P\.resolveItem\?\.\(x\)\?\.id===pilot\.id/);
-  assert.match(launch,/Kaynak sağlığı — ürün sahibi/);
+  assert.match(launch,/if\(h\.overall==='green'\)\{current\?\.remove\(\);return\}/);
+  assert.match(launch,/Bu konuda kaynak azalıyor/);
   assert.match(launch,/neededForGreen/);
 });
 
@@ -41,10 +42,18 @@ test('same daily plan uses a deterministic launch revision',()=>{
   assert.doesNotMatch(launch,/sessionId=.*Date\.now/);
 });
 
-test('source health card remains open across observer adaptation',()=>{
+test('source health warning stays hidden while healthy and preserves open state when shown',()=>{
   assert.match(launch,/current\?\.dataset\.pt3Signature===signature/);
   assert.match(launch,/const wasOpen=!!current\?\.open/);
   assert.match(launch,/card\.open=wasOpen/);
+});
+
+test('student teacher page contains only real-question and real-wrong actions',()=>{
+  assert.doesNotMatch(policy,/Hızlı Tekrar|Hızlı Onarım|Kısa Pekiştirme|pt2Recap|teacher-recap/);
+  assert.match(policy,/Gerçek sorular ve gerçek yanlışlar/);
+  assert.match(policy,/return !!\(d\.testDone&&d\.wrongDone\)/);
+  assert.doesNotMatch(policy,/Koç payı|Karar Kanıtları|ürün sahibi|auditHtml/);
+  assert.match(policy,/performanceHtml\?`<details/);
 });
 
 test('teacher and mini test preserve usable phone touch layout',()=>{
@@ -82,8 +91,8 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(mini,/retention30Passed/);
   assert.match(mini,/state\.teacher\.lastPraise=\{\.\.\.completionReward\.meta/);
   assert.match(policy,/resumeMode/);
-  assert.match(policy,/Öğrencinin kendi çözdüğü Mini Test/);
-  assert.match(policy,/Oturum hafızası/);
+  assert.match(policy,/Kendi çözdüğün Mini Test/);
+  assert.match(policy,/Sonraki kontrol/);
   assert.match(policy,/source==='teacher-session-outcome'/);
   assert.match(policy,/derivedFromOutcome:true/);
   assert.match(policy,/selfAt>Number\(memory\?\.studentEvidenceAt\|\|memory\?\.lastCompletedAt\|\|0\)/);
@@ -91,11 +100,9 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(policy,/newerOpenWrong/);
   assert.match(policy,/reopenedByWrongId/);
   assert.match(policy,/transitionMode\?\.\(previous,raw\?\.mode/);
-  assert.match(policy,/uygulanacak sıradaki mod/);
+  assert.match(policy,/Kapanmamış yanlış varsa öğretmen tarihi beklemez/);
   assert.match(policy,/modeInfo\[nextMemoryMode\]/);
-  assert.match(policy,/Öğretmen karar geçmişi — ürün sahibi/);
-  assert.match(policy,/buildAuditTrail/);
-  assert.match(policy,/Seçilen soru kimlikleri/);
+  assert.doesNotMatch(policy,/Öğretmen karar geçmişi — ürün sahibi/);
   assert.match(policy,/d\.decisionEvidence=/);
   assert.match(policy,/d\.reasonText=reason\(f,d\)/);
   assert.match(teacherWrongScope,/mem\.closureComplete=!!d\.wrongDone/);

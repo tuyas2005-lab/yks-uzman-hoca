@@ -520,9 +520,9 @@ cevaplamak değil, doğrulanmış plandan doğrudan devam etmektir.
 | Emek Puanı / takdir | Tamamlandı | İdempotent ödül kayıtları ve kanıta dayalı övgü |
 | Teacher Pool kaynak sağlığı | Tamamlandı | Yeşil/sarı/turuncu/kırmızı erken uyarı |
 | Açıklanabilir karar geçmişi | Tamamlandı | Karar → seçim → sonuç → sonraki karar audit zinciri |
-| Deterministik / sanal öğrenci testleri | Tamamlandı | 10 profil, 1/3/7/14/30. günler, 55/55 test |
-| Preview gerçek kullanıcı kabulü | Devam ediyor | Otomatik Preview kabulü geçti; tablet/telefon ürün sahibi göz kontrolü bekliyor |
-| Ready for Review / merge / production | Bekliyor | Ürün sahibi açık onayı olmadan ilerlenmez |
+| Deterministik / sanal öğrenci testleri | Tamamlandı | 10 profil, 1/3/7/14/30. günler, 57/57 test |
+| Preview gerçek kullanıcı kabulü | Tamamlandı | Telefon/tablet ürün sahibi kabulü geçti |
+| Ready for Review / merge / production | Tamamlandı | PR #31, production merge `c92e64e` ve canlı smoke |
 
 Uzun dönem simülasyonları iki sınır düzeltmesi doğurmuştur:
 
@@ -530,3 +530,13 @@ Uzun dönem simülasyonları iki sınır düzeltmesi doğurmuştur:
   yeniden Onarım moduna alır;
 - ilk başarılı 3 soruluk kalıcılık kontrolü 14 güne çıkar; ancak önceki 14 günlük
   kontrol de başarıyla geçildikten sonra 30 güne uzar ve kalıcılık ödülü kazanılır.
+
+### 17.1 Öğrenci ekranı sadeleştirme kararı
+
+Kişisel Öğretmen öğrenci ekranında soyut “Hızlı Tekrar” veya AI anlatım kutusu
+kullanılmaz. Görünür günlük akış yalnız gerçek Teacher Pool soruları ve bu sorulara
+bağlı gerçek yanlış kapanışından oluşur. Öğretmen karar/audit zinciri ve kaynak
+sağlığı arka planda çalışmaya devam eder; sağlıklı kaynak ve teknik audit verisi
+öğrenci ekranını işgal etmez. Kaynak kutusu yalnız eşik altına düşüldüğünde uyarı
+olarak görünür. Boş performans kutusu gösterilmez; gerçek performans oluştuğunda
+isteğe bağlı açılır.

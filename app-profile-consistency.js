@@ -38,7 +38,7 @@
   function resetTeacherIfGoalModeStale(){
     const d=state.teacher?.daily;if(!d||d.date!==today())return false;
     const goal=Math.max(1,Number(state.profile?.goal||10)),done=todayQuestions();
-    const noProgress=!d.testDone&&!d.recapDone&&!d.wrongDone;
+    const noProgress=!d.testDone&&!d.wrongDone;
     if((d.mode==='complete'&&done<goal)||(d.mode!=='complete'&&done>=goal&&noProgress)){
       state.teacher.daily=null;return true;
     }

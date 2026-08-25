@@ -75,7 +75,7 @@
   mo.observe(teacher,{childList:true,subtree:true});
 
   document.addEventListener('click',e=>{
-    if(e.target.closest('[data-go="home"],#pt2Recap,#pt3RecapDone,#pt3Test,#pt2Test,#pt2Wrong,#mtsFinish'))schedule(80);
+    if(e.target.closest('[data-go="home"],#pt3Test,#pt2Test,#pt2Wrong,#mtsFinish'))schedule(80);
   },true);
 
   schedule(0);

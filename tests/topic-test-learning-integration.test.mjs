@@ -4,8 +4,7 @@ import vm from 'node:vm';
 
 const taxonomyCode=fs.readFileSync(new URL('../data/yks-topic-taxonomy-v1.js',import.meta.url),'utf8');
 const dataCode=fs.readFileSync(new URL('../app-data-v5.js',import.meta.url),'utf8');
-const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-v2.js',import.meta.url),'utf8');
-const teacherLaunch=fs.readFileSync(new URL('../app-personal-teacher-source-launch-v3.js',import.meta.url),'utf8');
+const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-policy-v3.js',import.meta.url),'utf8');
 const teacherApi=fs.readFileSync(new URL('../api/teacher-recap.js',import.meta.url),'utf8');
 const coachUi=fs.readFileSync(new URL('../app-yks-coach.js',import.meta.url),'utf8');
 const coachApi=fs.readFileSync(new URL('../api/coach-report.js',import.meta.url),'utf8');
@@ -51,8 +50,8 @@ const day=(offset=0)=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDa
   assert.equal(h.YKSDataV5.getLearningModel().correct,1,'legacy StudyEvent davranışı korunmalı');
 }
 
-assert.match(teacherUi,/Konu testi kanıtı:/,'Aktif Teacher UI topic-test özetini göstermeli');
-assert.match(teacherLaunch,/topicTestEvidence:insight/,'Teacher source-launch interceptor aynı özeti iletmeli');
+assert.match(teacherUi,/Son konu testlerin:/,'Aktif Teacher UI topic-test özetini göstermeli');
+assert.doesNotMatch(teacherUi,/teacher-recap|pt2Recap/,'Kaldırılan hızlı tekrar topic-test özetini ayrı AI çağrısına göndermemeli');
 assert.match(teacherApi,/toplu performans sinyalidir, kesin mastery değildir/,'Teacher guard bulunmalı');
 assert.match(coachUi,/topicTestInsights:topicTestInsights\(\)/,'Coach payload topic-test özeti içermeli');
 assert.match(coachApi,/recency, soru hacmi, tekrar sayısı ve trendi/,'Coach karar kuralı bulunmalı');

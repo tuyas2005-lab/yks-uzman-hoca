@@ -613,6 +613,7 @@ Seviye 5 için 30 günlük kalıcılık kanıtı gerekir.
 | Deterministik konu geçiş kararı | Tamamlandı | `decideTopicRoute` |
 | Tek başarılı oturumla erken geçişi engelleme | Tamamlandı | Ayrı gün/oturum testleri |
 | Yanlış ve süresi gelen tekrar önceliği | Tamamlandı | Route öncelik testleri |
-| Öğrenme modelinden kanıt toplama | Sıradaki paket | Gerçek event geçmişi entegrasyonu |
+| Öğrenme modelinden kanıt toplama | Tamamlandı | `buildTopicProgressEvidence`, gerçek event geçmişi |
+| Öğrenci konu geçiş kapısı | Tamamlandı | Tamamlanma eylemi `decideTopicRoute` sonucuna bağlı |
 | Öğrenci gelişim rotası arayüzü | Bekliyor | Preview tasarım kabulü |
 | Merge / production | Bekliyor | Kullanıcı onayı sonrası |

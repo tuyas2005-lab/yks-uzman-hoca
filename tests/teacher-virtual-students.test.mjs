@@ -82,6 +82,15 @@ test('topic route repairs and reviews before opening the next topic',()=>{
   assert.equal(P.decideTopicRoute({...strong,dailyGoalComplete:true}).action,'finish-day');
 });
 
+test('topic evidence is rebuilt from canonical outcomes, results and open wrongs',()=>{
+  const P=engine(),topicId='tyt.matematik.problemler',outcome=(id,date,accuracy)=>P.buildOutcomeEvent({sessionId:id,decisionId:`d-${id}`,dateKey:date,topicId,answeredCount:5,correctCount:Math.round(accuracy/20),accuracy,nextReview:{days:id==='s2'?14:7,dateKey:'2026-09-08'}}),results=[...Array(10)].map((_,i)=>({id:`r${i}`,timestamp:i+1,dateKey:i<5?'2026-08-25':'2026-08-26',source:'source-question-result',topicKey:topicId,result:i===9?'wrong':'correct',meta:{topicId,wrongRecord:i===9,wrongClosed:i!==9}}));
+  const evidence=P.buildTopicProgressEvidence([outcome('s1','2026-08-25',80),outcome('s2','2026-08-26',100),...results],{topicId,today:'2026-08-27'});
+  assert.equal(evidence.measuredCount,10);assert.equal(evidence.successfulSessions,2);assert.equal(evidence.distinctStudyDays,2);assert.equal(evidence.openWrongCount,1);assert.equal(evidence.closureComplete,false);assert.equal(evidence.reviewDue,false);
+  results.at(-1).meta.wrongClosed=true;
+  const closed=P.buildTopicProgressEvidence([outcome('s1','2026-08-25',80),outcome('s2','2026-08-26',100),...results],{topicId,today:'2026-09-08'});
+  assert.equal(closed.closureComplete,true);assert.equal(closed.reviewDue,true);assert.equal(P.decideTopicRoute({...closed,hasNextTopic:true}).action,'review-current','süresi gelen kontrol sıradaki konudan önce gelmeli');
+});
+
 test('virtual student progresses through repair, reinforcement, challenge and spaced review',()=>{
   const P=engine();
   const first=P.decideTeacherSession({total:5,score:40,recentWrong:2});

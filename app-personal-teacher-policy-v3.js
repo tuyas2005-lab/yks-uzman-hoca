@@ -71,11 +71,23 @@
   const topicKey=x=>`${norm(x?.exam)}|${norm(x?.subject)}|${norm(x?.topic)}`;
   function completedTopicKeys(){const x=state.teacher?.completedTeacherTopics;return new Set(x?.date===today()?(x.keys||[]):[])}
   function nextTopicAfter(f){const completed=completedTopicKeys();completed.add(topicKey(f));return candidates().find(x=>topicKey(x)!==topicKey(f)&&!completed.has(topicKey(x)))||candidates().find(x=>topicKey(x)!==topicKey(f))||null}
+  function topicRoute(f,goalReached){
+    const P=window.YKSTeacherPilotV1,next=nextTopicAfter(f),evidence=P?.buildTopicProgressEvidence?.(state.studyEvents||[],{topicId:P?.resolveTopic?.(f)?.id,today:today()})||{};
+    const route=P?.decideTopicRoute?.({...evidence,hasNextTopic:!!next,dailyGoalComplete:goalReached})||{action:goalReached?'finish-day':'continue-current',progress:{level:1}};
+    return{route,evidence,next:route.action==='open-next-topic'?next:null};
+  }
+  function progressionMessage(route,evidence){
+    if(route.action==='review-current')return'Önce süresi gelen kısa kontrolü tamamlayacağız; ardından sıradaki konu kararını yeniden vereceğim.';
+    const needs=[],measured=Math.max(0,Number(evidence.measuredCount||0)),accuracy=evidence.accuracy==null?null:Number(evidence.accuracy),sessions=Math.max(0,Number(evidence.successfulSessions||0)),days=Math.max(0,Number(evidence.distinctStudyDays||0));
+    if(measured<5)needs.push(`${5-measured} gerçek soru daha`);if(accuracy===null||accuracy<80)needs.push('en az %80 güncel başarı');if(sessions<2)needs.push(`${2-sessions} güçlü çalışma daha`);if(days<2)needs.push(`${2-days} farklı çalışma günü daha`);
+    return`Bugün bu konuda değerli bir kanıt oluşturdun. Sıradaki konuyu açmadan önce ${needs.length?needs.join(', '):'bir sonraki planlı kontrol'} gerekiyor; öğretmenin seni doğru zamanda yeniden çağıracak.`;
+  }
   function continueTeacherDay(f,next,goalReached){
     const completed=completedTopicKeys();completed.add(topicKey(f));state.teacher.completedTeacherTopics={date:today(),keys:[...completed]};
     state.teacher.daily=null;state.strategy??={};state.strategy.manualTopicDate='';state.strategy.manualTopic='';
     state.teacher.selectedTopic=goalReached?'':(next?.topic||'');save();render();
   }
+  function finishTeacherDay(){if(state.teacher.daily){state.teacher.daily.mode='complete';state.teacher.daily.sessionDone=true}save();go('home')}
   function exactReady(f,limit=5){try{return C()?.findNextBatch?.({exam:f.exam,subject:f.subject,topic:f.topic,visualPreferred:true},Math.max(5,limit))||[]}catch{return[]}}
   function usableCount(f,d){const n=exactReady(f,d.desiredCount).length;if(d.desiredCount>=5)return n>=5?5:n>=3?3:0;return n>=3?3:0}
   function recent(f){return D()?.recentForTopic?.(f.topic,5)||[]}
@@ -116,7 +128,7 @@
     const guidanceText=root.querySelector('.pt2-hero h2 + p');
     if(guidanceText){const guidance=document.createElement('div');guidance.className='pt2-guidance';guidance.innerHTML='<span class="pt2-guidance-label">Öğretmeninden bugünkü not</span>';guidance.appendChild(guidanceText);root.querySelector('.pt2-hero h2')?.insertAdjacentElement('afterend',guidance)}
     if(d.sessionDone&&d.mode!=='complete'){
-      const next=nextTopicAfter(f),goalReached=todayQ>=goal,box=document.createElement('div');box.className='pt2-next';box.innerHTML=`<div class="pt2-next-copy"><span class="pt2-next-icon">✓</span><div><h3>${goalReached?'Bugünkü hedefini tamamladın!':'Harika, bu görevi tamamladın!'}</h3><p>${goalReached?'Öğretmenin bugün yeni soru yükü vermeyecek. Çalışmanı başarıyla sonlandırabilirsin.':next?`Sıradaki çalışma: <b>${esc(`${next.exam} ${next.subject} • ${next.topic}`)}</b>. Öğretmenin yeni planı hazır.`:'Bugünkü öğretmen çalışmasını başarıyla tamamladın.'}</p></div></div><button id="pt2Continue">${goalReached?'Bugünkü Çalışmayı Tamamla →':next?'Sıradaki Göreve Geç →':'Çalışmayı Tamamla →'}</button>`;root.querySelector('.pt2-main')?.insertAdjacentElement('afterend',box);box.querySelector('#pt2Continue').onclick=()=>continueTeacherDay(f,next,goalReached)
+      const goalReached=todayQ>=goal,{route,evidence,next}=topicRoute(f,goalReached),opensNext=route.action==='open-next-topic',box=document.createElement('div');box.className='pt2-next';box.innerHTML=`<div class="pt2-next-copy"><span class="pt2-next-icon">✓</span><div><h3>${goalReached?'Bugünkü hedefini tamamladın!':opensNext?'Harika, sıradaki konu açıldı!':'Bugünkü çalışmanı tamamladın!'}</h3><p>${goalReached?'Öğretmenin bugün yeni soru yükü vermeyecek. Çalışmanı başarıyla sonlandırabilirsin.':opensNext?`İki ayrı gündeki güçlü çalışman ve kapanmış yanlışlarınla bu konudaki ilerlemeni kanıtladın. Sıradaki çalışma: <b>${esc(`${next.exam} ${next.subject} • ${next.topic}`)}</b>.`:esc(progressionMessage(route,evidence))}</p></div></div><button id="pt2Continue">${opensNext?'Sıradaki Konuya Geç →':'Bugünkü Çalışmayı Tamamla →'}</button>`;root.querySelector('.pt2-main')?.insertAdjacentElement('afterend',box);box.querySelector('#pt2Continue').onclick=()=>opensNext?continueTeacherDay(f,next,false):finishTeacherDay()
     }
     root.querySelector('[data-go="home"]').onclick=()=>go('home');
     if(d.mode==='complete'){const wrong=root.querySelector('#pt2Wrong');if(wrong)wrong.onclick=()=>go('wrong')}

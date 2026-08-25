@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r64-teacher-growth-route';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r65-teacher-growth-evidence';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -18,7 +18,7 @@ const SHELL = [
   '/app-topic-ui.js?v=4',
   '/app-topic-test-entry.js?v=1',
   '/app-ui-cleanup-v1.js?v=2',
-  '/app-home-links.js?v=37',
+  '/app-home-links.js?v=38',
   '/app-startup-polish.js?v=2',
   '/app-personal-teacher-source-launch-v3.js?v=13'
 ];

@@ -76,13 +76,18 @@ test('completed teacher session presents a strong next-task action',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   const ui=read('app-personal-teacher-v2.js');
   assert.match(policy,/d\.sessionDone&&d\.mode!=='complete'/);
-  assert.match(policy,/Sıradaki Göreve Geç →/);
+  assert.match(policy,/Sıradaki Konuya Geç →/);
+  assert.match(policy,/Bugünkü Çalışmayı Tamamla →/);
   assert.match(policy,/completedTeacherTopics/);
   assert.match(policy,/state\.teacher\.daily=null/);
   assert.match(policy,/todayQ>=goal/);
   assert.match(ui,/\.pt2-next\{/);
   assert.match(ui,/min-height:54px/);
   assert.match(policy,/id&&!done\?`<button/,'completed task rows must not render action buttons');
+  assert.match(policy,/buildTopicProgressEvidence/);
+  assert.match(policy,/decideTopicRoute/);
+  assert.match(policy,/route\.action==='open-next-topic'/);
+  assert.match(policy,/İki ayrı gündeki güçlü çalışman/);
 });
 
 test('home has one clear teacher entry and no duplicated teacher plan',()=>{

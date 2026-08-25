@@ -25,6 +25,7 @@ test('daily completion never interrupts an active teacher session',()=>{
 test('review memory expands, shortens and reopens deterministically',()=>{
   const P=engine();
   assert.deepEqual({...P.nextReview({dateKey:'2026-08-25',answered:3,correct:3,staleCheck:true,previousIntervalDays:14})},{days:30,reason:'retention-passed',dateKey:'2026-09-24'});
+  assert.deepEqual({...P.nextReview({dateKey:'2026-08-25',answered:3,correct:3,staleCheck:true})},{days:14,reason:'retention-building',dateKey:'2026-09-08'});
   assert.equal(P.nextReview({dateKey:'2026-08-25',answered:3,correct:2}).days,4);
   assert.equal(P.nextReview({dateKey:'2026-08-25',answered:3,correct:1}).days,1);
   assert.equal(P.nextReview({dateKey:'2026-08-25',answered:1,correct:1,wrongRecovered:true}).days,2);

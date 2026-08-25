@@ -59,7 +59,7 @@
   }
   function nextReview(raw={}){
     const correct=Math.max(0,Number(raw.correct||0)),answered=Math.max(0,Number(raw.answered||0)),ratio=answered?correct/answered:0;let days,reason;
-    if(raw.wrongRecovered){days=2;reason='wrong-recovered'}else if(raw.staleCheck&&answered===3&&correct===3){days=Number(raw.previousIntervalDays||14)>=14?30:14;reason='retention-passed'}else if(answered===3&&correct<=1){days=1;reason='review-failed'}else if(answered===3&&correct===2){days=4;reason='partial-retention'}else if(ratio>=.9){days=14;reason='strong-learning'}else if(ratio>=.6){days=7;reason='developing-learning'}else{days=3;reason='new-or-fragile-learning'}
+    if(raw.wrongRecovered){days=2;reason='wrong-recovered'}else if(raw.staleCheck&&answered===3&&correct===3){days=Number(raw.previousIntervalDays||0)>=14?30:14;reason=days===30?'retention-passed':'retention-building'}else if(answered===3&&correct<=1){days=1;reason='review-failed'}else if(answered===3&&correct===2){days=4;reason='partial-retention'}else if(ratio>=.9){days=14;reason='strong-learning'}else if(ratio>=.6){days=7;reason='developing-learning'}else{days=3;reason='new-or-fragile-learning'}
     const from=String(raw.dateKey||new Date(Number(raw.now||Date.now())).toLocaleDateString('sv-SE')),date=new Date(`${from}T12:00:00`);date.setDate(date.getDate()+days);return{days,reason,dateKey:date.toLocaleDateString('sv-SE')};
   }
   const REWARD_POINTS={attempt:2,correct:3,mediumCorrect:1,hardCorrect:2,unableHonest:1,wrongReviewed:2,errorReason:1,similarCorrect:3,wrongRecovered:5,teacherTaskCompleted:10,dailyGoalCompleted:15,threeDayStreak:20,topicImproved:25,retention30Passed:10};

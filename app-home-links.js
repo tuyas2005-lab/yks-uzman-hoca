@@ -113,7 +113,7 @@
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
     ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
-    ()=>loadScript('/app-mini-tests-source.js?v=11'),
+    ()=>loadScript('/app-mini-tests-source.js?v=12'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=4'),
@@ -169,7 +169,7 @@
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=4'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=11'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=12'),
     ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=8'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=2')
   ],()=>{

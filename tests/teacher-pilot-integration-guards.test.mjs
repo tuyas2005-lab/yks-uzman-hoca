@@ -65,6 +65,9 @@ test('teacher wrong task completes only after real four-evidence closure',()=>{
 test('teacher persists session memory and observes student initiated mini tests',()=>{
   assert.match(mini,/state\.teacher\.topicMemory\[task\.topicId\]/);
   assert.match(mini,/studentInitiated:!teacherSet/);
+  assert.match(mini,/previousIntervalDays/);
+  assert.match(mini,/retention30Passed/);
+  assert.match(mini,/state\.teacher\.lastPraise=\{\.\.\.completionReward\.meta/);
   assert.match(policy,/resumeMode/);
   assert.match(policy,/Öğrencinin kendi çözdüğü Mini Test/);
   assert.match(policy,/Oturum hafızası/);
@@ -72,6 +75,8 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(policy,/derivedFromOutcome:true/);
   assert.match(policy,/selfAt>Number\(memory\?\.studentEvidenceAt\|\|memory\?\.lastCompletedAt\|\|0\)/);
   assert.match(policy,/studentInitiated:true/);
+  assert.match(policy,/newerOpenWrong/);
+  assert.match(policy,/reopenedByWrongId/);
   assert.match(policy,/transitionMode\?\.\(previous,raw\?\.mode/);
   assert.match(policy,/uygulanacak sıradaki mod/);
   assert.match(policy,/modeInfo\[nextMemoryMode\]/);

@@ -49,3 +49,15 @@ test('settings persistence owner loads directly on profile and saves goal withou
   assert.match(settings,/btn\.onclick=null/);
   assert.doesNotMatch(settings,/YKS alanını seçmeden ayarlar kaydedilemez/);
 });
+
+test('completed teacher session presents a strong next-task action',()=>{
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const ui=read('app-personal-teacher-v2.js');
+  assert.match(policy,/d\.sessionDone&&d\.mode!=='complete'/);
+  assert.match(policy,/Sıradaki Göreve Geç →/);
+  assert.match(policy,/completedTeacherTopics/);
+  assert.match(policy,/state\.teacher\.daily=null/);
+  assert.match(policy,/todayQ>=goal/);
+  assert.match(ui,/\.pt2-next\{/);
+  assert.match(ui,/min-height:54px/);
+});

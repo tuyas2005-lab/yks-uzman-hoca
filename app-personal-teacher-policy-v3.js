@@ -68,6 +68,14 @@
     if(d.mode==='complete')return true;
     return !!(d.testDone&&d.wrongDone);
   }
+  const topicKey=x=>`${norm(x?.exam)}|${norm(x?.subject)}|${norm(x?.topic)}`;
+  function completedTopicKeys(){const x=state.teacher?.completedTeacherTopics;return new Set(x?.date===today()?(x.keys||[]):[])}
+  function nextTopicAfter(f){const completed=completedTopicKeys();completed.add(topicKey(f));return candidates().find(x=>topicKey(x)!==topicKey(f)&&!completed.has(topicKey(x)))||candidates().find(x=>topicKey(x)!==topicKey(f))||null}
+  function continueTeacherDay(f,next,goalReached){
+    const completed=completedTopicKeys();completed.add(topicKey(f));state.teacher.completedTeacherTopics={date:today(),keys:[...completed]};
+    state.teacher.daily=null;state.strategy??={};state.strategy.manualTopicDate='';state.strategy.manualTopic='';
+    state.teacher.selectedTopic=goalReached?'':(next?.topic||'');save();render();
+  }
   function exactReady(f,limit=5){try{return C()?.findNextBatch?.({exam:f.exam,subject:f.subject,topic:f.topic,visualPreferred:true},Math.max(5,limit))||[]}catch{return[]}}
   function usableCount(f,d){const n=exactReady(f,d.desiredCount).length;if(d.desiredCount>=5)return n>=5?5:n>=3?3:0;return n>=3?3:0}
   function recent(f){return D()?.recentForTopic?.(f.topic,5)||[]}
@@ -100,6 +108,9 @@
     const guidanceText=root.querySelector('.pt2-hero h2 + p');
     if(guidanceText){const guidance=document.createElement('div');guidance.className='pt2-guidance';guidance.innerHTML='<span class="pt2-guidance-label">Öğretmeninin bugünkü talimatı</span>';guidance.appendChild(guidanceText);root.querySelector('.pt2-hero h2')?.insertAdjacentElement('afterend',guidance)}
     const reward=rewardSummary(),praise=state.teacher?.lastPraise,card=document.createElement('div');card.className='pt2-note';card.innerHTML=`<b>⭐ ${reward.points} Emek Puanı • ${esc(reward.title)}</b><br>${praise?esc(praiseText(praise.praiseId)):'İlk gerçek çalışma davranışından sonra öğretmenin takdiri burada görünecek.'}`;root.querySelector('.pt2-hero')?.insertAdjacentElement('afterend',card);
+    if(d.sessionDone&&d.mode!=='complete'){
+      const next=nextTopicAfter(f),goalReached=todayQ>=goal,box=document.createElement('div');box.className='pt2-next';box.innerHTML=`<div class="pt2-next-copy"><span class="pt2-next-icon">✓</span><div><h3>${goalReached?'Bugünkü hedefini tamamladın!':'Harika, bu görevi tamamladın!'}</h3><p>${goalReached?'Öğretmenin bugün yeni soru yükü vermeyecek. Çalışmanı başarıyla sonlandırabilirsin.':next?`Sıradaki çalışma: <b>${esc(`${next.exam} ${next.subject} • ${next.topic}`)}</b>. Öğretmenin yeni planı hazır.`:'Bugünkü öğretmen çalışmasını başarıyla tamamladın.'}</p></div></div><button id="pt2Continue">${goalReached?'Bugünkü Çalışmayı Tamamla →':next?'Sıradaki Göreve Geç →':'Çalışmayı Tamamla →'}</button>`;root.querySelector('.pt2-main')?.insertAdjacentElement('afterend',box);box.querySelector('#pt2Continue').onclick=()=>continueTeacherDay(f,next,goalReached)
+    }
     root.querySelector('[data-go="home"]').onclick=()=>go('home');
     root.querySelectorAll('[data-pt3-topic]').forEach(b=>b.onclick=()=>{state.teacher.selectedTopic=b.dataset.pt3Topic;state.strategy??={};state.strategy.manualTopicDate=today();state.strategy.manualTopic=b.dataset.pt3Topic;state.teacher.daily=null;save();render()});
     if(d.mode==='complete'){const wrong=root.querySelector('#pt2Wrong');if(wrong)wrong.onclick=()=>go('wrong')}

@@ -102,7 +102,7 @@
     }
     if(meta.teacherTask&&window.YKSTeacherPilotV1){
       const P=window.YKSTeacherPilotV1,difficulty=String(item.difficulty||'').toLocaleUpperCase('tr-TR'),behaviors={attempt:true,correct:kind==='correct',mediumCorrect:kind==='correct'&&difficulty==='ORTA',hardCorrect:kind==='correct'&&difficulty==='ZOR',unableHonest:kind==='unable',wrongRecovered:kind==='correct'&&!!canonical};
-      try{const reward=P.buildRewardEvent({rewardId:`${meta.teacherSessionId}:${event.id}`,sessionId:meta.teacherSessionId,dateKey:D()?.todayKey?.(),topicId:meta.topicId,behaviors});const saved=P.recordOnce(reward),teacherReward={...reward.meta,duplicate:saved.duplicate};patchMeta(event,{teacherReward});state.teacher??={};state.teacher.lastPraise={...teacherReward,at:Date.now()}}catch(e){console.warn('Öğretmen ödülü kaydedilemedi',e)}
+      try{const reward=P.buildRewardEvent({rewardId:`${meta.teacherSessionId}:${event.id}`,sessionId:meta.teacherSessionId,dateKey:D()?.todayKey?.(),topicId:meta.topicId,behaviors});const saved=P.recordOnce(reward),teacherReward={...reward.meta,duplicate:saved.duplicate};event.meta={...(event.meta||{}),teacherReward};patchMeta(event,{teacherReward});state.teacher??={};state.teacher.lastPraise={...teacherReward,at:Date.now()}}catch(e){console.warn('Öğretmen ödülü kaydedilemedi',e)}
     }
     try{window.refreshSourceSetTracking?.();window.renderWrongV2?.();window.renderStats?.();window.renderHome?.()}catch{}
     return event;

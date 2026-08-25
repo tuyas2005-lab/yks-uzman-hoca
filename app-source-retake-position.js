@@ -70,9 +70,9 @@
 
   function buildMeta(item,kind,studentAnswer,{isRetry,retryOf,ownsWrong,at}){
     const wrong=kind!=='correct',answer=item.answerKey||item.answer||'';
-    const pilot=window.YKSTeacherPilotV1?.resolveItem?.(item),task=state.miniTests?.teacherTask,itemIds=task?.itemIds||[],teacherTask=!!(task?.sessionId&&itemIds.includes(item.id));
+    const pilot=window.YKSTeacherPilotV1?.resolveItem?.(item),adaptive=state.teacher?.adaptiveSession,adaptiveTask=!!(adaptive?.status==='active'&&adaptive?.sessionId&&adaptive?.currentQuestionId===item.id),task=state.miniTests?.teacherTask,itemIds=task?.itemIds||[],teacherTask=adaptiveTask||!!(task?.sessionId&&itemIds.includes(item.id));
     const meta={catalogId:item.id,provider:item.provider,providerLabel:item.providerLabel,collection:item.collection,questionNo:item.questionNo,url:item.access?.url,visual:item.visual,sourceYear:item.year||null,topicId:pilot?.id||item.topicKey||'',wrongRecord:ownsWrong,wrongKind:wrong?kind:'',externalQuestion:true,studentAnswer:studentAnswer||'',correctAnswer:answer,asset:item.asset,question:{text:`${item.providerLabel||item.provider||''} ${item.year||''} ${item.exam||''} • ${item.topic||''} • Soru ${item.questionNo||''}`.trim(),image:''},solution:{answer,shortSolution:'Çözümü uygulamadaki Kaynak Soru ekranından tekrar incele.',curriculumOutcome:(item.subtopics||[]).join(' • ')}};
-    if(teacherTask){meta.teacherTask=true;meta.teacherSessionId=task.sessionId;meta.teacherDecisionId=task.decisionId||''}
+    if(teacherTask){const owner=adaptiveTask?adaptive:task;meta.teacherTask=true;meta.adaptiveTeacher=adaptiveTask;meta.teacherSessionId=owner.sessionId;meta.teacherDecisionId=owner.decisionId||''}
     if(ownsWrong)meta.wrongClosed=false;
     if(isRetry){meta.retake=true;meta.retakeAt=at;if(retryOf)meta.retryOf=retryOf}
     return meta;

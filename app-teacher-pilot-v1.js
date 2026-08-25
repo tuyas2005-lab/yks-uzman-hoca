@@ -62,6 +62,22 @@
     if(raw.wrongRecovered){days=2;reason='wrong-recovered'}else if(raw.staleCheck&&answered===3&&correct===3){days=Number(raw.previousIntervalDays||0)>=14?30:14;reason=days===30?'retention-passed':'retention-building'}else if(answered===3&&correct<=1){days=1;reason='review-failed'}else if(answered===3&&correct===2){days=4;reason='partial-retention'}else if(ratio>=.9){days=14;reason='strong-learning'}else if(ratio>=.6){days=7;reason='developing-learning'}else{days=3;reason='new-or-fragile-learning'}
     const from=String(raw.dateKey||new Date(Number(raw.now||Date.now())).toLocaleDateString('sv-SE')),date=new Date(`${from}T12:00:00`);date.setDate(date.getDate()+days);return{days,reason,dateKey:date.toLocaleDateString('sv-SE')};
   }
+  const DIFFICULTY_ORDER=['KOLAY','ORTA','ZOR'];
+  const modeStartDifficulty=mode=>({diagnostic:'KOLAY',foundation:'KOLAY',repair:'KOLAY',reinforce:'ORTA',challenge:'ORTA',spaced:'ORTA',maintain:'ORTA'}[mode]||'KOLAY');
+  function decideAdaptiveStep(raw={}){
+    const mode=MODE_CONFIG[raw.mode]?String(raw.mode):'diagnostic',attempts=Array.isArray(raw.attempts)?raw.attempts:[],answered=attempts.length,dailyRemaining=Math.max(0,Number(raw.dailyRemaining??999)),studentStopped=raw.studentStopped===true,available=raw.available&&typeof raw.available==='object'?raw.available:{};
+    const correct=attempts.filter(x=>x?.result==='correct').length,wrong=attempts.filter(x=>x?.result==='wrong').length,unable=attempts.filter(x=>x?.result==='unable'||x?.interaction==='unable').length,last=attempts.at(-1)||null,lastTwo=attempts.slice(-2),twoCorrect=lastTwo.length===2&&lastTwo.every(x=>x?.result==='correct');
+    const enoughByMode=mode==='spaced'||mode==='maintain'?answered>=3:answered>=5,accuracy=answered?correct/answered:0,teacherEnough=enoughByMode&&(mode!=='diagnostic'||wrong+unable>0||accuracy>=.6);
+    if(studentStopped)return{action:'student-stop',reasonCodes:['student-ended-session'],answered,correct,wrong,unable};
+    if(dailyRemaining<=0)return{action:'daily-goal-complete',reasonCodes:['daily-goal-complete'],answered,correct,wrong,unable};
+    let target=answered?String(last?.difficulty||modeStartDifficulty(mode)).toLocaleUpperCase('tr-TR').replace('İ','I'):modeStartDifficulty(mode);
+    let reasonCodes=answered?['answer-reviewed']:['session-start'];
+    if(last&&(last.result==='wrong'||last.result==='unable'||last.interaction==='unable')){target=target==='ZOR'?'ORTA':'KOLAY';reasonCodes=['support-after-mistake']}
+    else if(twoCorrect){target=DIFFICULTY_ORDER[Math.min(2,Math.max(0,DIFFICULTY_ORDER.indexOf(target))+1)];reasonCodes=['gradual-difficulty-increase']}
+    const selectedDifficulty=Number(available[target]||0)>0?target:'';
+    if(!selectedDifficulty)return{action:'source-exhausted',reasonCodes:['no-ready-source'],answered,correct,wrong,unable,recommendedStop:true};
+    return{action:'continue',reasonCodes,answered,correct,wrong,unable,targetDifficulty:target,selectedDifficulty,recommendedStop:teacherEnough,stopReason:teacherEnough?'enough-evidence':'',accuracy:answered?Math.round(accuracy*100):null};
+  }
   const REWARD_POINTS={attempt:2,correct:3,mediumCorrect:1,hardCorrect:2,unableHonest:1,wrongReviewed:2,errorReason:1,similarCorrect:3,wrongRecovered:5,teacherTaskCompleted:10,dailyGoalCompleted:15,threeDayStreak:20,topicImproved:25,retention30Passed:10};
   function rewardFor(raw={}){const awards=[];let points=0;for(const key of Object.keys(REWARD_POINTS))if(raw[key]){const value=REWARD_POINTS[key];awards.push({key,points:value});points+=value}let praiseId='effort-noticed';if(raw.wrongRecovered)praiseId='mistake-recovered';else if(raw.retention30Passed)praiseId='retention-proven';else if(raw.topicImproved)praiseId='measurable-growth';else if(raw.hardCorrect)praiseId='challenge-solved';else if(raw.unableHonest)praiseId='honest-feedback';return{points,awards,praiseId}}
   function difficultySelection(items=[],config={}){const wanted=config.difficultyCounts||{},limit=Math.max(0,Number(config.count||0)),selected=[],used=new Set(),actual={KOLAY:0,ORTA:0,ZOR:0},shortages={},level=x=>String(x?.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');for(const key of ['KOLAY','ORTA','ZOR']){const need=Math.max(0,Number(wanted[key]||0)),rows=items.filter(x=>level(x)===key).slice(0,need);rows.forEach(x=>{if(!used.has(x.id)){used.add(x.id);selected.push(x);actual[key]++}});if(rows.length<need)shortages[key]=need-rows.length}return{items:selected.slice(0,limit),actualDifficultyCounts:actual,shortages,distributionExact:Object.keys(shortages).length===0&&selected.length===limit,fallbackUsed:false}}
@@ -122,5 +138,5 @@
     return{event:dataApi.record(event,{persistNow:true}),duplicate:false};
   }
 
-  window.YKSTeacherPilotV1={version:1,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),resolveTopic,resolveItem,decideTeacherSession,transitionMode,resumeMode,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
+  window.YKSTeacherPilotV1={version:1,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
 })();

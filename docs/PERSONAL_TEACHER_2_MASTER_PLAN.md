@@ -540,3 +540,35 @@ sağlığı arka planda çalışmaya devam eder; sağlıklı kaynak ve teknik au
 öğrenci ekranını işgal etmez. Kaynak kutusu yalnız eşik altına düşüldüğünde uyarı
 olarak görünür. Boş performans kutusu gösterilmez; gerçek performans oluştuğunda
 isteğe bağlı açılır.
+
+---
+
+## 18. Faz 10 — Sürekli adaptif özel ders
+
+Faz 9'daki sabit 3/5 soruluk kontrollü setler pilot doğrulama aracıydı. Ürün
+davranışı artık tek soru üzerinden ilerleyen sürekli adaptif oturuma taşınır:
+
+1. Öğretmen aynı konudan yalnız bir doğrulanmış kaynak sorusu seçer.
+2. Öğrenci cevap verdikten sonra sonuç, yanlış hafızası, Emek Puanı ve takdir
+   kaydı tamamlanır.
+3. Karar motoru her cevaptan sonra zorluk, hata ve günlük yük kanıtlarını yeniden
+   değerlendirir.
+4. Öğrenciye `Sonraki Soruyu Getir` ve `Bugünlük Bu Kadar` seçenekleri sunulur.
+5. Yeterli kanıt oluştuğunda öğretmen oturumu bitirmeyi samimi bir dille önerir;
+   öğrenci isterse devam edebilir.
+6. Bitişte tek bir `teacher-session-outcome`, konu hafızası ve sonraki kontrol
+   tarihi yazılır.
+
+### 18.1 İlk uygulama paketi — 25 Ağustos 2026
+
+| Uygulama adımı | Durum | Kanıt |
+| --- | --- | --- |
+| Cevap başına yeniden karar sözleşmesi | Tamamlandı | `decideAdaptiveStep` deterministik testleri |
+| Kademeli zorluk geçişi | Tamamlandı | İki tutarlı doğru olmadan artış yok; seviye atlama yok |
+| Kaynak sınırı | Tamamlandı | İstenen zorluk yoksa sessiz kolay soru doldurma yok |
+| Tek-soru öğretmen oturumu | Tamamlandı | `state.teacher.adaptiveSession` |
+| Öğrenci devam / bitir kontrolleri | Tamamlandı | Soru sonuç ekranı eylemleri |
+| Oturum sonucu ve konu hafızası | Tamamlandı | Outcome, ödül, tekrar tarihi ve `topicMemory` |
+| Otomatik regresyon | Tamamlandı | 67/67 test |
+| Preview gerçek kullanıcı kabulü | Bekliyor | Telefon/tablet göz kontrolü |
+| Merge / production | Bekliyor | Kullanıcı onayı sonrası |

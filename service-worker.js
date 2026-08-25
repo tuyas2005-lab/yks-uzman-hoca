@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r57-human-teacher-voice';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r63-teacher-reward-card';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -13,14 +13,14 @@ const SHELL = [
   '/data/yks-topic-taxonomy-v1.js',
   '/app-analysis-flow.js?v=2',
   '/app-data-v5.js?v=2',
-  '/app-teacher-pilot-v1.js?v=9',
+  '/app-teacher-pilot-v1.js?v=10',
   '/app-home-data.js?v=4',
   '/app-topic-ui.js?v=4',
   '/app-topic-test-entry.js?v=1',
   '/app-ui-cleanup-v1.js?v=2',
-  '/app-home-links.js?v=31',
+  '/app-home-links.js?v=37',
   '/app-startup-polish.js?v=2',
-  '/app-personal-teacher-source-launch-v3.js?v=11'
+  '/app-personal-teacher-source-launch-v3.js?v=13'
 ];
 
 async function cacheOptionalExternal(cache) {

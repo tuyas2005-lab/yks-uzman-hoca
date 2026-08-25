@@ -39,9 +39,22 @@ test('mini test consumes exact teacher item ids instead of repicking',()=>{
   assert.match(mini,/startSet\(\{exam:selection\.exam,subject:selection\.subject,year:'latest',topic:selection\.topic\},selection\.count\)/);
 });
 
-test('same daily plan uses a deterministic launch revision',()=>{
+test('adaptive teacher opens one question and re-decides after every answer',()=>{
   assert.match(launch,/revision=hash\(`/);
-  assert.doesNotMatch(launch,/sessionId=.*Date\.now/);
+  assert.match(launch,/state\.teacher\.adaptiveSession=/);
+  assert.match(launch,/function afterAnswer\(event,item,kind\)/);
+  assert.match(launch,/decideAdaptiveStep/);
+  assert.match(launch,/adaptive-next-question/);
+  assert.match(sourceViewer,/Sonraki Soruyu Getir/);
+  assert.match(sourceViewer,/Bugünlük Bu Kadar/);
+  assert.match(sourceRetake,/meta\.adaptiveTeacher=adaptiveTask/);
+});
+
+test('teacher note prioritizes the just-completed adaptive session result',()=>{
+  assert.match(policy,/if\(d\.testDone&&d\.testSummary\)/);
+  assert.match(policy,/solved\} soruda \$\{correct\} doğru yaptın/);
+  assert.match(policy,/Çalışmanı değerlendirdim/);
+  assert.match(launch,/testSummary=\{count:a\.length,correct,wrong,unable,mistakes:wrong\+unable,percent:accuracy/);
 });
 
 test('source health warning stays hidden while healthy and preserves open state when shown',()=>{
@@ -55,7 +68,7 @@ test('student teacher page contains only real-question and real-wrong actions',(
   assert.match(policy,/Gerçek sorular ve gerçek yanlışlar/);
   assert.match(policy,/return !!\(d\.testDone&&d\.wrongDone\)/);
   assert.doesNotMatch(policy,/Koç payı|Karar Kanıtları|ürün sahibi|auditHtml/);
-  assert.match(policy,/performanceHtml\?`<details/);
+  assert.match(policy,/performanceHtml\?`<div class="pt2-details"><details/);
   assert.match(teacherUi,/window\.__teacherPolicyPending=true/);
   assert.match(teacherUi,/Kişisel Öğretmen hazırlanıyor/);
   assert.match(policy,/window\.__teacherPolicyPending=false/);
@@ -82,6 +95,9 @@ test('every teacher question result renders points and praise immediately',()=>{
 });
 
 test('teacher wrong task completes only after real four-evidence closure',()=>{
+  assert.match(teacherWrongScope,/#wrong\.teacher-wrong-active #wrong2Host\{display:none!important\}/);
+  assert.match(teacherWrongScope,/classList\.add\('teacher-wrong-active'\)/);
+  assert.match(teacherWrongScope,/classList\.remove\('teacher-wrong-active'\)/);
   assert.match(teacherWrongScope,/rows\.every\(x=>x\.meta\?\.wrongClosed===true\)/);
   assert.match(teacherWrongScope,/getWrongLearningEvidence/);
   assert.match(teacherWrongScope,/data-tws-reason/);
@@ -98,6 +114,8 @@ test('teacher-directed retry closes the original wrong and refreshes its task st
 });
 
 test('teacher persists session memory and observes student initiated mini tests',()=>{
+  assert.match(launch,/state\.teacher\.topicMemory\[s\.topicId\]/);
+  assert.match(launch,/buildOutcomeEvent/);
   assert.match(mini,/state\.teacher\.topicMemory\[task\.topicId\]/);
   assert.match(mini,/studentInitiated:!teacherSet/);
   assert.match(mini,/previousIntervalDays/);

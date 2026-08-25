@@ -105,7 +105,7 @@
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
-    ()=>loadScript('/app-source-question-viewer.js?v=9'),
+    ()=>loadScript('/app-source-question-viewer.js?v=10'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
@@ -118,7 +118,7 @@
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=5'),
-    ()=>loadScript('/app-source-retake-position.js?v=8')
+    ()=>loadScript('/app-source-retake-position.js?v=9')
   ],()=>{
     const C=window.YKSQuestionCatalogV1,all=C?.all?.()||[],manual=all.filter(x=>x?.sourceKind==='manual-crop').length,visible=all.filter(x=>x?.sourceKind==='manual-crop'&&x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.status==='ready').length,unresolved=manual-visible;
     if(!C||manual!==1523||manual!==visible+unresolved||unresolved!==2){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
@@ -162,16 +162,15 @@
     ()=>loadScript('/app-low-cost.js?v=2'),
     ()=>loadScript('/app-low-cost-fix.js?v=2'),
     ()=>loadScript('/app-teacher-performance.js?v=2'),
-    ()=>loadScript('/app-personal-teacher-v2.js?v=8'),
+    ()=>loadScript('/app-personal-teacher-v2.js?v=9'),
     // Teacher policy v3 requires getStudentStrategy. Load the shared strategy
     // engine in the teacher path too, so opening Teacher before Coach cannot
     // leave the legacy v2 renderer active after the policy install timeout.
     ()=>loadScript('/app-strategy-engine.js?v=3'),
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
-    ()=>loadScript('/app-teacher-wrong-scope.js?v=6'),
-    ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=16'),
-    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=11'),
+    ()=>loadScript('/app-teacher-wrong-scope.js?v=7'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=20'),
+    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=13'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=3')
   ],()=>{
     if(typeof window.renderTeacher==='function'){

@@ -13,6 +13,18 @@ test('teacher guidance is visually separated as a teacher instruction',()=>{
   assert.match(ui,/font-size:15px/);
 });
 
+test('effort points are promoted beside the daily plan without a duplicate note',()=>{
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const ui=read('app-personal-teacher-v2.js');
+  assert.match(policy,/class="pt2-hero-side"/);
+  assert.match(policy,/class="pt2-reward"/);
+  assert.match(policy,/Emek Puanı/);
+  assert.doesNotMatch(policy,/insertAdjacentElement\('afterend',card\)/);
+  assert.match(ui,/\.pt2-reward\{/);
+  assert.match(ui,/linear-gradient\(145deg,#fff9cf/);
+  assert.match(ui,/@media\(max-width:600px\).*\.pt2-hero-side\{display:grid/);
+});
+
 test('teacher-facing copy sounds human while raw statistics stay in evaluation',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   assert.match(policy,/bazı sorularda takıldığını görüyorum; bu çok normal/);
@@ -70,4 +82,16 @@ test('completed teacher session presents a strong next-task action',()=>{
   assert.match(policy,/todayQ>=goal/);
   assert.match(ui,/\.pt2-next\{/);
   assert.match(ui,/min-height:54px/);
+  assert.match(policy,/id&&!done\?`<button/,'completed task rows must not render action buttons');
+});
+
+test('home has one clear teacher entry and no duplicated teacher plan',()=>{
+  const home=read('index.html');
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const loader=read('app-home-links.js');
+  assert.match(home,/Kişisel Öğretmenin/);
+  assert.match(home,/Öğretmenle Çalış →/);
+  assert.doesNotMatch(home,/Hocandan Bugünkü Öneri|Öneriyi Aç|id="teacherTip"|id="dailyPlan"/);
+  assert.doesNotMatch(loader,/app-home-teacher-flow\.js/);
+  assert.doesNotMatch(policy,/Başka bir konu seç|data-pt3-topic/);
 });

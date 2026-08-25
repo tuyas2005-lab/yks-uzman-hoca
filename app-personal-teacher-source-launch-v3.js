@@ -32,11 +32,11 @@
   }
 
   function plan(ctx){
-    const desired=Number(state.teacher?.daily?.desiredCount||5)>=5?5:3;
-    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx);if(!pilot)return{items:[],count:0,desired,mode:'blocked',shortages:{PILOT:desired},distributionExact:false};
+    const desired=1;
+    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx);if(!pilot)return{items:[],count:0,desired,mode:'blocked',shortages:{PILOT:1},distributionExact:false};
     const poolTopic=pilot.poolTopics?.[0]||pilot.displayTitle;let exact=[];try{exact=C()?.findNextBatch?.({...ctx,topic:poolTopic,visualPreferred:true},30)||[]}catch{}
-    const mode=state.teacher?.daily?.mode||'diagnostic',cfg=P?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selection=P?.difficultySelection?.(exact,{...cfg,count:desired})||{items:[],shortages:{UNKNOWN:desired},distributionExact:false},count=selection.distributionExact?desired:0;
-    return{...selection,items:count?selection.items:[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{},pilot,poolTopic,health:sourceHealth(ctx)}
+    const mode=state.teacher?.daily?.mode||'diagnostic',available=exact.reduce((a,x)=>{const k=String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),step=P?.decideAdaptiveStep?.({mode,attempts:[],available}),item=exact.find(x=>String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I')===step?.selectedDifficulty)||null;
+    return{items:item?[item]:[],pool:exact,count:item?1:0,desired,mode,difficultyCounts:item?{[step.selectedDifficulty]:1}:{},pilot,poolTopic,health:sourceHealth(ctx),step,distributionExact:!!item,shortages:item?{}:{[step?.targetDifficulty||'KAYNAK']:1}}
   }
 
   function adapt(){
@@ -55,10 +55,10 @@
       if(p.health?.alerts?.length){try{const P=window.YKSTeacherPilotV1,shortages=Object.fromEntries(p.health.alerts.map(x=>[x.difficulty,x.neededForGreen])),warningId=`${today()}-${p.pilot.id}-health-${hash(JSON.stringify(p.health.counts))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:{KOLAY:15,ORTA:15,ZOR:15},available:p.health.counts,shortages,severity:p.health.overall}))}catch(e){console.warn('Teacher Pool sağlık uyarısı kaydedilemedi',e)}}
       if(!p.distributionExact&&p.pilot&&Object.keys(p.shortages||{}).length){try{const P=window.YKSTeacherPilotV1,warningId=`${today()}-${p.pilot.id}-${p.mode}-${hash(JSON.stringify(p.shortages))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:p.difficultyCounts,available:p.actualDifficultyCounts,shortages:p.shortages,severity:'orange'}))}catch(e){console.warn('Teacher Pool uyarısı kaydedilemedi',e)}}
       if(btn&&!t?.classList.contains('done')){
-        btn.textContent=p.count?`${p.count} Soruluk Seti Başlat`:'Kaynak Yok';
+        btn.textContent=p.count?'Özel Derse Başla':'Kaynak Yok';
         btn.disabled=!p.count||t.classList.contains('locked');
         const desc=t?.querySelector('p');
-        if(desc)desc.textContent=p.count?`${p.count} çözülmemiş, indekslenmiş ve aynı konudan kaynak sorusuyla çalış.`:p.mode==='blocked'?'Bu konu Limited Pilot kapsamında değil; öğretmen görev açmayacak.':`İstenen zorluk dağılımında kaynak eksik (${Object.entries(p.shortages||{}).map(([k,v])=>`${k} ${v}`).join(', ')}). Daha kolay soruyla sessizce doldurulmayacak.`
+        if(desc)desc.textContent=p.count?'Öğretmenin her cevabından sonra ilerleyişini değerlendirip sıradaki soruyu seçecek.':p.mode==='blocked'?'Bu konu Limited Pilot kapsamında değil; öğretmen görev açmayacak.':'Bu konu için çözülmemiş ve doğrulanmış kaynak sorusu kalmadı.'
       }
       if(d.mode==='complete'){
         const w=root.querySelector('#pt2Wrong');
@@ -83,38 +83,29 @@
 
   function launch(ctx,p){
     if(!p.count||!p.distributionExact)return;
-    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),daily=state.teacher?.daily||{},revision=hash(`${daily.mode||'diagnostic'}|${p.items.map(x=>x.id).join('|')}`),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${revision}`,decisionId=`${sessionId}-decision`;
+    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),daily=state.teacher?.daily||{},revision=hash(`${Date.now()}|${p.items[0].id}`),sessionId=`pt3-${today()}-${topic?.id||norm(ctx.topic)}-${revision}`,decisionId=`${sessionId}-q1`;
     if(P&&topic){
-      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan',`mode-${daily.mode||'diagnostic'}`],reasonText:daily.reasonText||'',evidence:{...(daily.decisionEvidence||{}),dailyMode:daily.mode||'',expectedCount:p.count,sourceHealth:p.health?{total:p.health.total,counts:p.health.counts,overall:p.health.overall}:{}},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
+      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['adaptive-session-start',...(p.step?.reasonCodes||[])],reasonText:daily.reasonText||'',evidence:{...(daily.decisionEvidence||{}),adaptive:true,answerIndex:0,sourceHealth:p.health?{total:p.health.total,counts:p.health.counts,overall:p.health.overall}:{}},selection:{questionIds:[p.items[0].id],difficultyCounts:{KOLAY:p.step.selectedDifficulty==='KOLAY'?1:0,ORTA:p.step.selectedDifficulty==='ORTA'?1:0,ZOR:p.step.selectedDifficulty==='ZOR'?1:0},total:1}});
       P.recordOnce(event)
     }
-    state.miniTests??={history:[]};
-    state.miniTests.teacherTask={date:today(),topic:ctx.topic,topicId:topic?.id||'',exam:ctx.exam,subject:ctx.subject,sessionId,decisionId,mode:daily.mode||'diagnostic',expectedCount:p.count,fallback:false,strictTopic:true,itemIds:p.items.map(x=>x.id)};
-    state.miniTests.prefillSubject=`${ctx.exam} ${ctx.subject}`;
-    state.miniTests.prefillTopic=ctx.topic;
+    state.teacher??={};state.teacher.adaptiveSession={date:today(),topic:ctx.topic,topicId:topic?.id||'',exam:ctx.exam,subject:ctx.subject,sessionId,decisionId,mode:daily.mode||'diagnostic',startedAt:Date.now(),status:'active',currentQuestionId:p.items[0].id,seenQuestionIds:[p.items[0].id],attempts:[],sourceHealth:p.health||{}};
     if(state.teacher?.daily){
       state.teacher.daily.testLaunchedAt=Date.now();
       state.teacher.daily.teacherExam=ctx.exam;
       state.teacher.daily.teacherSubject=ctx.subject;
       state.teacher.daily.teacherTopic=ctx.topic;
-      state.teacher.daily.teacherSetItemIds=p.items.map(x=>x.id)
+      state.teacher.daily.teacherSetItemIds=[p.items[0].id]
     }
-    save();go('tests');window.renderMiniTestHome?.();
-    let tries=0;
-    const setup=()=>{
-      if(++tries>50)return;
-      const ex=document.getElementById('mtsExam');if(!ex){setTimeout(setup,60);return}
-      if(!choose(ex,ctx.exam)){setTimeout(setup,60);return}
-      const sub=document.getElementById('mtsSubject');if(!sub){setTimeout(setup,60);return}
-      if(!choose(sub,ctx.subject)){setTimeout(setup,60);return}
-      const top=document.getElementById('mtsTopic');if(!top){setTimeout(setup,60);return}
-      if(!choose(top,ctx.topic)){setTimeout(setup,60);return}
-      const count=document.getElementById('mtsCount');if(count)count.value=String(p.count);
-      const build=document.getElementById('mtsBuild');
-      if(build)setTimeout(()=>build.click(),30);else setTimeout(setup,60)
-    };
-    setTimeout(setup,80)
+    save();window.openSourceQuestion?.(p.items[0],{type:'teacher-adaptive',teacherDirected:true,teacherSessionId:sessionId,returnScreen:'teacher'})
   }
+
+  function activeSession(){const s=state.teacher?.adaptiveSession;return s?.status==='active'?s:null}
+  function availablePool(s){const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(s.topicId),seen=new Set(s.seenQuestionIds||[]),solved=C()?.getSolvedIds?.()||new Set(),visible=typeof window.isStudentVisibleQuestion==='function'?window.isStudentVisibleQuestion:()=>true;return(C()?.all?.()||[]).filter(visible).filter(x=>P.resolveItem?.(x)?.id===topic?.id&&!seen.has(x.id)&&!solved.has(x.id))}
+  function counts(rows){return rows.reduce((a,x)=>{const k=String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0})}
+  function afterAnswer(event,item,kind){const s=activeSession();if(!s||s.currentQuestionId!==item.id)return null;s.attempts.push({eventId:event.id,questionId:item.id,result:kind,interaction:kind==='unable'?'unable':'answered-source',difficulty:String(item.difficulty||'').toLocaleUpperCase('tr-TR'),at:Date.now()});const pool=availablePool(s),goal=Math.max(1,Number(state.profile?.goal||10)),todayCount=(state.studyEvents||[]).filter(x=>x?.dateKey===today()&&x?.source==='source-question-result').length,step=window.YKSTeacherPilotV1.decideAdaptiveStep({mode:s.mode,attempts:s.attempts,available:counts(pool),dailyRemaining:Math.max(0,goal-todayCount)});s.nextStep=step;save();return step}
+  function nextQuestion(){const s=activeSession();if(!s)return;const pool=availablePool(s),step=window.YKSTeacherPilotV1.decideAdaptiveStep({mode:s.mode,attempts:s.attempts,available:counts(pool),dailyRemaining:999});if(step.action!=='continue')return finishSession(step.action);const item=pool.find(x=>String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I')===step.selectedDifficulty);if(!item)return finishSession('source-exhausted');const index=s.attempts.length+1,decisionId=`${s.sessionId}-q${index+1}`,P=window.YKSTeacherPilotV1;P.recordOnce(P.buildDecisionEvent({decisionId,sessionId:s.sessionId,dateKey:s.date,topicId:s.topicId,mode:s.mode,reasonCodes:['adaptive-next-question',...step.reasonCodes],evidence:{adaptive:true,answerIndex:index,previousResult:s.attempts.at(-1)?.result||''},selection:{questionIds:[item.id],difficultyCounts:{KOLAY:step.selectedDifficulty==='KOLAY'?1:0,ORTA:step.selectedDifficulty==='ORTA'?1:0,ZOR:step.selectedDifficulty==='ZOR'?1:0},total:1}}));s.currentQuestionId=item.id;s.decisionId=decisionId;s.seenQuestionIds.push(item.id);save();window.openSourceQuestion?.(item,{type:'teacher-adaptive',teacherDirected:true,teacherSessionId:s.sessionId,returnScreen:'teacher'})}
+  function finishSession(reason='student-stop'){const s=activeSession();if(!s)return;const P=window.YKSTeacherPilotV1,a=s.attempts||[],correct=a.filter(x=>x.result==='correct').length,wrong=a.filter(x=>x.result==='wrong').length,unable=a.filter(x=>x.result==='unable').length,accuracy=a.length?Math.round(correct/a.length*100):0,raw=P.decideTeacherSession({total:a.length,score:accuracy,recentWrong:wrong,recentSignals:unable,staleDays:0}),nextMode=P.transitionMode(s.mode,raw.mode),review=P.nextReview({dateKey:s.date,answered:a.length,correct}),completedAt=Date.now(),completion=a.length?P.buildRewardEvent({rewardId:`${s.sessionId}:completed`,sessionId:s.sessionId,dateKey:s.date,topicId:s.topicId,behaviors:{teacherTaskCompleted:true}}):null;P.recordOnce(P.buildOutcomeEvent({sessionId:s.sessionId,decisionId:s.decisionId,dateKey:s.date,topicId:s.topicId,questionIds:a.map(x=>x.questionId),expectedCount:0,answeredCount:a.length,correctCount:correct,wrongCount:wrong,unableCount:unable,accuracy,adaptation:{changed:nextMode!==s.mode,previousMode:s.mode,nextMode,reason},reward:completion?{points:completion.meta.points,awardIds:[`${s.sessionId}:completed`],praiseId:completion.meta.praiseId}:{points:0,awardIds:[],praiseId:''},sourceHealth:{delivered:a.length},nextReview:review}));if(completion){P.recordOnce(completion);state.teacher.lastPraise={...completion.meta,at:completedAt}}state.teacher.topicMemory??={};state.teacher.topicMemory[s.topicId]={topicId:s.topicId,exam:s.exam,subject:s.subject,topic:s.topic,lastSessionDate:s.date,previousMode:s.mode,nextMode,nextReview:review,closureComplete:wrong+unable===0,lastAccuracy:accuracy,lastCompletedAt:completedAt};if(state.teacher.daily){state.teacher.daily.testDone=true;state.teacher.daily.testSummary={count:a.length,correct,wrong,unable,mistakes:wrong+unable,percent:accuracy,finishedAt:completedAt};state.teacher.daily.nextReview=review;state.teacher.daily.nextMode=nextMode}state.teacher.lastSessionSummary={topicId:s.topicId,topic:s.topic,answered:a.length,correct,wrong,unable,accuracy,reason,at:completedAt};s.status='completed';s.completedAt=completedAt;s.endReason=reason;save();go('teacher');setTimeout(()=>window.renderTeacher?.(),0)}
+  window.YKSAdaptiveTeacherSession={afterAnswer,nextQuestion,finishSession,activeSession};
 
   document.addEventListener('click',e=>{
     const b=e.target.closest('#teacher #pt3Test');if(!b||b.disabled)return;

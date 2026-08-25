@@ -22,6 +22,28 @@ test('daily completion never interrupts an active teacher session',()=>{
   assert.equal(d.mode,'reinforce');
 });
 
+test('adaptive lesson re-decides after every answer without difficulty jumps',()=>{
+  const P=engine(),available={KOLAY:10,ORTA:10,ZOR:10};
+  const first=P.decideAdaptiveStep({mode:'diagnostic',attempts:[],available});
+  assert.equal(first.action,'continue');assert.equal(first.selectedDifficulty,'KOLAY');
+  const afterOne=P.decideAdaptiveStep({mode:'diagnostic',attempts:[{result:'correct',difficulty:'KOLAY'}],available});
+  assert.equal(afterOne.selectedDifficulty,'KOLAY','one correct answer must not increase difficulty');
+  const afterTwo=P.decideAdaptiveStep({mode:'diagnostic',attempts:[{result:'correct',difficulty:'KOLAY'},{result:'correct',difficulty:'KOLAY'}],available});
+  assert.equal(afterTwo.selectedDifficulty,'ORTA','two consistent answers increase only one level');
+  const afterWrong=P.decideAdaptiveStep({mode:'challenge',attempts:[{result:'wrong',difficulty:'ZOR'}],available});
+  assert.equal(afterWrong.selectedDifficulty,'ORTA','a hard mistake must return to supported evidence, not easy-point farming');
+});
+
+test('adaptive lesson offers a humane stop and handles source/daily boundaries',()=>{
+  const P=engine(),five=[...Array(5)].map((_,i)=>({result:i<4?'correct':'wrong',difficulty:i<2?'KOLAY':'ORTA'}));
+  const enough=P.decideAdaptiveStep({mode:'diagnostic',attempts:five,available:{KOLAY:3,ORTA:3,ZOR:3}});
+  assert.equal(enough.action,'continue');assert.equal(enough.recommendedStop,true);assert.equal(enough.stopReason,'enough-evidence');
+  assert.equal(P.decideAdaptiveStep({mode:'repair',attempts:five,available:{KOLAY:3},studentStopped:true}).action,'student-stop');
+  assert.equal(P.decideAdaptiveStep({mode:'repair',attempts:five,available:{KOLAY:3},dailyRemaining:0}).action,'daily-goal-complete');
+  assert.equal(P.decideAdaptiveStep({mode:'challenge',attempts:[],available:{KOLAY:5,ORTA:0,ZOR:5}}).action,'source-exhausted','missing requested difficulty must not be silently filled with easier questions');
+  assert.equal(P.decideAdaptiveStep({mode:'repair',attempts:[],available:{}}).action,'source-exhausted');
+});
+
 test('review memory expands, shortens and reopens deterministically',()=>{
   const P=engine();
   assert.deepEqual({...P.nextReview({dateKey:'2026-08-25',answered:3,correct:3,staleCheck:true,previousIntervalDays:14})},{days:30,reason:'retention-passed',dateKey:'2026-09-24'});

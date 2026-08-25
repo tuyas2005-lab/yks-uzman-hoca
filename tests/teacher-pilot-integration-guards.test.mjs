@@ -44,8 +44,15 @@ test('same daily plan uses a deterministic launch revision',()=>{
 test('teacher and mini test preserve usable phone touch layout',()=>{
   assert.match(teacherUi,/\.pt2-task>div:last-child\{grid-column:1\/-1/);
   assert.match(teacherUi,/min-height:44px/);
+  assert.match(teacherUi,/#teacher \.back\{width:44px;height:44px/);
+  assert.match(teacherUi,/\.pt2-details>details>summary\{[^}]*min-height:44px/);
+  assert.match(teacherUi,/\.pt2-audit-grid,\.pt2-health-grid\{grid-template-columns:1fr\}/);
   assert.match(mini,/\.mts-progress\{align-items:flex-start;flex-direction:column\}/);
   assert.match(mini,/\.mts-open\{width:100%;min-height:44px\}/);
+  assert.match(mini,/#tests \.back\{width:44px;height:44px/);
+  assert.match(mini,/\.mts-form select\{height:44px/);
+  assert.match(teacherWrongScope,/\.tws-reason\{min-height:44px/);
+  assert.match(sourceViewer,/#sourceQuestion \.back\{width:44px;height:44px/);
 });
 
 test('every teacher question result renders points and praise immediately',()=>{

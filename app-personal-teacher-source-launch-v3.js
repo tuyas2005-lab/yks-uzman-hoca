@@ -3,6 +3,7 @@
   const norm=s=>D()?.norm?.(s)||String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const today=()=>D()?.todayKey?.()||new Date().toLocaleDateString('sv-SE');
+  const hash=s=>{let h=2166136261;for(const c of String(s||'')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};
   const topicTestInsight=ctx=>(D()?.getTopicTestInsights?.({days:60})||[]).find(x=>x.exam===ctx.exam&&norm(x.subject)===norm(ctx.subject)&&norm(x.topic)===norm(ctx.topic))||null;
   let timer=0,painting=false,recapBusy=false;
 
@@ -14,11 +15,27 @@
     return exam&&subject&&topic?{exam,subject,topic}:null
   }
 
+  function sourceHealth(ctx){
+    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx),catalog=C(),solved=catalog?.getSolvedIds?.()||new Set();
+    if(!pilot||!catalog?.all)return null;
+    const visible=typeof window.isStudentVisibleQuestion==='function'?window.isStudentVisibleQuestion:()=>true,rows=catalog.all().filter(visible).filter(x=>P.resolveItem?.(x)?.id===pilot.id),remaining=rows.filter(x=>!solved.has(x.id)),counts=remaining.reduce((a,x)=>{const k=String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0});
+    return{...P.poolHealth(counts),topicId:pilot.id,totalRows:rows.length,solved:rows.length-remaining.length}
+  }
+
+  function healthCard(root,p){
+    const h=p.health,host=root.querySelector('.pt2-details');if(!h||!host)return;
+    const labels={KOLAY:'Kolay',ORTA:'Orta',ZOR:'Zor'},colors={green:['#eaf7ef','#197249'],yellow:['#fff8dd','#8a6500'],orange:['#fff1df','#a35400'],red:['#fff0f1','#b73845']},levelText={green:'Yeterli',yellow:'Erken uyarı',orange:'Yüksek öncelik',red:'Kritik'},alerts=h.alerts.map(x=>`${labels[x.difficulty]} ${x.remaining}`).join(' • '),advice=h.overall==='green'?'Bu konu ve tüm zorluk seviyelerinde kaynak normal kullanım için yeterli.':h.overall==='yellow'?`Erken kaynak uyarısı: ${alerts}. Yeni doğrulanmış kaynak ekleme planına alınmalı.`:h.overall==='orange'?`Yeni kaynak yüksek öncelik: ${alerts}. Havuz bitmeden ekleme yapılmalı.`:`Kritik kaynak uyarısı: ${alerts}. Eksik zorluk düzeyinde yeni ölçüm seti açılmayacak ve daha kolay soruyla doldurulmayacak.`;
+    const signature=hash(JSON.stringify({topicId:h.topicId,totalRows:h.totalRows,solved:h.solved,total:h.total,overall:h.overall,cells:h.cells})),current=root.querySelector('[data-pt3-health]');
+    if(current?.dataset.pt3Signature===signature)return;
+    const wasOpen=!!current?.open,card=document.createElement('details');card.dataset.pt3Health='1';card.dataset.pt3Signature=signature;card.open=wasOpen;card.style.gridColumn='1 / -1';card.innerHTML=`<summary>Kaynak sağlığı — ürün sahibi • ${h.total} çözülmemiş • ${levelText[h.overall]}</summary><div class="pt2-health-grid">${Object.entries(h.cells).map(([k,x])=>{const c=colors[x.level];return`<div style="padding:10px;border-radius:12px;background:${c[0]};color:${c[1]}"><small>${labels[k]}</small><br><b>${x.remaining} çözülmemiş</b></div>`}).join('')}</div><div class="pt2-note"><b>${levelText[h.overall]}:</b> ${esc(advice)}<br>Toplam ${h.totalRows} doğrulanmış soru • ${h.solved} çözülmüş • ${h.total} çözülmemiş.</div>`;if(current)current.replaceWith(card);else host.prepend(card)
+  }
+
   function plan(ctx){
     const desired=Number(state.teacher?.daily?.desiredCount||5)>=5?5:3;
-    let exact=[];try{exact=C()?.findNextBatch?.({...ctx,visualPreferred:true},5)||[]}catch{}
-    const count=desired===5?(exact.length>=5?5:exact.length>=3?3:exact.length):(exact.length>=3?3:exact.length);
-    return{items:count?exact.slice(0,count):[],count,desired}
+    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx);if(!pilot)return{items:[],count:0,desired,mode:'blocked',shortages:{PILOT:desired},distributionExact:false};
+    const poolTopic=pilot.poolTopics?.[0]||pilot.displayTitle;let exact=[];try{exact=C()?.findNextBatch?.({...ctx,topic:poolTopic,visualPreferred:true},30)||[]}catch{}
+    const mode=state.teacher?.daily?.mode||'diagnostic',cfg=P?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selection=P?.difficultySelection?.(exact,{...cfg,count:desired})||{items:[],shortages:{UNKNOWN:desired},distributionExact:false},count=selection.distributionExact?desired:0;
+    return{...selection,items:count?selection.items:[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{},pilot,poolTopic,health:sourceHealth(ctx)}
   }
 
   function adapt(){
@@ -33,11 +50,14 @@
         if(h)h.textContent=d.desiredCount===3?'Kaynak Sorularla Kısa Kontrol':'Kaynak Sorularla Ölçüm'
       }
       const p=plan(ctx),btn=root.querySelector('#pt3Test'),t=btn?.closest('.pt2-task');
+      healthCard(root,p);
+      if(p.health?.alerts?.length){try{const P=window.YKSTeacherPilotV1,shortages=Object.fromEntries(p.health.alerts.map(x=>[x.difficulty,x.neededForGreen])),warningId=`${today()}-${p.pilot.id}-health-${hash(JSON.stringify(p.health.counts))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:{KOLAY:15,ORTA:15,ZOR:15},available:p.health.counts,shortages,severity:p.health.overall}))}catch(e){console.warn('Teacher Pool sağlık uyarısı kaydedilemedi',e)}}
+      if(!p.distributionExact&&p.pilot&&Object.keys(p.shortages||{}).length){try{const P=window.YKSTeacherPilotV1,warningId=`${today()}-${p.pilot.id}-${p.mode}-${hash(JSON.stringify(p.shortages))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:p.difficultyCounts,available:p.actualDifficultyCounts,shortages:p.shortages,severity:'orange'}))}catch(e){console.warn('Teacher Pool uyarısı kaydedilemedi',e)}}
       if(btn&&!t?.classList.contains('done')){
         btn.textContent=p.count?`${p.count} Soruluk Seti Başlat`:'Kaynak Yok';
         btn.disabled=!p.count||t.classList.contains('locked');
         const desc=t?.querySelector('p');
-        if(desc)desc.textContent=p.count?`${p.count} çözülmemiş, indekslenmiş ve aynı konudan kaynak sorusuyla çalış. Eksik hazırlanmış kayıt varsa soru ekranında açıkça gösterilir.`:'Bu konu için indekslenmiş kaynak sorusu yok. AI soru üretmeyecek.'
+        if(desc)desc.textContent=p.count?`${p.count} çözülmemiş, indekslenmiş ve aynı konudan kaynak sorusuyla çalış.`:p.mode==='blocked'?'Bu konu Limited Pilot kapsamında değil; öğretmen görev açmayacak.':`İstenen zorluk dağılımında kaynak eksik (${Object.entries(p.shortages||{}).map(([k,v])=>`${k} ${v}`).join(', ')}). Daha kolay soruyla sessizce doldurulmayacak.`
       }
       if(d.mode==='complete'){
         const w=root.querySelector('#pt2Wrong');
@@ -61,9 +81,14 @@
   }
 
   function launch(ctx,p){
-    if(!p.count)return;
+    if(!p.count||!p.distributionExact)return;
+    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),daily=state.teacher?.daily||{},revision=hash(`${daily.mode||'diagnostic'}|${p.items.map(x=>x.id).join('|')}`),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${revision}`,decisionId=`${sessionId}-decision`;
+    if(P&&topic){
+      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan',`mode-${daily.mode||'diagnostic'}`],reasonText:daily.reasonText||'',evidence:{...(daily.decisionEvidence||{}),dailyMode:daily.mode||'',expectedCount:p.count,sourceHealth:p.health?{total:p.health.total,counts:p.health.counts,overall:p.health.overall}:{}},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
+      P.recordOnce(event)
+    }
     state.miniTests??={history:[]};
-    state.miniTests.teacherTask={date:today(),topic:ctx.topic,exam:ctx.exam,subject:ctx.subject,expectedCount:p.count,fallback:false,strictTopic:true,itemIds:p.items.map(x=>x.id)};
+    state.miniTests.teacherTask={date:today(),topic:ctx.topic,topicId:topic?.id||'',exam:ctx.exam,subject:ctx.subject,sessionId,decisionId,mode:daily.mode||'diagnostic',expectedCount:p.count,fallback:false,strictTopic:true,itemIds:p.items.map(x=>x.id)};
     state.miniTests.prefillSubject=`${ctx.exam} ${ctx.subject}`;
     state.miniTests.prefillTopic=ctx.topic;
     if(state.teacher?.daily){
@@ -96,7 +121,7 @@
 
   async function openRecap(ctx,button){
     const d=state.teacher?.daily||{};
-    if(!ctx||(d.mode!=='repair'&&!d.testDone)||recapBusy)return;
+    if(!ctx||(!['repair','foundation'].includes(d.mode)&&!d.testDone)||recapBusy)return;
     const slot=document.getElementById('pt2RecapSlot');if(!slot)return;
 
     recapBusy=true;

@@ -72,7 +72,7 @@
     if(!targetIds().has(id))return;
     const src=(state.studyEvents||[]).find(x=>x.id===id);if(!src)return;
     const exists=(state.studyEvents||[]).some(x=>x.source==='wrong-review'&&x.dateKey===today()&&x.meta?.reviewOf===id);if(exists){patchHome();patchPriorityPanel();return}
-    try{window.YKSDataV5?.record?.({source:'wrong-review',exam:src.exam,track:src.track,subject:src.subject,topic:src.topic,curriculumOutcome:src.curriculumOutcome||src.meta?.solution?.curriculumOutcome||'',result:'unknown',difficulty:src.difficulty,interaction:'reviewed',questionCount:0,signals:['reviewed-wrong'],meta:{reviewOf:id,reviewedAt:Date.now(),dailyPriority:true}},{persistNow:true})}catch(e){console.warn('Yanlış tekrar kaydı oluşturulamadı',e)}
+    const reviewedAt=Date.now();try{const event=window.YKSDataV5?.record?.({source:'wrong-review',exam:src.exam,track:src.track,subject:src.subject,topic:src.topic,curriculumOutcome:src.curriculumOutcome||src.meta?.solution?.curriculumOutcome||'',result:'unknown',difficulty:src.difficulty,interaction:'reviewed',questionCount:0,signals:['reviewed-wrong'],meta:{reviewOf:id,reviewedAt,dailyPriority:true}},{persistNow:true});window.markWrongLearningEvidence?.(id,{wrongReviewedAt:reviewedAt,wrongReviewEventId:event?.id||''})}catch(e){console.warn('Yanlış tekrar kaydı oluşturulamadı',e)}
     patchHome();patchPriorityPanel();
   }
 

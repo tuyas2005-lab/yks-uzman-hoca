@@ -5,6 +5,7 @@ import vm from 'node:vm';
 const closureCode=fs.readFileSync(new URL('../app-wrong-closure-v2.js',import.meta.url),'utf8');
 const attemptCode=fs.readFileSync(new URL('../app-source-retake-position.js',import.meta.url),'utf8');
 const catalogPolicyCode=fs.readFileSync(new URL('../data/question-catalog-policy-v2.js',import.meta.url),'utf8');
+const teacherPilotCode=fs.readFileSync(new URL('../app-teacher-pilot-v1.js',import.meta.url),'utf8');
 
 const item={
   id:'osym-loop-test-1',provider:'OSYM',providerLabel:'ÖSYM',collection:'2026 TYT',year:2026,
@@ -54,14 +55,43 @@ function createHarness(seed=[]){
     }
   };
   vm.createContext(context);
+  vm.runInContext(teacherPilotCode,context,{filename:'app-teacher-pilot-v1.js'});
   vm.runInContext(closureCode,context,{filename:'app-wrong-closure-v2.js'});
   vm.runInContext(attemptCode,context,{filename:'app-source-retake-position.js'});
   return context;
 }
 
+{
+  const h=createHarness();
+  const polygon={...item,id:'meb-pilot-polygon-1',provider:'MEB_OGM',topic:'Çokgen ve Dörtgenlerin Özellikleri',difficulty:'ORTA'};
+  h.state.miniTests={teacherTask:{sessionId:'session-polygon-1',decisionId:'decision-polygon-1',itemIds:[polygon.id]}};
+  const event=h.recordSourceQuestionAttempt(polygon,'correct','C',{type:'mini',actionId:'teacher-polygon-correct'});
+  assert.equal(event.topicKey,'tyt.matematik.cokgenler-ve-dortgenler','pool topic must be recorded with canonical pilot topicKey');
+  assert.equal(event.meta.topicId,event.topicKey,'canonical topic identity must also survive in meta');
+  assert.equal(event.meta.teacherTask,true);
+  assert.equal(event.meta.teacherSessionId,'session-polygon-1');
+  assert.equal(event.meta.teacherDecisionId,'decision-polygon-1');
+}
+
 const attempts=state=>state.studyEvents.filter(x=>x.source==='source-question-result');
 const openWrongs=state=>state.studyEvents.filter(x=>x.meta?.wrongRecord===true&&!x.meta?.wrongClosed);
 const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
+
+{
+  const h=createHarness();h.state.miniTests={teacherTask:{sessionId:'reward-session',decisionId:'reward-decision',itemIds:[item.id]}};
+  h.recordSourceQuestionAttempt(item,'wrong','A',{type:'mini',actionId:'reward-first-wrong'});
+  h.state.miniTests.teacherTask=null;
+  h.recordSourceQuestionAttempt(item,'wrong','B',{type:'wrong',actionId:'reward-retry-wrong'});
+  const visibleRewardAttempt=h.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',actionId:'reward-retry-correct'});
+  const rewards=h.state.studyEvents.filter(x=>x.source==='reward-earned');
+  assert.equal(rewards.length,3,'her gerçek attempt benzersiz event kimliğiyle ayrı ödül kaydı üretmeli');
+  assert.equal(new Set(rewards.map(x=>x.id)).size,3,'retry wrong ve retry correct aynı ödül kimliğini paylaşmamalı');
+  assert.ok(rewards.at(-1).meta.awards.some(x=>x.key==='wrongRecovered'),'doğru retry geri kazanım ödülünü kaybetmemeli');
+  assert.equal(attempts(h.state).every(x=>Number(x.meta?.teacherReward?.points)>0),true,'her öğretmen attempti görünür puan verisini kendi sonucunda taşımalı');
+  assert.equal(attempts(h.state).every(x=>x.meta?.teacherReward?.praiseId),true,'her öğretmen attempti görünür takdir kimliği taşımalı');
+  assert.ok(visibleRewardAttempt.meta.teacherReward?.points>0,'çağırana dönen olay nesnesi görünür ödülü hemen taşımalı');
+  assert.equal(visibleRewardAttempt.meta.teacherSessionId,'reward-session','yanlış inceleme retry kaydı özgün öğretmen oturum bağını korumalı');
+}
 
 {
   const h=createHarness();
@@ -101,13 +131,16 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.deepEqual(openWrongs(h.state).map(x=>x.id),[original.id],'yapamadım retry canonical yanlışı açık bırakmalı');
   assert.equal(retryUnable.meta.retryOf,original.id);
 
+  h.markWrongLearningEvidence(original.id,{wrongReviewedAt:Date.now(),wrongReason:'İşlem hatası'});
+  const similar={...item,id:'meb-manual-similar-2',questionNo:'2'};
+  h.recordSourceQuestionAttempt(similar,'correct','C',{type:'mini',actionId:'similar-correct'});
   const retryCorrect=h.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',wrongId:original.id,actionId:'retry-correct'});
-  assert.equal(attempts(h.state).length,4,'doğru retry yeni attempt olarak korunmalı');
+  assert.equal(attempts(h.state).length,5,'benzer soru ve doğru retry ayrı attempt olarak korunmalı');
   assert.equal(retryCorrect.meta.retryOf,original.id);
   assert.equal(openWrongs(h.state).length,0,'yalnız doğru retry canonical yanlışı kapatmalı');
   assert.equal(original.meta.wrongRecord,false);
   assert.equal(original.meta.wrongClosed,true);
-  assert.equal(original.meta.wrongCloseMethod,'retry-correct');
+  assert.equal(original.meta.wrongCloseMethod,'mastery-evidence');
   assert.equal(audits(h.state,'wrong-closure').length,1,'otomatik kapanış audit olayı üretmeli');
   assert.equal(audits(h.state,'wrong-closure')[0].meta.wrongOf,original.id);
 
@@ -126,18 +159,20 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   const persisted=JSON.parse(JSON.stringify(h.state.studyEvents));
   const reloaded=createHarness(persisted);
   const restoredOriginal=reloaded.state.studyEvents.find(x=>x.id===original.id);
-  assert.equal(attempts(reloaded.state).length,4,'yenileme sonrası attempt geçmişi korunmalı');
+  assert.equal(attempts(reloaded.state).length,5,'yenileme sonrası attempt geçmişi korunmalı');
   assert.equal(restoredOriginal.meta.wrongRecord,true,'yenileme sonrası açık yanlış durumu korunmalı');
   assert.equal(restoredOriginal.meta.wrongClosed,false);
   assert.equal(attempts(reloaded.state).filter(x=>x.meta?.retryOf===original.id).length,3,'retry ilişkileri yenileme sonrası korunmalı');
 
+  reloaded.markWrongLearningEvidence(original.id,{wrongReviewedAt:Date.now(),wrongReason:'İşlem hatası',wrongReasonAt:Date.now()});
+  reloaded.recordSourceQuestionAttempt({...item,id:'meb-manual-similar-3',questionNo:'3'},'correct','C',{type:'mini',actionId:'similar-correct-after-reopen'});
   const correctAfterReopen=reloaded.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',wrongId:original.id,actionId:'retry-correct-after-reopen'});
-  assert.equal(attempts(reloaded.state).length,5,'reopen sonrası doğru retry yeni attempt olarak saklanmalı');
+  assert.equal(attempts(reloaded.state).length,7,'reopen sonrası yeni benzer soru ve doğru retry saklanmalı');
   assert.equal(correctAfterReopen.meta.retryOf,original.id);
   assert.equal(openWrongs(reloaded.state).length,0,'reopen sonrası doğru retry canonical yanlışı yeniden kapatmalı');
   assert.equal(restoredOriginal.meta.wrongRecord,false);
   assert.equal(restoredOriginal.meta.wrongClosed,true);
-  assert.equal(restoredOriginal.meta.wrongCloseMethod,'retry-correct');
+  assert.equal(restoredOriginal.meta.wrongCloseMethod,'mastery-evidence');
   assert.equal(audits(reloaded.state,'wrong-closure').length,2,'reopen sonrası ikinci doğru retry yeni closure audit olayı üretmeli');
 }
 

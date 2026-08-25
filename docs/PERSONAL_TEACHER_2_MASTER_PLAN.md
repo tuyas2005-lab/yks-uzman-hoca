@@ -504,3 +504,29 @@ Yeni sohbet veya geliştirme oturumunda:
 
 Bu belgenin amacı yeni sohbette “şimdi ne yapacağız?” sorusunu yeniden
 cevaplamak değil, doğrulanmış plandan doğrudan devam etmektir.
+
+---
+
+## 17. Faz 9 uygulama durumu — 25 Ağustos 2026
+
+| Uygulama adımı | Durum | Kanıt |
+| --- | --- | --- |
+| Strategy Engine yükleme güvencesi | Tamamlandı | Öğretmen açılış ve loader testleri |
+| Canonical pilot allowlist / Teacher Pool kapısı | Tamamlandı | 3 pilot konu, doğrulanmış kaynak politikası |
+| Karar ve sonuç sözleşmeleri | Tamamlandı | `teacher-decision`, `teacher-session-outcome` |
+| Adaptif mod ve zorluk seçimi | Tamamlandı | Kontrollü dağılım, sessiz kolay fallback yok |
+| Yanlış Hafızası | Tamamlandı | Dört kanıtlı kapanış ve yeni yanlışla yeniden açılma |
+| Öğrenme Hafızası / tekrar | Tamamlandı | 1–3–7–14–30 günlük uyarlanabilir geçişler |
+| Emek Puanı / takdir | Tamamlandı | İdempotent ödül kayıtları ve kanıta dayalı övgü |
+| Teacher Pool kaynak sağlığı | Tamamlandı | Yeşil/sarı/turuncu/kırmızı erken uyarı |
+| Açıklanabilir karar geçmişi | Tamamlandı | Karar → seçim → sonuç → sonraki karar audit zinciri |
+| Deterministik / sanal öğrenci testleri | Tamamlandı | 10 profil, 1/3/7/14/30. günler, 55/55 test |
+| Preview gerçek kullanıcı kabulü | Devam ediyor | Otomatik Preview kabulü geçti; tablet/telefon ürün sahibi göz kontrolü bekliyor |
+| Ready for Review / merge / production | Bekliyor | Ürün sahibi açık onayı olmadan ilerlenmez |
+
+Uzun dönem simülasyonları iki sınır düzeltmesi doğurmuştur:
+
+- öğretmen oturumundan sonra aynı konuda oluşan yeni açık yanlış, konu hafızasını
+  yeniden Onarım moduna alır;
+- ilk başarılı 3 soruluk kalıcılık kontrolü 14 güne çıkar; ancak önceki 14 günlük
+  kontrol de başarıyla geçildikten sonra 30 güne uzar ve kalıcılık ödülü kazanılır.

@@ -25,6 +25,10 @@
       aliases:['Özel Dörtgenler','Çokgenler/Dörtgenler']
     }
   ];
+  const REVIEWED_SOURCE_TOPIC_MAP={
+    'temel-kavramlar-sayi-kumeleri':{topicId:'tyt.matematik.temel-kavramlar',confidence:'HIGH',reason:'Kaynak başlığı ve alt başlığı Sayı Kümeleri; merkezi konu Temel Kavramlar ve Sayı Kümeleri ile birebir örtüşür.'},
+    'bolme-bolunebilme-kurallari':{topicId:'tyt.matematik.bolme-ve-bolunebilme',confidence:'HIGH',reason:'Kaynak başlığı Bölme-Bölünebilme Kuralları; merkezi Bölme ve Bölünebilme konusu ile birebir örtüşür.'}
+  };
   let TOPICS=BASE_TOPICS.map(clone);
 
   const sourceReady=item=>String(item?.exam||'').toUpperCase()==='TYT'&&norm(item?.subject)==='matematik'&&item?.provider==='MEB_OGM'&&item?.manualCrop===true&&item?.answerVerified===true&&item?.status==='student-ready'&&item?.asset?.status==='ready';
@@ -42,9 +46,9 @@
     const registry=BASE_TOPICS.map(clone),known=new Set(registry.map(x=>x.id));
     for(const group of [...groups.values()].sort((a,b)=>a.displayTitle.localeCompare(b.displayTitle,'tr'))){
       const base=BASE_TOPICS.find(topic=>[topic.id,topic.displayTitle,...topic.poolTopics,...topic.aliases].some(label=>norm(label)===norm(group.key)||norm(label)===norm(group.displayTitle)));
-      const canonical=base||taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.displayTitle}),id=canonical?.id||'',healthy=Object.values(group.counts).every(count=>count>=minimumPerDifficulty);
+      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.key],canonical=base||taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.displayTitle})||(reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):null),id=canonical?.id||'',healthy=Object.values(group.counts).every(count=>count>=minimumPerDifficulty);
       if(!healthy||!id||known.has(id))continue;
-      known.add(id);registry.push({id,displayTitle:String(canonical.displayTitle||canonical.topic||group.displayTitle),poolTopics:[...group.poolTopics],aliases:[...(canonical.aliases||[]),group.key],sourceHealth:{...group.counts,total:group.total,minimumPerDifficulty}});
+      known.add(id);registry.push({id,displayTitle:String(canonical.displayTitle||canonical.topic||group.displayTitle),poolTopics:[...group.poolTopics],aliases:[...(canonical.aliases||[]),group.key],mapping:{kind:reviewed?'reviewed-high':'taxonomy-exact',confidence:reviewed?.confidence||'HIGH',sourceKey:group.key},sourceHealth:{...group.counts,total:group.total,minimumPerDifficulty}});
     }
     const order=new Map((taxonomy?.all?.({exam:'TYT',subjectId:'matematik',active:true})||[]).map((topic,index)=>[topic.id,index]));
     return registry.sort((a,b)=>(order.get(a.id)??9999)-(order.get(b.id)??9999));
@@ -192,5 +196,5 @@
     return{event:dataApi.record(event,{persistNow:true}),duplicate:false};
   }
 
-  window.YKSTeacherPilotV1={version:3,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),buildTopicRegistry,refreshTopics,resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
+  window.YKSTeacherPilotV1={version:3,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),reviewedSourceTopics:clone(REVIEWED_SOURCE_TOPIC_MAP),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),buildTopicRegistry,refreshTopics,resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
 })();

@@ -648,5 +648,21 @@ eşiğe taşıdığında uygulama güncellemesi gerekmeden öğretmen konuyu far
 | Yeşil kaynak sağlığı kapısı | Uygulandı | Her zorlukta en az 15 hazır soru |
 | Yeni kaynakları otomatik fark etme | Uygulandı | Catalog boyutu değiştiğinde registry yenilenir |
 | Deterministik kapsam testleri | Tamamlandı | 76/76 test; kaynak eşiği ve otomatik canonical açılış |
-| Preview / gerçek kullanıcı kabulü | Bekliyor | Telefon/tablet kontrolü |
-| Merge / production | Bekliyor | Kullanıcı onayı sonrası |
+| Preview / gerçek kullanıcı kabulü | Tamamlandı | Ürün sahibi kabulü geçti |
+| Merge / production | Tamamlandı | PR #35, production merge `321829e` ve canlı HTTP 200 |
+
+### 20.2 Yüksek güvenli kaynak–taxonomy eşleştirmeleri
+
+Yeşil kaynak sağlığına ulaştığı hâlde yalnız yazım/ad farkı nedeniyle otomatik
+eşleşmeyen başlıklar manuel kanıtla incelenir. Yalnız `HIGH` güvenli ve merkezi
+taxonomy karşılığı birebir olan eşleştirmeler öğretmene açılır.
+
+| Kaynak başlığı | Canonical konu | Karar |
+| --- | --- | --- |
+| Temel Kavramlar / Sayı Kümeleri | `tyt.matematik.temel-kavramlar` | HIGH — aç |
+| Bölme - Bölünebilme Kuralları | `tyt.matematik.bolme-ve-bolunebilme` | HIGH — aç |
+| Denklemler ve Eşitsizlikler | — | Belirsiz kapsam — kapalı tut |
+
+Bu paketle güvenli öğretmen kapsamı 6 konudan 8 konuya çıkar. Geniş
+“Denklemler ve Eşitsizlikler” havuzu yalnız soru sayısı yüksek olduğu için
+`Basit Eşitsizlikler` konusuna zorla bağlanmaz.

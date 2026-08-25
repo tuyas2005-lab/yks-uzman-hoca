@@ -62,6 +62,26 @@ test('completed session memory controls the next session and due review',()=>{
   assert.equal(P.resumeMode({previousMode:'challenge',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-08-26',closureComplete:false}),'repair');
 });
 
+test('topic progress requires strong evidence on separate days before progression',()=>{
+  const P=engine();
+  assert.equal(P.assessTopicProgress({measuredCount:0}).level,1);
+  assert.equal(P.assessTopicProgress({measuredCount:6,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:false}).level,2,'açık yanlış varken konu güçlü sayılamaz');
+  assert.equal(P.assessTopicProgress({measuredCount:5,accuracy:100,successfulSessions:1,distinctStudyDays:1,closureComplete:true}).level,3,'tek kusursuz oturum konu geçişi için yeterli değildir');
+  const strong=P.assessTopicProgress({measuredCount:10,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:true});
+  assert.equal(strong.level,4);assert.equal(strong.stage,'strong');
+  const retained=P.assessTopicProgress({measuredCount:15,accuracy:93,successfulSessions:3,distinctStudyDays:3,closureComplete:true,retention30Passed:true});
+  assert.equal(retained.level,5);assert.equal(retained.stage,'retained');
+});
+
+test('topic route repairs and reviews before opening the next topic',()=>{
+  const P=engine(),strong={measuredCount:10,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:true,hasNextTopic:true};
+  assert.equal(P.decideTopicRoute({...strong,closureComplete:false}).action,'repair-current');
+  assert.equal(P.decideTopicRoute({...strong,reviewDue:true}).action,'review-current');
+  assert.equal(P.decideTopicRoute(strong).action,'open-next-topic');
+  assert.equal(P.decideTopicRoute({...strong,hasNextTopic:false}).action,'maintain-current');
+  assert.equal(P.decideTopicRoute({...strong,dailyGoalComplete:true}).action,'finish-day');
+});
+
 test('virtual student progresses through repair, reinforcement, challenge and spaced review',()=>{
   const P=engine();
   const first=P.decideTeacherSession({total:5,score:40,recentWrong:2});

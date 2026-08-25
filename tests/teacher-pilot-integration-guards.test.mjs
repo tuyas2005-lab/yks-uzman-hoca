@@ -5,10 +5,13 @@ import test from 'node:test';
 const policy=fs.readFileSync(new URL('../app-personal-teacher-policy-v3.js',import.meta.url),'utf8');
 const launch=fs.readFileSync(new URL('../app-personal-teacher-source-launch-v3.js',import.meta.url),'utf8');
 const mini=fs.readFileSync(new URL('../app-mini-tests-source.js',import.meta.url),'utf8');
+const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'utf8');
 
 test('empty student starts from a canonical pilot topic',()=>{
   assert.match(policy,/topic:'Problemler',topicKey:'tyt\.matematik\.problemler'/);
   assert.match(policy,/filter\(x=>window\.YKSTeacherPilotV1\?\.resolveTopic/);
+  assert.match(loader,/makeGroup\('official',\['tests','questionIndex','teacher'\]/,'Teacher açıldığında gerçek katalog da yüklenmeli');
+  assert.doesNotMatch(policy,/!window\.getStudentStrategy\|\|!window\.YKSQuestionCatalogV1/,'policy katalog tamamlanana kadar eski rendererda kalmamalı');
 });
 
 test('teacher query resolves pool alias before catalog selection and blocks non-pilot topics',()=>{

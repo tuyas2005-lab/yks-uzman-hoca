@@ -113,7 +113,7 @@
     slot.querySelector('#pt3RecapDone').onclick=()=>{d.recapDone=true;save();render()};slot.querySelector('#pt3RecapClose').onclick=()=>slot.innerHTML='';
   }
   function install(tries=0){
-    if(!window.getStudentStrategy||!window.YKSQuestionCatalogV1){if(tries<80)setTimeout(()=>install(tries+1),80);return}
+    if(!window.getStudentStrategy){if(tries<80)setTimeout(()=>install(tries+1),80);return}
     window.renderTeacher=render;try{renderTeacher=render}catch{};if(root.classList.contains('active'))render();setTimeout(()=>{try{window.renderHome?.()}catch{}},40);
   }
   install();

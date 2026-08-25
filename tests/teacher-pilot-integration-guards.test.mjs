@@ -39,9 +39,15 @@ test('mini test consumes exact teacher item ids instead of repicking',()=>{
   assert.match(mini,/startSet\(\{exam:selection\.exam,subject:selection\.subject,year:'latest',topic:selection\.topic\},selection\.count\)/);
 });
 
-test('same daily plan uses a deterministic launch revision',()=>{
+test('adaptive teacher opens one question and re-decides after every answer',()=>{
   assert.match(launch,/revision=hash\(`/);
-  assert.doesNotMatch(launch,/sessionId=.*Date\.now/);
+  assert.match(launch,/state\.teacher\.adaptiveSession=/);
+  assert.match(launch,/function afterAnswer\(event,item,kind\)/);
+  assert.match(launch,/decideAdaptiveStep/);
+  assert.match(launch,/adaptive-next-question/);
+  assert.match(sourceViewer,/Sonraki Soruyu Getir/);
+  assert.match(sourceViewer,/Bugünlük Bu Kadar/);
+  assert.match(sourceRetake,/meta\.adaptiveTeacher=adaptiveTask/);
 });
 
 test('source health warning stays hidden while healthy and preserves open state when shown',()=>{
@@ -98,6 +104,8 @@ test('teacher-directed retry closes the original wrong and refreshes its task st
 });
 
 test('teacher persists session memory and observes student initiated mini tests',()=>{
+  assert.match(launch,/state\.teacher\.topicMemory\[s\.topicId\]/);
+  assert.match(launch,/buildOutcomeEvent/);
   assert.match(mini,/state\.teacher\.topicMemory\[task\.topicId\]/);
   assert.match(mini,/studentInitiated:!teacherSet/);
   assert.match(mini,/previousIntervalDays/);

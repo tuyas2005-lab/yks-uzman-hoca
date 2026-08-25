@@ -34,11 +34,11 @@ test('Coach keeps using the same Strategy Engine URL for loader dedupe', () => {
 });
 
 test('Startup and service worker use the new loader cache key', () => {
-  assert.match(startup, /\/app-home-links\.js\?v=31/);
-  assert.doesNotMatch(startup, /\/app-home-links\.js\?v=30/);
-  assert.match(serviceWorker, /\/app-home-links\.js\?v=31/);
-  assert.match(startup, /\/app-teacher-pilot-v1\.js\?v=9/);
-  assert.match(serviceWorker, /\/app-teacher-pilot-v1\.js\?v=9/);
-  assert.match(serviceWorker, /\/app-personal-teacher-source-launch-v3\.js\?v=11/);
-  assert.match(serviceWorker, /r57-human-teacher-voice/);
+  assert.match(startup, /\/app-home-links\.js\?v=32/);
+  assert.doesNotMatch(startup, /\/app-home-links\.js\?v=31/);
+  assert.match(serviceWorker, /\/app-home-links\.js\?v=32/);
+  assert.match(startup, /\/app-teacher-pilot-v1\.js\?v=10/);
+  assert.match(serviceWorker, /\/app-teacher-pilot-v1\.js\?v=10/);
+  assert.match(serviceWorker, /\/app-personal-teacher-source-launch-v3\.js\?v=12/);
+  assert.match(serviceWorker, /r58-adaptive-teacher-session/);
 });

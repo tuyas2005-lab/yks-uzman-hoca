@@ -65,5 +65,8 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(policy,/Oturum hafızası/);
   assert.match(policy,/source==='teacher-session-outcome'/);
   assert.match(policy,/derivedFromOutcome:true/);
+  assert.match(policy,/selfAt>Number\(memory\?\.studentEvidenceAt\|\|memory\?\.lastCompletedAt\|\|0\)/);
+  assert.match(policy,/studentInitiated:true/);
+  assert.match(policy,/transitionMode\?\.\(previous,raw\?\.mode/);
   assert.match(teacherWrongScope,/mem\.closureComplete=!!d\.wrongDone/);
 });

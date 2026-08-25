@@ -7,6 +7,7 @@ const launch=fs.readFileSync(new URL('../app-personal-teacher-source-launch-v3.j
 const mini=fs.readFileSync(new URL('../app-mini-tests-source.js',import.meta.url),'utf8');
 const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-v2.js',import.meta.url),'utf8');
 const sourceViewer=fs.readFileSync(new URL('../app-source-question-viewer.js',import.meta.url),'utf8');
+const teacherWrongScope=fs.readFileSync(new URL('../app-teacher-wrong-scope.js',import.meta.url),'utf8');
 const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'utf8');
 
 test('empty student starts from a canonical pilot topic',()=>{
@@ -46,4 +47,12 @@ test('every teacher question result renders points and praise immediately',()=>{
   assert.match(sourceViewer,/function rewardFeedback\(event,kind\)/);
   assert.match(sourceViewer,/Emek Puanı/);
   assert.match(sourceViewer,/Öğretmenin:/);
+});
+
+test('teacher wrong task completes only after real four-evidence closure',()=>{
+  assert.match(teacherWrongScope,/rows\.every\(x=>x\.meta\?\.wrongClosed===true\)/);
+  assert.match(teacherWrongScope,/getWrongLearningEvidence/);
+  assert.match(teacherWrongScope,/data-tws-reason/);
+  assert.match(teacherWrongScope,/markWrongLearningEvidence/);
+  assert.doesNotMatch(teacherWrongScope,/wrongDone=rows\.every\(x=>seen\.has\(x\.id\)\)/);
 });

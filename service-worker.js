@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r38-teacher-wrong-reward';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r39-real-wrong-closure';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

@@ -167,7 +167,7 @@
     // leave the legacy v2 renderer active after the policy install timeout.
     ()=>loadScript('/app-strategy-engine.js?v=3'),
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
-    ()=>loadScript('/app-teacher-wrong-scope.js?v=2'),
+    ()=>loadScript('/app-teacher-wrong-scope.js?v=3'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
     ()=>loadScript('/app-personal-teacher-policy-v3.js?v=6'),
     ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=6'),

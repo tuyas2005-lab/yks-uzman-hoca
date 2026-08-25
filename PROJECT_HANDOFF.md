@@ -1,6 +1,6 @@
 # YKS Uzman Hoca — Project Handoff
 
-Last updated: 2026-08-23
+Last updated: 2026-08-25
 
 Bu dosya YKS Uzman Hoca projesinin güncel çalışma hafızasıdır.
 
@@ -14,6 +14,22 @@ doğrulamaktır.
 
 Canlı repository durumu ile bu dosya çelişirse canlı repository esas
 alınır.
+
+## ZORUNLU KİŞİSEL ÖĞRETMEN 2.0 SOURCE-OF-TRUTH
+
+Kişisel Öğretmen 2.0'ın güncel ve kullanıcı tarafından onaylanmış ayrıntılı
+Master Plan'ı:
+
+`docs/PERSONAL_TEACHER_2_MASTER_PLAN.md`
+
+Yeni sohbet ve geliştirme oturumlarında bu dosya eksiksiz okunmalıdır.
+
+Bu dosyanın aşağıdaki eski Kişisel Öğretmen 2.0 bölümleri ile yeni Master Plan
+çelişirse `docs/PERSONAL_TEACHER_2_MASTER_PLAN.md` esas alınır. Özellikle eski
+"yanlışlar yalnız Yanlışlarım bölümünün görevidir", "motivasyon yalnız Rehber
+Öğretmenin görevidir" ve sabit akışın tamamen kaldırılması kararları güncel ürün
+kararı değildir. Yanlış Hafızası, Öğrenme Hafızası, Emek Puanı, kanıta dayalı
+takdir ve Kaynak Sağlığı artık Kişisel Öğretmen 2.0'ın zorunlu parçalarıdır.
 
 ---
 

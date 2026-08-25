@@ -95,6 +95,9 @@ test('every teacher question result renders points and praise immediately',()=>{
 });
 
 test('teacher wrong task completes only after real four-evidence closure',()=>{
+  assert.match(teacherWrongScope,/#wrong\.teacher-wrong-active #wrong2Host\{display:none!important\}/);
+  assert.match(teacherWrongScope,/classList\.add\('teacher-wrong-active'\)/);
+  assert.match(teacherWrongScope,/classList\.remove\('teacher-wrong-active'\)/);
   assert.match(teacherWrongScope,/rows\.every\(x=>x\.meta\?\.wrongClosed===true\)/);
   assert.match(teacherWrongScope,/getWrongLearningEvidence/);
   assert.match(teacherWrongScope,/data-tws-reason/);

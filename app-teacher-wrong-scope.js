@@ -7,6 +7,7 @@
 
   const style=document.createElement('style');
   style.textContent=`
+    #wrong.teacher-wrong-active #wrong2Host{display:none!important}
     .teacher-wrong-scope{margin:0 0 14px;padding:16px;border:1px solid #d9d2ff;border-radius:18px;background:linear-gradient(135deg,#f7f5ff,#fff)}
     .tws-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}.tws-head h3{margin:0 0 5px}.tws-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.tws-progress{white-space:nowrap;padding:6px 9px;border-radius:999px;background:#fff0d8;color:#8a5c12;font-size:11px;font-weight:900}.tws-progress.done{background:#e7f7ed;color:#1d724a}
     .tws-list{display:grid;gap:9px}.tws-item{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(190px,auto);gap:11px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface)}.tws-item.done{border-color:#bce3ca;background:#f8fdf9}.tws-no{width:32px;height:32px;border-radius:10px;background:#eeeaff;color:#5942d1;display:grid;place-items:center;font-weight:900}.tws-item.done .tws-no{background:#def4e6;color:#187649}.tws-item b{display:block;font-size:13px}.tws-item small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.tws-evidence{margin-top:5px!important;line-height:1.45}.tws-controls{display:grid;gap:7px}.tws-reason{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 8px}.tws-open{border:0;border-radius:10px;min-height:44px;padding:9px 11px;background:#6747eb;color:#fff;font-weight:850}.tws-item.done .tws-open{background:#edf2ef;color:#557064}.tws-actions{display:flex;justify-content:flex-end;margin-top:12px}.tws-empty{padding:18px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center}@media(max-width:700px){.tws-head{flex-direction:column}.tws-item{grid-template-columns:36px 1fr}.tws-controls{grid-column:1/-1}.tws-open{width:100%}}
@@ -60,10 +61,10 @@
     if(item&&typeof window.openSourceQuestion==='function'&&(!window.isSourceQuestionReady||window.isSourceQuestionReady(item))){window.openSourceQuestion(item,{type:'wrong',wrongId:x.id,teacherWrongClosure:true,returnScreen:'wrong'});return}
     const btn=document.querySelector(`#wrong2Host [data-wrong-id="${CSS.escape(x.id)}"]`);if(btn)btn.click();
   }
-  function cleanup(){const host=document.getElementById('wrong2Host');if(host)host.style.display='';document.getElementById('teacherWrongScopeHost')?.remove()}
+  function cleanup(){const root=document.getElementById('wrong');root?.classList.remove('teacher-wrong-active');const host=document.getElementById('wrong2Host');if(host)host.style.display='';document.getElementById('teacherWrongScopeHost')?.remove()}
   function renderScope(){
     const active=state.teacher.teacherWrongScope;if(!active?.active){cleanup();return}
-    const root=document.getElementById('wrong');if(!root)return;const scope=active.scope||currentScope();if(!scope)return;
+    const root=document.getElementById('wrong');if(!root)return;root.classList.add('teacher-wrong-active');const scope=active.scope||currentScope();if(!scope)return;
     const general=document.getElementById('wrong2Host');if(general)general.style.display='none';
     let host=document.getElementById('teacherWrongScopeHost');if(!host){host=document.createElement('div');host.id='teacherWrongScopeHost';const head=root.querySelector('.screen-head');head?.insertAdjacentElement('afterend',host)}
     const rows=wrongRows(scope),done=syncDone(scope),count=rows.filter(x=>x.meta?.wrongClosed===true).length,reasons=['Konu bilgisi eksik','Soruyu yanlış anlama','Model kuramama','İşlem hatası','Dikkat hatası','Formül karıştırma','Çeldiriciye düşme','Süre problemi','Yapamadım'];
@@ -74,7 +75,7 @@
   }
   function activate(){
     const scope=currentScope();if(!scope)return;state.teacher.teacherWrongScope={active:true,scope};const d=state.teacher.daily;if(d){d.teacherExam=scope.exam;d.teacherSubject=scope.subject;d.teacherTopic=scope.topic;d.teacherSetItemIds=[...(scope.itemIds||[])];d.teacherReviewedWrongIds=d.teacherReviewedWrongIds||[];d.wrongReviewBaseline=reviewTotalToday()}
-    persist();go('wrong');setTimeout(renderScope,80);
+    document.getElementById('wrong')?.classList.add('teacher-wrong-active');persist();go('wrong');setTimeout(renderScope,80);
   }
 
   document.addEventListener('click',e=>{

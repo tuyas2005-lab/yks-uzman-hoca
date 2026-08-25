@@ -44,6 +44,7 @@
   function syncDone(scope){
     const d=state.teacher.daily;if(!d)return false;const rows=wrongRows(scope),seen=reviewed(),mistakes=Number(d.testSummary?.mistakes||0);
     if(mistakes===0)d.wrongDone=true;else if(rows.length)d.wrongDone=rows.every(x=>x.meta?.wrongClosed===true);else d.wrongDone=false;
+    const topicId=window.YKSTeacherPilotV1?.resolveTopic?.(scope)?.id,mem=topicId&&state.teacher?.topicMemory?.[topicId];if(mem)mem.closureComplete=!!d.wrongDone;
     persist();return !!d.wrongDone;
   }
   function recordReview(x,scope){

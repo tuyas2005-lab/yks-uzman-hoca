@@ -56,3 +56,12 @@ test('teacher wrong task completes only after real four-evidence closure',()=>{
   assert.match(teacherWrongScope,/markWrongLearningEvidence/);
   assert.doesNotMatch(teacherWrongScope,/wrongDone=rows\.every\(x=>seen\.has\(x\.id\)\)/);
 });
+
+test('teacher persists session memory and observes student initiated mini tests',()=>{
+  assert.match(mini,/state\.teacher\.topicMemory\[task\.topicId\]/);
+  assert.match(mini,/studentInitiated:!teacherSet/);
+  assert.match(policy,/resumeMode/);
+  assert.match(policy,/Öğrencinin kendi çözdüğü Mini Test/);
+  assert.match(policy,/Oturum hafızası/);
+  assert.match(teacherWrongScope,/mem\.closureComplete=!!d\.wrongDone/);
+});

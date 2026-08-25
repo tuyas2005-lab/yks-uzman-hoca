@@ -30,6 +30,15 @@ test('review memory expands, shortens and reopens deterministically',()=>{
   assert.equal(P.nextReview({dateKey:'2026-08-25',answered:1,correct:1,wrongRecovered:true}).days,2);
 });
 
+test('completed session memory controls the next session and due review',()=>{
+  const P=engine();
+  assert.equal(P.resumeMode({previousMode:'diagnostic',nextMode:'reinforce',nextReviewDate:'2026-09-01',today:'2026-08-26',closureComplete:true}),'reinforce');
+  assert.equal(P.resumeMode({previousMode:'reinforce',nextMode:'maintain',nextReviewDate:'2026-09-01',today:'2026-08-26',closureComplete:true}),'maintain');
+  assert.equal(P.resumeMode({previousMode:'challenge',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-08-26',closureComplete:true}),'maintain');
+  assert.equal(P.resumeMode({previousMode:'maintain',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-09-08',closureComplete:true}),'spaced');
+  assert.equal(P.resumeMode({previousMode:'challenge',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-08-26',closureComplete:false}),'repair');
+});
+
 test('effort rewards do not punish mistakes and praise evidence',()=>{
   const P=engine();
   assert.deepEqual(JSON.parse(JSON.stringify(P.rewardFor({attempt:true}))),{points:2,awards:[{key:'attempt',points:2}],praiseId:'effort-noticed'});

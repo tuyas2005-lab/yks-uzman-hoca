@@ -34,7 +34,9 @@ test('teacher shows a compact five-level topic growth journey',()=>{
   assert.match(policy,/class="pt2-growth"/);
   assert.match(policy,/BU KONUDAKİ YOLCULUĞUN/);
   assert.match(ui,/\.pt2-growth-steps\{display:grid;grid-template-columns:repeat\(5/);
-  assert.match(ui,/@media\(max-width:600px\).*\.pt2-growth\{padding:14px 10px\}/);
+  assert.match(ui,/\.pt2-growth-step small\{[^}]*font-size:12px/);
+  assert.match(ui,/\.pt2-growth>p\{[^}]*font-size:14px/);
+  assert.match(ui,/@media\(max-width:600px\).*\.pt2-growth\{padding:15px 10px\}/);
 });
 
 test('teacher-facing copy sounds human while raw statistics stay in evaluation',()=>{

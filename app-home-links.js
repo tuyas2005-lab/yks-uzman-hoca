@@ -162,6 +162,10 @@
     ()=>loadScript('/app-low-cost-fix.js?v=2'),
     ()=>loadScript('/app-teacher-performance.js?v=2'),
     ()=>loadScript('/app-personal-teacher-v2.js?v=2'),
+    // Teacher policy v3 requires getStudentStrategy. Load the shared strategy
+    // engine in the teacher path too, so opening Teacher before Coach cannot
+    // leave the legacy v2 renderer active after the policy install timeout.
+    ()=>loadScript('/app-strategy-engine.js?v=2'),
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=1'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),

@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r35-teacher-mobile-acceptance';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r36-visible-question-reward';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',

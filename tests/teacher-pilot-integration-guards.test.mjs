@@ -6,6 +6,7 @@ const policy=fs.readFileSync(new URL('../app-personal-teacher-policy-v3.js',impo
 const launch=fs.readFileSync(new URL('../app-personal-teacher-source-launch-v3.js',import.meta.url),'utf8');
 const mini=fs.readFileSync(new URL('../app-mini-tests-source.js',import.meta.url),'utf8');
 const teacherUi=fs.readFileSync(new URL('../app-personal-teacher-v2.js',import.meta.url),'utf8');
+const sourceViewer=fs.readFileSync(new URL('../app-source-question-viewer.js',import.meta.url),'utf8');
 const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'utf8');
 
 test('empty student starts from a canonical pilot topic',()=>{
@@ -39,4 +40,10 @@ test('teacher and mini test preserve usable phone touch layout',()=>{
   assert.match(teacherUi,/min-height:44px/);
   assert.match(mini,/\.mts-progress\{align-items:flex-start;flex-direction:column\}/);
   assert.match(mini,/\.mts-open\{width:100%;min-height:44px\}/);
+});
+
+test('every teacher question result renders points and praise immediately',()=>{
+  assert.match(sourceViewer,/function rewardFeedback\(event,kind\)/);
+  assert.match(sourceViewer,/Emek Puanı/);
+  assert.match(sourceViewer,/Öğretmenin:/);
 });

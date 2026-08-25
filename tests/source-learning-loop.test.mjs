@@ -86,6 +86,8 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.equal(rewards.length,3,'her gerçek attempt benzersiz event kimliğiyle ayrı ödül kaydı üretmeli');
   assert.equal(new Set(rewards.map(x=>x.id)).size,3,'retry wrong ve retry correct aynı ödül kimliğini paylaşmamalı');
   assert.ok(rewards.at(-1).meta.awards.some(x=>x.key==='wrongRecovered'),'doğru retry geri kazanım ödülünü kaybetmemeli');
+  assert.equal(attempts(h.state).every(x=>Number(x.meta?.teacherReward?.points)>0),true,'her öğretmen attempti görünür puan verisini kendi sonucunda taşımalı');
+  assert.equal(attempts(h.state).every(x=>x.meta?.teacherReward?.praiseId),true,'her öğretmen attempti görünür takdir kimliği taşımalı');
 }
 
 {

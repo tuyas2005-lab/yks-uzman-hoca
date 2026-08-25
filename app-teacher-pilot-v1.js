@@ -1,11 +1,11 @@
 (()=>{
   if(window.YKSTeacherPilotV1)return;
 
-  const PILOT_ID='pt2-tyt-math-limited-v1';
-  const ENGINE_VERSION='teacher-decision-engine-v2';
+  const PILOT_ID='pt2-tyt-math-expanded-v1';
+  const ENGINE_VERSION='teacher-decision-engine-v3';
   const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const clone=x=>{try{return structuredClone(x)}catch{return JSON.parse(JSON.stringify(x))}};
-  const TOPICS=[
+  const BASE_TOPICS=[
     {
       id:'tyt.matematik.problemler',
       displayTitle:'Problemler',
@@ -25,6 +25,35 @@
       aliases:['Özel Dörtgenler','Çokgenler/Dörtgenler']
     }
   ];
+  let TOPICS=BASE_TOPICS.map(clone);
+
+  const sourceReady=item=>String(item?.exam||'').toUpperCase()==='TYT'&&norm(item?.subject)==='matematik'&&item?.provider==='MEB_OGM'&&item?.manualCrop===true&&item?.answerVerified===true&&item?.status==='student-ready'&&item?.asset?.status==='ready';
+  const sourceKey=item=>String(item?.canonicalTopic||'').trim();
+  const canonicalId=key=>`tyt.matematik.${String(key||'').trim()}`;
+  function buildTopicRegistry(items=[],raw={}){
+    const minimumPerDifficulty=Math.max(1,Number(raw.minimumPerDifficulty||15)),taxonomy=raw.taxonomy||window.YKSTopicTaxonomyV1,groups=new Map();
+    for(const item of Array.isArray(items)?items:[]){
+      if(!sourceReady(item)||!sourceKey(item))continue;
+      const key=sourceKey(item),group=groups.get(key)||{key,displayTitle:String(item.topic||key),poolTopics:new Set(),counts:{KOLAY:0,ORTA:0,ZOR:0},total:0};
+      group.poolTopics.add(String(item.topic||group.displayTitle));group.total++;
+      const difficulty=String(item.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(difficulty in group.counts)group.counts[difficulty]++;
+      groups.set(key,group);
+    }
+    const registry=BASE_TOPICS.map(clone),known=new Set(registry.map(x=>x.id));
+    for(const group of [...groups.values()].sort((a,b)=>a.displayTitle.localeCompare(b.displayTitle,'tr'))){
+      const base=BASE_TOPICS.find(topic=>[topic.id,topic.displayTitle,...topic.poolTopics,...topic.aliases].some(label=>norm(label)===norm(group.key)||norm(label)===norm(group.displayTitle)));
+      const canonical=base||taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.displayTitle}),id=canonical?.id||'',healthy=Object.values(group.counts).every(count=>count>=minimumPerDifficulty);
+      if(!healthy||!id||known.has(id))continue;
+      known.add(id);registry.push({id,displayTitle:String(canonical.displayTitle||canonical.topic||group.displayTitle),poolTopics:[...group.poolTopics],aliases:[...(canonical.aliases||[]),group.key],sourceHealth:{...group.counts,total:group.total,minimumPerDifficulty}});
+    }
+    const order=new Map((taxonomy?.all?.({exam:'TYT',subjectId:'matematik',active:true})||[]).map((topic,index)=>[topic.id,index]));
+    return registry.sort((a,b)=>(order.get(a.id)??9999)-(order.get(b.id)??9999));
+  }
+  function refreshTopics(items=[],raw={}){
+    TOPICS=buildTopicRegistry(items,raw);
+    if(window.YKSTeacherPilotV1)window.YKSTeacherPilotV1.topics=TOPICS.map(clone);
+    return TOPICS.map(clone);
+  }
 
   function resolveTopic(value){
     const values=typeof value==='string'?[value]:[value?.topicId,value?.topicKey,value?.canonicalTopic,value?.topic].filter(Boolean);
@@ -163,5 +192,5 @@
     return{event:dataApi.record(event,{persistNow:true}),duplicate:false};
   }
 
-  window.YKSTeacherPilotV1={version:2,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
+  window.YKSTeacherPilotV1={version:3,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),buildTopicRegistry,refreshTopics,resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
 })();

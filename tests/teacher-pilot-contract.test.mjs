@@ -4,6 +4,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 const pilotCode=fs.readFileSync(new URL('../app-teacher-pilot-v1.js',import.meta.url),'utf8');
+const taxonomyCode=fs.readFileSync(new URL('../data/yks-topic-taxonomy-v1.js',import.meta.url),'utf8');
 const pool=JSON.parse(fs.readFileSync(new URL('../data/catalog/meb-manual-student-pool-1523.json',import.meta.url),'utf8'));
 
 function harness(){
@@ -11,7 +12,7 @@ function harness(){
   const context={state,console,Date,structuredClone};
   context.window=context;context.globalThis=context;
   context.YKSDataV5={record(event){const row=structuredClone(event);state.studyEvents.push(row);return row}};
-  vm.createContext(context);vm.runInContext(pilotCode,context,{filename:'app-teacher-pilot-v1.js'});
+  vm.createContext(context);vm.runInContext(taxonomyCode,context,{filename:'data/yks-topic-taxonomy-v1.js'});vm.runInContext(pilotCode,context,{filename:'app-teacher-pilot-v1.js'});
   return context;
 }
 
@@ -37,6 +38,24 @@ test('Pilot pool coverage and difficulty distribution stay exact',()=>{
     rows.forEach(x=>actual[x.difficulty]++);
     assert.deepEqual(actual,want,topicId);
   }
+});
+
+test('healthy TYT mathematics sources automatically expand teacher coverage',()=>{
+  const h=harness(),P=h.YKSTeacherPilotV1,ready=pool.filter(x=>x.status==='student-ready'&&x.answerVerified===true&&x.manualCrop===true).map(x=>({...x,asset:{status:'ready'}}));
+  const topics=P.refreshTopics(ready);
+  assert.equal(topics.length,6,'three protected pilot topics plus three taxonomy-safe healthy topics');
+  assert.equal(P.resolveTopic('Kümeler').id,'tyt.matematik.kumeler');
+  assert.equal(P.resolveTopic('Mantık').id,'tyt.matematik.mantik');
+  assert.equal(P.resolveTopic('Denklemler ve Eşitsizlikler'),null,'ambiguous source title must not invent a taxonomy identity');
+  assert.equal(P.resolveTopic('Olasılık'),null,'a topic below the green threshold stays closed');
+});
+
+test('new source coverage opens a canonical topic without a code allowlist after reaching green health',()=>{
+  const h=harness(),P=h.YKSTeacherPilotV1,rows=[];
+  for(const difficulty of ['KOLAY','ORTA','ZOR'])for(let i=0;i<15;i++)rows.push({id:`new-${difficulty}-${i}`,exam:'TYT',subject:'Matematik',provider:'MEB_OGM',manualCrop:true,answerVerified:true,status:'student-ready',asset:{status:'ready'},canonicalTopic:'olasilik',topic:'Olasılık',difficulty});
+  P.refreshTopics(rows);
+  assert.equal(P.resolveTopic('Olasılık').id,'tyt.matematik.olaslik');
+  assert.equal(P.resolveItem(rows[0]).displayTitle,'Olasılık');
 });
 
 test('Decision and outcome contracts are canonical, zero-count and idempotent',()=>{

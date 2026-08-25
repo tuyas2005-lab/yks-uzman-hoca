@@ -1,6 +1,6 @@
 # Kişisel Öğretmen 2.0 — Master Plan
 
-**Durum:** Faz 11 — Öğrenci Gelişim Rotası için ürün source-of-truth
+**Durum:** Faz 12 — TYT Matematik Teacher Pool kapsam genişletme için ürün source-of-truth
 **Karar tarihi:** 25 Ağustos 2026  
 **Ürün sahibi:** Yaşar Güler  
 **Ana hedef:** Öğrenciyi TYT Matematikte başlangıç seviyesinden kalıcı ve ölçülebilir gelişime taşıyan adaptif dijital öğretmen
@@ -616,5 +616,37 @@ Seviye 5 için 30 günlük kalıcılık kanıtı gerekir.
 | Öğrenme modelinden kanıt toplama | Tamamlandı | `buildTopicProgressEvidence`, gerçek event geçmişi |
 | Öğrenci konu geçiş kapısı | Tamamlandı | Tamamlanma eylemi `decideTopicRoute` sonucuna bağlı |
 | Öğrenci gelişim rotası arayüzü | Tamamlandı | Beş seviyeli sade yolculuk kartı |
-| Preview tasarım kabulü | Bekliyor | Telefon/tablet ürün sahibi kontrolü |
+| Preview tasarım kabulü | Tamamlandı | Telefon/tablet ürün sahibi kabulü geçti |
+| Merge / production | Tamamlandı | PR #34, production merge `1fc2feb` ve canlı HTTP 200 |
+
+---
+
+## 20. Faz 12 — TYT Matematik Teacher Pool kapsam genişletme
+
+Limited Pilot'taki üç konu ve bu konulardaki öğrenci hafızası korunur. Öğretmen
+kapsamı, kod içine elle yeni allowlist eklemek yerine gerçek kaynak sağlığına
+göre genişler.
+
+Bir TYT Matematik konusu otomatik olarak öğretmen kapsamına yalnız şu koşullarda
+girer:
+
+1. kaynak MEB/OGM'dir;
+2. soru `student-ready`, cevap doğrulanmış, manuel crop ve asset hazırdır;
+3. canonical konu kimliği vardır;
+4. kolay, orta ve zor seviyelerin her birinde en az 15 hazır soru bulunur.
+
+Bu eşik öğretmenin tanıma, pekiştirme ve challenge akışlarında sessiz zorluk
+fallback'i yapmadan çalışabilmesini sağlar. Yeni eklenen kaynak bir konuyu bu
+eşiğe taşıdığında uygulama güncellemesi gerekmeden öğretmen konuyu fark eder.
+
+### 20.1 İlk uygulama paketi — 25 Ağustos 2026
+
+| Uygulama adımı | Durum | Kanıt |
+| --- | --- | --- |
+| Kaynaktan dinamik konu kaydı | Uygulandı | `buildTopicRegistry`, `refreshTopics` |
+| Üç pilot konunun geriye uyumluluğu | Uygulandı | Sabit canonical kimlikler korunur |
+| Yeşil kaynak sağlığı kapısı | Uygulandı | Her zorlukta en az 15 hazır soru |
+| Yeni kaynakları otomatik fark etme | Uygulandı | Catalog boyutu değiştiğinde registry yenilenir |
+| Deterministik kapsam testleri | Tamamlandı | 76/76 test; kaynak eşiği ve otomatik canonical açılış |
+| Preview / gerçek kullanıcı kabulü | Bekliyor | Telefon/tablet kontrolü |
 | Merge / production | Bekliyor | Kullanıcı onayı sonrası |

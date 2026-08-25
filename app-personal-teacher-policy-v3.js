@@ -5,6 +5,8 @@
   const norm=s=>D()?.norm?.(s)||String(s||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,' ').trim();
   const today=()=>D()?.todayKey?.()||new Date().toLocaleDateString('sv-SE');
   state.teacher??={};state.miniTests??={history:[]};
+  let registrySourceCount=-1;
+  function refreshTeacherTopics(){const items=C()?.all?.()||[];if(items.length!==registrySourceCount){window.YKSTeacherPilotV1?.refreshTopics?.(items);registrySourceCount=items.length}}
 
   const modeInfo={
     diagnostic:{label:'Önce tanıyalım',title:'Önce seni biraz tanıyayım',count:5},
@@ -18,12 +20,16 @@
   };
 
   function candidates(){
+    refreshTeacherTopics();
+    const P=window.YKSTeacherPilotV1,registry=(P?.topics||[]).map(topic=>({exam:'TYT',subject:'Matematik',topic:topic.displayTitle,topicKey:topic.id,score:null,total:0,wrong:0,recentWrong:0,recentSignals:0,staleDays:999,confidence:'Henüz ölçülmedi'}));
     const s=window.getStudentStrategy?.();
     if(s?.topics?.length){
       const list=(s.focus?[s.focus.primary,...(s.focus.alternatives||[])]:s.topics).filter(Boolean),seen=new Set();
-      return list.filter(x=>window.YKSTeacherPilotV1?.resolveTopic?.(x)).filter(x=>{const k=`${x.exam}|${x.subject}|${x.topic}`;if(seen.has(k))return false;seen.add(k);return true}).slice(0,8);
+      const measured=list.filter(x=>P?.resolveTopic?.(x)).filter(x=>{const id=P.resolveTopic(x).id;if(seen.has(id))return false;seen.add(id);return true});
+      return [...measured,...registry.filter(x=>!seen.has(x.topicKey))];
     }
-    return (D()?.getLearningModel?.()?.topics||[]).filter(x=>window.YKSTeacherPilotV1?.resolveTopic?.(x)).map(x=>({...x,priority:(100-(x.score??70))+(x.recentWrong||0)*8+(x.recentSignals||0)*10})).sort((a,b)=>b.priority-a.priority);
+    const measured=(D()?.getLearningModel?.()?.topics||[]).filter(x=>P?.resolveTopic?.(x)).map(x=>({...x,priority:(100-(x.score??70))+(x.recentWrong||0)*8+(x.recentSignals||0)*10})).sort((a,b)=>b.priority-a.priority),seen=new Set(measured.map(x=>P.resolveTopic(x).id));
+    return [...measured,...registry.filter(x=>!seen.has(x.topicKey))];
   }
   function focus(){
     const list=candidates(),manual=state.strategy?.manualTopicDate===today()?state.strategy?.manualTopic:'',daily=state.teacher.daily;

@@ -14,7 +14,8 @@ const loader=fs.readFileSync(new URL('../app-home-links.js',import.meta.url),'ut
 
 test('empty student starts from a canonical pilot topic',()=>{
   assert.match(policy,/topic:'Problemler',topicKey:'tyt\.matematik\.problemler'/);
-  assert.match(policy,/filter\(x=>window\.YKSTeacherPilotV1\?\.resolveTopic/);
+  assert.match(policy,/refreshTeacherTopics\(\)/);
+  assert.match(policy,/registry\.filter\(x=>!seen\.has\(x\.topicKey\)\)/);
   assert.match(loader,/makeGroup\('official',\['tests','questionIndex','teacher'\]/,'Teacher açıldığında gerçek katalog da yüklenmeli');
   assert.doesNotMatch(policy,/!window\.getStudentStrategy\|\|!window\.YKSQuestionCatalogV1/,'policy katalog tamamlanana kadar eski rendererda kalmamalı');
 });

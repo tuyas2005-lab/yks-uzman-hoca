@@ -62,6 +62,7 @@
 
   function renderTeacherTaskOrHome(){
     const task=state.miniTests?.teacherTask;
+    if(task?.sessionId&&autoStartedTeacherSession===task.sessionId&&activeQuery&&current.length){renderSet(activeQuery,activeCount);return}
     if(task?.sessionId&&task.itemIds?.length&&autoStartedTeacherSession!==task.sessionId){
       autoStartedTeacherSession=task.sessionId;
       selection={exam:task.exam||'TYT',subject:task.subject||'Matematik',year:'latest',topic:task.topic||'',count:Number(task.expectedCount)||task.itemIds.length||5};

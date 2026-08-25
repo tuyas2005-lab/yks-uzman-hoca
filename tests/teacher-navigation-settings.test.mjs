@@ -70,6 +70,7 @@ test('completed teacher session presents a strong next-task action',()=>{
   assert.match(policy,/todayQ>=goal/);
   assert.match(ui,/\.pt2-next\{/);
   assert.match(ui,/min-height:54px/);
+  assert.match(policy,/id&&!done\?`<button/,'completed task rows must not render action buttons');
 });
 
 test('home has one clear teacher entry and no duplicated teacher plan',()=>{

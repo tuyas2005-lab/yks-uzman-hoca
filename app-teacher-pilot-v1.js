@@ -64,6 +64,7 @@
   }
   const REWARD_POINTS={attempt:2,correct:3,mediumCorrect:1,hardCorrect:2,unableHonest:1,wrongReviewed:2,errorReason:1,similarCorrect:3,wrongRecovered:5,teacherTaskCompleted:10,dailyGoalCompleted:15,threeDayStreak:20,topicImproved:25,retention30Passed:10};
   function rewardFor(raw={}){const awards=[];let points=0;for(const key of Object.keys(REWARD_POINTS))if(raw[key]){const value=REWARD_POINTS[key];awards.push({key,points:value});points+=value}let praiseId='effort-noticed';if(raw.wrongRecovered)praiseId='mistake-recovered';else if(raw.retention30Passed)praiseId='retention-proven';else if(raw.topicImproved)praiseId='measurable-growth';else if(raw.hardCorrect)praiseId='challenge-solved';else if(raw.unableHonest)praiseId='honest-feedback';return{points,awards,praiseId}}
+  function selectByDifficulty(items=[],config={}){const wanted=config.difficultyCounts||{},limit=Math.max(0,Number(config.count||0)),selected=[],used=new Set(),level=x=>String(x?.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');for(const key of ['KOLAY','ORTA','ZOR']){const need=Math.max(0,Number(wanted[key]||0));items.filter(x=>level(x)===key).slice(0,need).forEach(x=>{if(!used.has(x.id)){used.add(x.id);selected.push(x)}})}for(const x of items){if(selected.length>=limit)break;if(!used.has(x.id)){used.add(x.id);selected.push(x)}}return selected.slice(0,limit)}
   function buildRewardEvent(input={}){const rewardId=String(input.rewardId||'').trim();if(!rewardId)throw new Error('Teacher rewardId is required');const reward=rewardFor(input.behaviors||{}),event=baseEvent({...input,id:`teacher-reward:${rewardId}`},'reward-earned','reward-earned','teacher-reward-v1');event.signals.push(...reward.awards.map(x=>`reward-${x.key}`));event.meta={...event.meta,rewardId,sessionId:String(input.sessionId||''),points:reward.points,awards:reward.awards,praiseId:reward.praiseId};return event}
 
   function baseEvent(input,source,interaction,schema){
@@ -115,5 +116,5 @@
     return{event:dataApi.record(event,{persistNow:true}),duplicate:false};
   }
 
-  window.YKSTeacherPilotV1={version:1,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),resolveTopic,resolveItem,decideTeacherSession,nextReview,rewardFor,buildRewardEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
+  window.YKSTeacherPilotV1={version:1,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),resolveTopic,resolveItem,decideTeacherSession,nextReview,rewardFor,selectByDifficulty,buildRewardEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
 })();

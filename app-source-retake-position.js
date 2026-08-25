@@ -95,6 +95,10 @@
       if(typeof window.closeWrongRecord==='function')window.closeWrongRecord(canonical.id,'retry-correct');
       else console.error('Canonical yanlış kapatma API hazır değil; yanlış açık bırakıldı.',canonical.id);
     }
+    if(kind==='correct'&&!canonical){
+      const open=(state.studyEvents||[]).filter(x=>x?.meta?.wrongRecord===true&&!x?.meta?.wrongClosed&&x.meta?.catalogId!==item.id&&x.exam===item.exam&&x.subject===item.subject&&x.topic===item.topic);
+      open.forEach(x=>window.markWrongLearningEvidence?.(x.id,{wrongSimilarCorrectAt:at,wrongSimilarCorrectEventId:event.id,wrongSimilarCatalogId:item.id}))
+    }
     if(meta.teacherTask&&window.YKSTeacherPilotV1){
       const P=window.YKSTeacherPilotV1,difficulty=String(item.difficulty||'').toLocaleUpperCase('tr-TR'),behaviors={attempt:true,correct:kind==='correct',mediumCorrect:kind==='correct'&&difficulty==='ORTA',hardCorrect:kind==='correct'&&difficulty==='ZOR',unableHonest:kind==='unable',wrongRecovered:kind==='correct'&&!!canonical};
       try{const reward=P.buildRewardEvent({rewardId:`${meta.teacherSessionId}:${item.id}:${isRetry?'retry':'first'}`,sessionId:meta.teacherSessionId,dateKey:D()?.todayKey?.(),topicId:meta.topicId,behaviors});const saved=P.recordOnce(reward);state.teacher??={};state.teacher.lastPraise={...reward.meta,duplicate:saved.duplicate,at:Date.now()}}catch(e){console.warn('Öğretmen ödülü kaydedilemedi',e)}

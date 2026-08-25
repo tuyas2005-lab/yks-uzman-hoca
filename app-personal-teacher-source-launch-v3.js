@@ -16,9 +16,9 @@
 
   function plan(ctx){
     const desired=Number(state.teacher?.daily?.desiredCount||5)>=5?5:3;
-    let exact=[];try{exact=C()?.findNextBatch?.({...ctx,visualPreferred:true},5)||[]}catch{}
-    const count=desired===5?(exact.length>=5?5:exact.length>=3?3:exact.length):(exact.length>=3?3:exact.length);
-    return{items:count?exact.slice(0,count):[],count,desired}
+    let exact=[];try{exact=C()?.findNextBatch?.({...ctx,visualPreferred:true},30)||[]}catch{}
+    const mode=state.teacher?.daily?.mode||'diagnostic',cfg=window.YKSTeacherPilotV1?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selected=window.YKSTeacherPilotV1?.selectByDifficulty?.(exact,{...cfg,count:desired})||exact.slice(0,desired),count=desired===5?(selected.length>=5?5:selected.length>=3?3:0):(selected.length>=3?3:0);
+    return{items:count?selected.slice(0,count):[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{}}
   }
 
   function adapt(){

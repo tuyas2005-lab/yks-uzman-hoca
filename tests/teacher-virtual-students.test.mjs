@@ -49,4 +49,8 @@ test('mode configurations select controlled source difficulty',()=>{
   assert.deepEqual({...P.decideTeacherSession({total:5,score:20}).config.difficultyCounts},{KOLAY:4,ORTA:1,ZOR:0});
   assert.deepEqual({...P.decideTeacherSession({total:8,score:95,staleDays:1}).config.difficultyCounts},{KOLAY:0,ORTA:2,ZOR:3});
   assert.equal(P.decideTeacherSession({total:8,score:95,staleDays:10}).config.count,3);
+  const items=[...Array(4)].map((_,i)=>({id:`k${i}`,difficulty:'KOLAY'})).concat([...Array(4)].map((_,i)=>({id:`o${i}`,difficulty:'ORTA'})),[...Array(4)].map((_,i)=>({id:`z${i}`,difficulty:'ZOR'})));
+  const foundation=P.selectByDifficulty(items,P.modeConfig.foundation),challenge=P.selectByDifficulty(items,P.modeConfig.challenge);
+  assert.deepEqual(Array.from(foundation,x=>x.difficulty),['KOLAY','KOLAY','KOLAY','KOLAY','ORTA']);
+  assert.deepEqual(Array.from(challenge,x=>x.difficulty),['ORTA','ORTA','ZOR','ZOR','ZOR']);
 });

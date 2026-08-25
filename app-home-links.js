@@ -116,8 +116,8 @@
     ()=>loadScript('/app-mini-tests-source.js?v=6'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
-    ()=>loadScript('/app-wrong-closure-v2.js?v=2'),
-    ()=>loadScript('/app-source-retake-position.js?v=2')
+    ()=>loadScript('/app-wrong-closure-v2.js?v=3'),
+    ()=>loadScript('/app-source-retake-position.js?v=3')
   ],()=>{
     const C=window.YKSQuestionCatalogV1,all=C?.all?.()||[],manual=all.filter(x=>x?.sourceKind==='manual-crop').length,visible=all.filter(x=>x?.sourceKind==='manual-crop'&&x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.status==='ready').length,unresolved=manual-visible;
     if(!C||manual!==1523||manual!==visible+unresolved||unresolved!==2){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
@@ -143,11 +143,11 @@
 
   groups.wrongs=makeGroup('wrongs',['wrong'],[
     ()=>loadScript('/app-wrongs-v2.js?v=1'),
-    ()=>loadScript('/app-wrong-review-task.js?v=2'),
+    ()=>loadScript('/app-wrong-review-task.js?v=3'),
     ()=>loadScript('/app-wrong-review-id-fix.js?v=1'),
     ()=>loadScript('/app-wrongs-source-link.js?v=3'),
     ()=>loadScript('/app-wrong-priority-order.js?v=1'),
-    ()=>loadScript('/app-wrong-closure-v2.js?v=2')
+    ()=>loadScript('/app-wrong-closure-v2.js?v=3')
   ],()=>{
     if(typeof window.renderWrongV2==='function'){
       window.installWrongClosureV2?.();
@@ -169,8 +169,8 @@
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=1'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=3'),
-    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=4'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=4'),
+    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=5'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=2')
   ],()=>{
     if(typeof window.renderTeacher==='function'){

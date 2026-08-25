@@ -62,6 +62,35 @@ test('completed session memory controls the next session and due review',()=>{
   assert.equal(P.resumeMode({previousMode:'challenge',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-08-26',closureComplete:false}),'repair');
 });
 
+test('topic progress requires strong evidence on separate days before progression',()=>{
+  const P=engine();
+  assert.equal(P.assessTopicProgress({measuredCount:0}).level,1);
+  assert.equal(P.assessTopicProgress({measuredCount:6,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:false}).level,2,'açık yanlış varken konu güçlü sayılamaz');
+  assert.equal(P.assessTopicProgress({measuredCount:5,accuracy:100,successfulSessions:1,distinctStudyDays:1,closureComplete:true}).level,3,'tek kusursuz oturum konu geçişi için yeterli değildir');
+  const strong=P.assessTopicProgress({measuredCount:10,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:true});
+  assert.equal(strong.level,4);assert.equal(strong.stage,'strong');
+  const retained=P.assessTopicProgress({measuredCount:15,accuracy:93,successfulSessions:3,distinctStudyDays:3,closureComplete:true,retention30Passed:true});
+  assert.equal(retained.level,5);assert.equal(retained.stage,'retained');
+});
+
+test('topic route repairs and reviews before opening the next topic',()=>{
+  const P=engine(),strong={measuredCount:10,accuracy:90,successfulSessions:2,distinctStudyDays:2,closureComplete:true,hasNextTopic:true};
+  assert.equal(P.decideTopicRoute({...strong,closureComplete:false}).action,'repair-current');
+  assert.equal(P.decideTopicRoute({...strong,reviewDue:true}).action,'review-current');
+  assert.equal(P.decideTopicRoute(strong).action,'open-next-topic');
+  assert.equal(P.decideTopicRoute({...strong,hasNextTopic:false}).action,'maintain-current');
+  assert.equal(P.decideTopicRoute({...strong,dailyGoalComplete:true}).action,'finish-day');
+});
+
+test('topic evidence is rebuilt from canonical outcomes, results and open wrongs',()=>{
+  const P=engine(),topicId='tyt.matematik.problemler',outcome=(id,date,accuracy)=>P.buildOutcomeEvent({sessionId:id,decisionId:`d-${id}`,dateKey:date,topicId,answeredCount:5,correctCount:Math.round(accuracy/20),accuracy,nextReview:{days:id==='s2'?14:7,dateKey:'2026-09-08'}}),results=[...Array(10)].map((_,i)=>({id:`r${i}`,timestamp:i+1,dateKey:i<5?'2026-08-25':'2026-08-26',source:'source-question-result',topicKey:topicId,result:i===9?'wrong':'correct',meta:{topicId,wrongRecord:i===9,wrongClosed:i!==9}}));
+  const evidence=P.buildTopicProgressEvidence([outcome('s1','2026-08-25',80),outcome('s2','2026-08-26',100),...results],{topicId,today:'2026-08-27'});
+  assert.equal(evidence.measuredCount,10);assert.equal(evidence.successfulSessions,2);assert.equal(evidence.distinctStudyDays,2);assert.equal(evidence.openWrongCount,1);assert.equal(evidence.closureComplete,false);assert.equal(evidence.reviewDue,false);
+  results.at(-1).meta.wrongClosed=true;
+  const closed=P.buildTopicProgressEvidence([outcome('s1','2026-08-25',80),outcome('s2','2026-08-26',100),...results],{topicId,today:'2026-09-08'});
+  assert.equal(closed.closureComplete,true);assert.equal(closed.reviewDue,true);assert.equal(P.decideTopicRoute({...closed,hasNextTopic:true}).action,'review-current','süresi gelen kontrol sıradaki konudan önce gelmeli');
+});
+
 test('virtual student progresses through repair, reinforcement, challenge and spaced review',()=>{
   const P=engine();
   const first=P.decideTeacherSession({total:5,score:40,recentWrong:2});

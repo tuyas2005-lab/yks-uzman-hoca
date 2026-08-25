@@ -1,6 +1,6 @@
 # Kişisel Öğretmen 2.0 — Master Plan
 
-**Durum:** Faz 9 — Limited Pilot için ürün source-of-truth  
+**Durum:** Faz 11 — Öğrenci Gelişim Rotası için ürün source-of-truth
 **Karar tarihi:** 25 Ağustos 2026  
 **Ürün sahibi:** Yaşar Güler  
 **Ana hedef:** Öğrenciyi TYT Matematikte başlangıç seviyesinden kalıcı ve ölçülebilir gelişime taşıyan adaptif dijital öğretmen
@@ -569,6 +569,52 @@ davranışı artık tek soru üzerinden ilerleyen sürekli adaptif oturuma taş�
 | Tek-soru öğretmen oturumu | Tamamlandı | `state.teacher.adaptiveSession` |
 | Öğrenci devam / bitir kontrolleri | Tamamlandı | Soru sonuç ekranı eylemleri |
 | Oturum sonucu ve konu hafızası | Tamamlandı | Outcome, ödül, tekrar tarihi ve `topicMemory` |
-| Otomatik regresyon | Tamamlandı | 67/67 test |
-| Preview gerçek kullanıcı kabulü | Bekliyor | Telefon/tablet göz kontrolü |
+| Otomatik regresyon | Tamamlandı | 70/70 test |
+| Preview gerçek kullanıcı kabulü | Tamamlandı | Telefon/tablet ürün sahibi kabulü geçti |
+| Merge / production | Tamamlandı | PR #33, production merge `9ce658d` ve canlı HTTP 200 |
+
+---
+
+## 19. Faz 11 — Öğrenci Gelişim Rotası ve Konu Geçişi
+
+Faz 10 öğretmenin tek bir oturum içinde her cevaptan sonra karar vermesini
+sağladı. Faz 11 bu kararları günler ve konular arasında tutarlı bir öğrenci
+yolculuğuna dönüştürür.
+
+Her pilot konu için beş gelişim seviyesi izlenir:
+
+| Seviye | Durum | Geçiş anlamı |
+| ---: | --- | --- |
+| 1 | Başlangıç | Yeterli ölçüm yok; önce öğrenci tanınır |
+| 2 | Temel oluşturuyor | Düşük başarı veya açık yanlış vardır |
+| 3 | Gelişiyor | Kanıt olumlu fakat henüz farklı günlerde tutarlı değildir |
+| 4 | Güçlü | Sıradaki konu açılabilir; eski konu planlı kontrollerle korunur |
+| 5 | Kalıcı | 30 günlük kalıcılık kanıtı alınmıştır |
+
+### 19.1 Konu geçiş kapısı
+
+Öğretmen sıradaki konuyu yalnız aşağıdaki kanıtların tamamında açar:
+
+1. Konuda en az 5 ölçülmüş gerçek kaynak sorusu vardır.
+2. Güncel başarı en az `%80` seviyesindedir.
+3. En az 2 başarılı öğretmen oturumu tamamlanmıştır.
+4. Güçlü kanıtlar en az 2 farklı çalışma gününde oluşmuştur.
+5. Açık yanlış borcu kalmamıştır.
+
+Tek bir kusursuz set konu geçişi için yeterli değildir. Seviye 4'e ulaşan konu
+terk edilmez; Öğrenme Hafızasındaki tarihte kısa kontrol için yeniden açılır.
+Seviye 5 için 30 günlük kalıcılık kanıtı gerekir.
+
+### 19.2 İlk uygulama paketi — 25 Ağustos 2026
+
+| Uygulama adımı | Durum | Kanıt |
+| --- | --- | --- |
+| Konu gelişim seviyesi sözleşmesi | Tamamlandı | `assessTopicProgress` |
+| Deterministik konu geçiş kararı | Tamamlandı | `decideTopicRoute` |
+| Tek başarılı oturumla erken geçişi engelleme | Tamamlandı | Ayrı gün/oturum testleri |
+| Yanlış ve süresi gelen tekrar önceliği | Tamamlandı | Route öncelik testleri |
+| Öğrenme modelinden kanıt toplama | Tamamlandı | `buildTopicProgressEvidence`, gerçek event geçmişi |
+| Öğrenci konu geçiş kapısı | Tamamlandı | Tamamlanma eylemi `decideTopicRoute` sonucuna bağlı |
+| Öğrenci gelişim rotası arayüzü | Tamamlandı | Beş seviyeli sade yolculuk kartı |
+| Preview tasarım kabulü | Bekliyor | Telefon/tablet ürün sahibi kontrolü |
 | Merge / production | Bekliyor | Kullanıcı onayı sonrası |

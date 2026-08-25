@@ -25,6 +25,20 @@ test('effort points are promoted beside the daily plan without a duplicate note'
   assert.match(ui,/@media\(max-width:600px\).*\.pt2-hero-side\{display:grid/);
 });
 
+test('teacher shows a compact five-level topic growth journey',()=>{
+  const policy=read('app-personal-teacher-policy-v3.js');
+  const ui=read('app-personal-teacher-v2.js');
+  assert.match(policy,/growthLabels=\['Başlangıç','Temel','Gelişiyor','Güçlü','Kalıcı'\]/);
+  assert.match(policy,/buildTopicProgressEvidence/);
+  assert.match(policy,/assessTopicProgress/);
+  assert.match(policy,/class="pt2-growth"/);
+  assert.match(policy,/BU KONUDAKİ YOLCULUĞUN/);
+  assert.match(ui,/\.pt2-growth-steps\{display:grid;grid-template-columns:repeat\(5/);
+  assert.match(ui,/\.pt2-growth-step small\{[^}]*font-size:12px/);
+  assert.match(ui,/\.pt2-growth>p\{[^}]*font-size:14px/);
+  assert.match(ui,/@media\(max-width:600px\).*\.pt2-growth\{padding:15px 10px\}/);
+});
+
 test('teacher-facing copy sounds human while raw statistics stay in evaluation',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   assert.match(policy,/bazı sorularda takıldığını görüyorum; bu çok normal/);
@@ -76,13 +90,18 @@ test('completed teacher session presents a strong next-task action',()=>{
   const policy=read('app-personal-teacher-policy-v3.js');
   const ui=read('app-personal-teacher-v2.js');
   assert.match(policy,/d\.sessionDone&&d\.mode!=='complete'/);
-  assert.match(policy,/Sıradaki Göreve Geç →/);
+  assert.match(policy,/Sıradaki Konuya Geç →/);
+  assert.match(policy,/Bugünkü Çalışmayı Tamamla →/);
   assert.match(policy,/completedTeacherTopics/);
   assert.match(policy,/state\.teacher\.daily=null/);
   assert.match(policy,/todayQ>=goal/);
   assert.match(ui,/\.pt2-next\{/);
   assert.match(ui,/min-height:54px/);
   assert.match(policy,/id&&!done\?`<button/,'completed task rows must not render action buttons');
+  assert.match(policy,/buildTopicProgressEvidence/);
+  assert.match(policy,/decideTopicRoute/);
+  assert.match(policy,/route\.action==='open-next-topic'/);
+  assert.match(policy,/İki ayrı gündeki güçlü çalışman/);
 });
 
 test('home has one clear teacher entry and no duplicated teacher plan',()=>{

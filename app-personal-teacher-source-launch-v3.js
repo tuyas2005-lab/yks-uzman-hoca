@@ -83,7 +83,7 @@
     if(!p.count||!p.distributionExact)return;
     const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),daily=state.teacher?.daily||{},revision=hash(`${daily.mode||'diagnostic'}|${p.items.map(x=>x.id).join('|')}`),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${revision}`,decisionId=`${sessionId}-decision`;
     if(P&&topic){
-      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan'],evidence:{dailyMode:daily.mode||'',expectedCount:p.count},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
+      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan',`mode-${daily.mode||'diagnostic'}`],reasonText:daily.reasonText||'',evidence:{...(daily.decisionEvidence||{}),dailyMode:daily.mode||'',expectedCount:p.count,sourceHealth:p.health?{total:p.health.total,counts:p.health.counts,overall:p.health.overall}:{}},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
       P.recordOnce(event)
     }
     state.miniTests??={history:[]};

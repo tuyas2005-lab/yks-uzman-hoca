@@ -75,5 +75,10 @@ test('teacher persists session memory and observes student initiated mini tests'
   assert.match(policy,/transitionMode\?\.\(previous,raw\?\.mode/);
   assert.match(policy,/uygulanacak sıradaki mod/);
   assert.match(policy,/modeInfo\[nextMemoryMode\]/);
+  assert.match(policy,/Öğretmen karar geçmişi — ürün sahibi/);
+  assert.match(policy,/buildAuditTrail/);
+  assert.match(policy,/Seçilen soru kimlikleri/);
+  assert.match(policy,/d\.decisionEvidence=/);
+  assert.match(policy,/d\.reasonText=reason\(f,d\)/);
   assert.match(teacherWrongScope,/mem\.closureComplete=!!d\.wrongDone/);
 });

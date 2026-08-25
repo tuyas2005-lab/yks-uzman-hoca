@@ -80,6 +80,7 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
 {
   const h=createHarness();h.state.miniTests={teacherTask:{sessionId:'reward-session',decisionId:'reward-decision',itemIds:[item.id]}};
   h.recordSourceQuestionAttempt(item,'wrong','A',{type:'mini',actionId:'reward-first-wrong'});
+  h.state.miniTests.teacherTask=null;
   h.recordSourceQuestionAttempt(item,'wrong','B',{type:'wrong',actionId:'reward-retry-wrong'});
   const visibleRewardAttempt=h.recordSourceQuestionAttempt(item,'correct','C',{type:'wrong',actionId:'reward-retry-correct'});
   const rewards=h.state.studyEvents.filter(x=>x.source==='reward-earned');
@@ -89,6 +90,7 @@ const audits=(state,source)=>state.studyEvents.filter(x=>x.source===source);
   assert.equal(attempts(h.state).every(x=>Number(x.meta?.teacherReward?.points)>0),true,'her öğretmen attempti görünür puan verisini kendi sonucunda taşımalı');
   assert.equal(attempts(h.state).every(x=>x.meta?.teacherReward?.praiseId),true,'her öğretmen attempti görünür takdir kimliği taşımalı');
   assert.ok(visibleRewardAttempt.meta.teacherReward?.points>0,'çağırana dönen olay nesnesi görünür ödülü hemen taşımalı');
+  assert.equal(visibleRewardAttempt.meta.teacherSessionId,'reward-session','yanlış inceleme retry kaydı özgün öğretmen oturum bağını korumalı');
 }
 
 {

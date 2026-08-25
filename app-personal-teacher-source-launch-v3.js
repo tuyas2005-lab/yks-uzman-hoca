@@ -62,8 +62,13 @@
 
   function launch(ctx,p){
     if(!p.count)return;
+    const P=window.YKSTeacherPilotV1,topic=P?.resolveTopic?.(ctx.topic),stamp=Date.now(),sessionId=`pt2-${today()}-${topic?.id||norm(ctx.topic)}-${stamp}`,decisionId=`${sessionId}-decision`,daily=state.teacher?.daily||{};
+    if(P&&topic){
+      const event=P.buildDecisionEvent({decisionId,sessionId,dateKey:today(),topicId:topic.id,mode:daily.mode||'diagnostic',reasonCodes:['daily-plan'],evidence:{dailyMode:daily.mode||'',expectedCount:p.count},selection:{questionIds:p.items.map(x=>x.id),difficultyCounts:p.items.reduce((a,x)=>{const k=String(x.difficulty||'').toUpperCase();if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0}),total:p.count}});
+      P.recordOnce(event)
+    }
     state.miniTests??={history:[]};
-    state.miniTests.teacherTask={date:today(),topic:ctx.topic,exam:ctx.exam,subject:ctx.subject,expectedCount:p.count,fallback:false,strictTopic:true,itemIds:p.items.map(x=>x.id)};
+    state.miniTests.teacherTask={date:today(),topic:ctx.topic,topicId:topic?.id||'',exam:ctx.exam,subject:ctx.subject,sessionId,decisionId,mode:daily.mode||'diagnostic',expectedCount:p.count,fallback:false,strictTopic:true,itemIds:p.items.map(x=>x.id)};
     state.miniTests.prefillSubject=`${ctx.exam} ${ctx.subject}`;
     state.miniTests.prefillTopic=ctx.topic;
     if(state.teacher?.daily){
@@ -96,7 +101,7 @@
 
   async function openRecap(ctx,button){
     const d=state.teacher?.daily||{};
-    if(!ctx||(d.mode!=='repair'&&!d.testDone)||recapBusy)return;
+    if(!ctx||(!['repair','foundation'].includes(d.mode)&&!d.testDone)||recapBusy)return;
     const slot=document.getElementById('pt2RecapSlot');if(!slot)return;
 
     recapBusy=true;

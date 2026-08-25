@@ -8,8 +8,10 @@
 
   const modeInfo={
     diagnostic:{label:'Önce ölç',title:'Veriyi netleştir',count:5},
+    foundation:{label:'Temel kur',title:'Temelden güven oluştur',count:5},
     repair:{label:'Onarım',title:'Eksik noktayı kapat',count:5},
     reinforce:{label:'Pekiştir',title:'Bilgiyi sağlamlaştır',count:5},
+    challenge:{label:'Meydan okuma',title:'Zorluğu kontrollü artır',count:5},
     spaced:{label:'Aralıklı tekrar',title:'Unutmadan kısa kontrol',count:3},
     maintain:{label:'Koru',title:'Kısa kontrol yeterli',count:3},
     complete:{label:'Hedef tamam',title:'Bugün yeni yük yok',count:0}
@@ -32,13 +34,8 @@
   function todayQuestions(){return Number(D()?.getLearningModel?.()?.todayCount||0)}
   function reviewsToday(){return (state.studyEvents||[]).filter(x=>x?.source==='wrong-review'&&x?.dateKey===today()).length}
   function baseMode(f){
-    const goal=Math.max(1,Number(state.profile?.goal||10)),done=todayQuestions(),existing=state.teacher.daily;
-    if(done>=goal&&!(existing?.date===today()&&(existing.testDone||existing.recapDone)))return'complete';
-    if(Number(f.total||0)<3)return'diagnostic';
-    if((f.score??100)<55||Number(f.recentWrong||0)>=2||Number(f.recentSignals||0)>=2)return'repair';
-    if((f.score??100)<80)return'reinforce';
-    if(Number(f.staleDays||0)>=7&&Number(f.staleDays||0)<999)return'spaced';
-    return'maintain';
+    const existing=state.teacher.daily;
+    return window.YKSTeacherPilotV1?.decideTeacherSession?.({...f,todayCount:todayQuestions(),dailyGoal:Math.max(1,Number(state.profile?.goal||10)),sessionInProgress:existing?.date===today()&&(existing.testDone||existing.recapDone)})?.mode||'diagnostic';
   }
   function ensureDaily(f){
     let d=state.teacher.daily;
@@ -56,8 +53,8 @@
   }
   function isSessionDone(d){
     if(d.mode==='complete')return true;
-    if(d.mode==='diagnostic'||d.mode==='reinforce')return !!(d.testDone&&d.recapDone&&d.wrongDone);
-    if(d.mode==='repair')return !!(d.recapDone&&d.testDone&&d.wrongDone);
+    if(['diagnostic','reinforce','challenge'].includes(d.mode))return !!(d.testDone&&d.recapDone&&d.wrongDone);
+    if(d.mode==='repair'||d.mode==='foundation')return !!(d.recapDone&&d.testDone&&d.wrongDone);
     return !!(d.testDone&&d.wrongDone);
   }
   function exactReady(f,limit=5){try{return C()?.findNextBatch?.({exam:f.exam,subject:f.subject,topic:f.topic,visualPreferred:true},Math.max(5,limit))||[]}catch{return[]}}
@@ -71,7 +68,9 @@
     if(d.mode==='complete')return`Bugünkü soru hedefi ${done}/${goal}. Yeni görev eklemiyorum; istersen yalnız yanlışlarını tekrar edebilirsin.`;
     if(d.mode==='diagnostic')return`${f.topic} için yalnız ${f.total||0} ölçüm var. Tahmin yürütmek yerine önce gerçek kaynak sorularıyla seviyeyi ölçeceğim.`;
     if(d.mode==='repair')return`${f.topic}: ${score}${wr?` • ${wr} yakın yanlış`:''}${sig?` • ${sig} zorlanma sinyali`:''}. Önce kısa onarım, sonra kaynak sorularıyla kontrol en yüksek getiriyi verir.`;
+    if(d.mode==='foundation')return`${f.topic}: ${score}. Temel eksik görünüyor; kısa anlatım ve ağırlıklı kolay sorularla güvenli bir başlangıç yapacağız.`;
     if(d.mode==='reinforce')return`${f.topic}: ${score}. Temel oluşmuş; 5 gerçek kaynak sorusuyla pekiştirip yalnız hata çıkarsa kısa tekrar yapacağız.`;
+    if(d.mode==='challenge')return`${f.topic}: ${score}. Güçlü ve güncel performans kanıtlandı; orta ve zor sorularla kontrollü meydan okuma zamanı.`;
     if(d.mode==='spaced')return`${f.topic} iyi durumda ancak ${stale} gündür ölçülmedi. 3 soruluk aralıklı kontrol yeterli.`;
     return`${f.topic} güncel ölçümlerde iyi durumda. Uzun çalışma yerine 3 soruluk kısa kontrol yeterli.`;
   }
@@ -79,7 +78,7 @@
   function stepsHtml(f,d,count){
     const mistakes=Number(d.testSummary?.mistakes||0),sourceDesc=count?`${count} çözülmemiş, doğrulanmış kaynak sorusuyla çalış.`:`Bu konu için en az 3 çözülmemiş hazır kaynak sorusu yok; AI soru üretmeyecek.`,testLabel=count?`${count} Soruluk Seti Başlat`:'Kaynak Bekleniyor';
     if(d.mode==='complete')return task(1,'Bugünkü hedef tamamlandı','Yeni soru yükü eklenmedi. İstersen Yanlışlarım bölümünden serbest tekrar yapabilirsin.',true,false,'pt2Wrong','Yanlışları Aç',false);
-    if(d.mode==='repair')return [
+    if(d.mode==='repair'||d.mode==='foundation')return [
       task(1,'5 Dakika Hızlı Onarım','AI yalnız kritik noktaları açıklar; soru üretmez.',d.recapDone,!d.recapDone,'pt2Recap',d.recapDone?'Tekrar Aç':'Hızlı Tekrarı Aç'),
       task(2,'Kaynakla Seviye Ölçümü',sourceDesc,d.testDone,d.recapDone&&!d.testDone,'pt2Test',testLabel,!count||!d.recapDone),
       task(3,'Yanlışları Kapat',d.testDone?(mistakes?`${mistakes} yanlış/yapamadım kaydını tek-soru ekranından yeniden incele.`:'Bu sette yanlış yok; otomatik tamamlandı.'):'Kaynak seti bittikten sonra açılır.',d.wrongDone,d.testDone&&!d.wrongDone,'pt2Wrong',d.wrongDone?'Yanlışları Aç':'Yanlışlarımı Aç',!d.testDone||!mistakes)
@@ -104,7 +103,7 @@
     setTimeout(()=>window.refreshSourceSetTracking?.(),0);
   }
   async function openRecap(f){
-    const d=ensureDaily(f);if(d.mode!=='repair'&&!d.testDone)return;
+    const d=ensureDaily(f);if(!['repair','foundation'].includes(d.mode)&&!d.testDone)return;
     const slot=document.getElementById('pt2RecapSlot');if(!slot)return;const insight=topicTestInsight(f),key=recapCacheKey(f,insight);let data=state.teacher.recapCache?.[key];
     if(!data){slot.innerHTML='<div class="pt2-recap"><b>✍️ Hızlı tekrar hazırlanıyor…</b></div>';try{const r=await fetch('/api/teacher-recap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exam:f.exam,subject:f.subject,topic:f.topic,mastery:f.score??0,recentWrongCount:f.recentWrong||f.wrong||0,topicTestEvidence:insight})}),j=await r.json();if(!r.ok)throw new Error(j.error||'Tekrar hazırlanamadı');state.teacher.recapCache[key]=j;save();data=j}catch(e){slot.innerHTML=`<div class="pt2-recap"><b>Tekrar hazırlanamadı</b><p>${esc(e.message)}</p></div>`;return}}
     slot.innerHTML=`<div class="pt2-recap"><h3>${esc(data.title||f.topic)}</h3><p class="muted">${esc(data.overview||'')}</p><div class="pt2-key">${(data.key_points||[]).map((x,i)=>`<div><b>${i+1}. nokta</b><br>${esc(x)}</div>`).join('')}</div><div class="pt2-warn"><b>⚠️ Sık hata</b><br>${esc(data.common_mistake||'')}</div><div class="pt2-tip"><b>💡 Sınav püf noktası</b><br>${esc(data.exam_tip||'')}</div><div class="pt2-recap-actions"><button id="pt3RecapDone" class="primary">✓ Tekrarı Tamamladım</button><button id="pt3RecapClose" class="ghost">Kapat</button></div></div>`;

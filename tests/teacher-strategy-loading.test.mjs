@@ -15,8 +15,8 @@ function groupJobs(name) {
 
 test('Teacher loads the shared Strategy Engine before policy v3', () => {
   const teacher = groupJobs('teacher');
-  const strategy = teacher.indexOf("loadScript('/app-strategy-engine.js?v=2')");
-  const policy = teacher.indexOf("loadScript('/app-personal-teacher-policy-v3.js?v=2')");
+  const strategy = teacher.indexOf("loadScript('/app-strategy-engine.js?v=3')");
+  const policy = teacher.indexOf("loadScript('/app-personal-teacher-policy-v3.js?v=3')");
 
   assert.notEqual(strategy, -1, 'Teacher must load Strategy Engine directly');
   assert.notEqual(policy, -1, 'Teacher policy v3 must remain in the Teacher group');
@@ -25,17 +25,17 @@ test('Teacher loads the shared Strategy Engine before policy v3', () => {
 
 test('Coach keeps using the same Strategy Engine URL for loader dedupe', () => {
   const coach = groupJobs('coach');
-  assert.match(coach, /loadScript\('\/app-strategy-engine\.js\?v=2'\)/);
+  assert.match(coach, /loadScript\('\/app-strategy-engine\.js\?v=3'\)/);
   assert.equal(
-    loader.match(/loadScript\('\/app-strategy-engine\.js\?v=2'\)/g)?.length,
+    loader.match(/loadScript\('\/app-strategy-engine\.js\?v=3'\)/g)?.length,
     2,
     'Teacher and Coach should request one identical URL so the shared loader evaluates it once'
   );
 });
 
 test('Startup and service worker use the new loader cache key', () => {
-  assert.match(startup, /\/app-home-links\.js\?v=14/);
-  assert.doesNotMatch(startup, /\/app-home-links\.js\?v=13/);
-  assert.match(serviceWorker, /\/app-home-links\.js\?v=14/);
-  assert.match(serviceWorker, /r28-teacher-strategy/);
+  assert.match(startup, /\/app-home-links\.js\?v=15/);
+  assert.doesNotMatch(startup, /\/app-home-links\.js\?v=14/);
+  assert.match(serviceWorker, /\/app-home-links\.js\?v=15/);
+  assert.match(serviceWorker, /r29-teacher-engine/);
 });

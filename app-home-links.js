@@ -170,8 +170,8 @@
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=6'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=16'),
-    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=12'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=17'),
+    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=13'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=3')
   ],()=>{
     if(typeof window.renderTeacher==='function'){

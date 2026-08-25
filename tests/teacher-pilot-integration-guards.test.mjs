@@ -50,6 +50,13 @@ test('adaptive teacher opens one question and re-decides after every answer',()=
   assert.match(sourceRetake,/meta\.adaptiveTeacher=adaptiveTask/);
 });
 
+test('teacher note prioritizes the just-completed adaptive session result',()=>{
+  assert.match(policy,/if\(d\.testDone&&d\.testSummary\)/);
+  assert.match(policy,/solved\} soruda \$\{correct\} doğru yaptın/);
+  assert.match(policy,/Çalışmanı değerlendirdim/);
+  assert.match(launch,/testSummary=\{count:a\.length,correct,wrong,unable,mistakes:wrong\+unable,percent:accuracy/);
+});
+
 test('source health warning stays hidden while healthy and preserves open state when shown',()=>{
   assert.match(launch,/current\?\.dataset\.pt3Signature===signature/);
   assert.match(launch,/const wasOpen=!!current\?\.open/);

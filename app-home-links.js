@@ -170,7 +170,7 @@
     ()=>loadScript('/app-teacher-wrong-scope.js?v=4'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
     ()=>loadScript('/app-personal-teacher-policy-v3.js?v=10'),
-    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=6'),
+    ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=7'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=2')
   ],()=>{
     if(typeof window.renderTeacher==='function'){

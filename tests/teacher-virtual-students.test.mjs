@@ -87,3 +87,14 @@ test('mode configurations select controlled source difficulty',()=>{
   assert.equal(P.transitionMode('repair','challenge'),'reinforce','tek başarılı onarım doğrudan challenge açmamalı');
   assert.equal(P.transitionMode('reinforce','challenge'),'maintain','challenge farklı zamanda güçlü kanıt gerektirmeli');
 });
+
+test('pool health warns before a difficulty source is exhausted',()=>{
+  const P=engine();
+  assert.equal(P.poolHealth({KOLAY:15,ORTA:15,ZOR:15}).overall,'green');
+  assert.equal(P.poolHealth({KOLAY:14,ORTA:15,ZOR:15}).overall,'yellow');
+  assert.equal(P.poolHealth({KOLAY:8,ORTA:7,ZOR:15}).overall,'orange');
+  const critical=P.poolHealth({KOLAY:3,ORTA:2,ZOR:0});
+  assert.equal(critical.overall,'red');
+  assert.deepEqual(JSON.parse(JSON.stringify(critical.counts)),{KOLAY:3,ORTA:2,ZOR:0});
+  assert.deepEqual(Array.from(critical.alerts,x=>[x.difficulty,x.level,x.neededForGreen]),[['KOLAY','orange',12],['ORTA','red',13],['ZOR','red',15]]);
+});

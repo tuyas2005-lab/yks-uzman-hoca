@@ -15,12 +15,26 @@
     return exam&&subject&&topic?{exam,subject,topic}:null
   }
 
+  function sourceHealth(ctx){
+    const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx),catalog=C(),solved=catalog?.getSolvedIds?.()||new Set();
+    if(!pilot||!catalog?.all)return null;
+    const visible=typeof window.isStudentVisibleQuestion==='function'?window.isStudentVisibleQuestion:()=>true,rows=catalog.all().filter(visible).filter(x=>P.resolveItem?.(x)?.id===pilot.id),remaining=rows.filter(x=>!solved.has(x.id)),counts=remaining.reduce((a,x)=>{const k=String(x.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(k in a)a[k]++;return a},{KOLAY:0,ORTA:0,ZOR:0});
+    return{...P.poolHealth(counts),topicId:pilot.id,totalRows:rows.length,solved:rows.length-remaining.length}
+  }
+
+  function healthCard(root,p){
+    root.querySelector('[data-pt3-health]')?.remove();
+    const h=p.health,host=root.querySelector('.pt2-details');if(!h||!host)return;
+    const labels={KOLAY:'Kolay',ORTA:'Orta',ZOR:'Zor'},colors={green:['#eaf7ef','#197249'],yellow:['#fff8dd','#8a6500'],orange:['#fff1df','#a35400'],red:['#fff0f1','#b73845']},levelText={green:'Yeterli',yellow:'Erken uyarı',orange:'Yüksek öncelik',red:'Kritik'},alerts=h.alerts.map(x=>`${labels[x.difficulty]} ${x.remaining}`).join(' • '),advice=h.overall==='green'?'Bu konu ve tüm zorluk seviyelerinde kaynak normal kullanım için yeterli.':h.overall==='yellow'?`Erken kaynak uyarısı: ${alerts}. Yeni doğrulanmış kaynak ekleme planına alınmalı.`:h.overall==='orange'?`Yeni kaynak yüksek öncelik: ${alerts}. Havuz bitmeden ekleme yapılmalı.`:`Kritik kaynak uyarısı: ${alerts}. Eksik zorluk düzeyinde yeni ölçüm seti açılmayacak ve daha kolay soruyla doldurulmayacak.`;
+    const card=document.createElement('details');card.dataset.pt3Health='1';card.style.gridColumn='1 / -1';card.innerHTML=`<summary>Kaynak sağlığı — ürün sahibi • ${h.total} çözülmemiş • ${levelText[h.overall]}</summary><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:11px">${Object.entries(h.cells).map(([k,x])=>{const c=colors[x.level];return`<div style="padding:10px;border-radius:12px;background:${c[0]};color:${c[1]}"><small>${labels[k]}</small><br><b>${x.remaining} çözülmemiş</b></div>`}).join('')}</div><div class="pt2-note"><b>${levelText[h.overall]}:</b> ${esc(advice)}<br>Toplam ${h.totalRows} doğrulanmış soru • ${h.solved} çözülmüş • ${h.total} çözülmemiş.</div>`;host.prepend(card)
+  }
+
   function plan(ctx){
     const desired=Number(state.teacher?.daily?.desiredCount||5)>=5?5:3;
     const P=window.YKSTeacherPilotV1,pilot=P?.resolveTopic?.(ctx);if(!pilot)return{items:[],count:0,desired,mode:'blocked',shortages:{PILOT:desired},distributionExact:false};
     const poolTopic=pilot.poolTopics?.[0]||pilot.displayTitle;let exact=[];try{exact=C()?.findNextBatch?.({...ctx,topic:poolTopic,visualPreferred:true},30)||[]}catch{}
     const mode=state.teacher?.daily?.mode||'diagnostic',cfg=P?.modeConfig?.[mode]||{count:desired,difficultyCounts:{}},selection=P?.difficultySelection?.(exact,{...cfg,count:desired})||{items:[],shortages:{UNKNOWN:desired},distributionExact:false},count=selection.distributionExact?desired:0;
-    return{...selection,items:count?selection.items:[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{},pilot,poolTopic}
+    return{...selection,items:count?selection.items:[],count,desired,mode,difficultyCounts:cfg.difficultyCounts||{},pilot,poolTopic,health:sourceHealth(ctx)}
   }
 
   function adapt(){
@@ -35,6 +49,8 @@
         if(h)h.textContent=d.desiredCount===3?'Kaynak Sorularla Kısa Kontrol':'Kaynak Sorularla Ölçüm'
       }
       const p=plan(ctx),btn=root.querySelector('#pt3Test'),t=btn?.closest('.pt2-task');
+      healthCard(root,p);
+      if(p.health?.alerts?.length){try{const P=window.YKSTeacherPilotV1,shortages=Object.fromEntries(p.health.alerts.map(x=>[x.difficulty,x.neededForGreen])),warningId=`${today()}-${p.pilot.id}-health-${hash(JSON.stringify(p.health.counts))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:{KOLAY:15,ORTA:15,ZOR:15},available:p.health.counts,shortages,severity:p.health.overall}))}catch(e){console.warn('Teacher Pool sağlık uyarısı kaydedilemedi',e)}}
       if(!p.distributionExact&&p.pilot&&Object.keys(p.shortages||{}).length){try{const P=window.YKSTeacherPilotV1,warningId=`${today()}-${p.pilot.id}-${p.mode}-${hash(JSON.stringify(p.shortages))}`;P.recordOnce(P.buildPoolWarningEvent({warningId,dateKey:today(),topicId:p.pilot.id,mode:p.mode,requested:p.difficultyCounts,available:p.actualDifficultyCounts,shortages:p.shortages,severity:'orange'}))}catch(e){console.warn('Teacher Pool uyarısı kaydedilemedi',e)}}
       if(btn&&!t?.classList.contains('done')){
         btn.textContent=p.count?`${p.count} Soruluk Seti Başlat`:'Kaynak Yok';

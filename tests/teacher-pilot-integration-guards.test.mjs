@@ -21,6 +21,11 @@ test('teacher query resolves pool alias before catalog selection and blocks non-
   assert.match(launch,/poolTopic=pilot\.poolTopics\?\.\[0\]\|\|pilot\.displayTitle/);
   assert.match(launch,/if\(!pilot\)return\{items:\[\],count:0/);
   assert.match(launch,/if\(!p\.count\|\|!p\.distributionExact\)return/);
+  assert.match(launch,/function sourceHealth\(ctx\)/);
+  assert.match(launch,/getSolvedIds/);
+  assert.match(launch,/P\.resolveItem\?\.\(x\)\?\.id===pilot\.id/);
+  assert.match(launch,/Kaynak sağlığı — ürün sahibi/);
+  assert.match(launch,/neededForGreen/);
 });
 
 test('mini test consumes exact teacher item ids instead of repicking',()=>{

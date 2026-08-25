@@ -1,4 +1,4 @@
-const CACHE = 'yks-uzman-hoca-v5.1.2-r44-teacher-progression';
+const CACHE = 'yks-uzman-hoca-v5.1.2-r45-pool-health';
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const SHELL = [
   '/',
@@ -13,14 +13,14 @@ const SHELL = [
   '/data/yks-topic-taxonomy-v1.js',
   '/app-analysis-flow.js?v=2',
   '/app-data-v5.js?v=2',
-  '/app-teacher-pilot-v1.js?v=6',
+  '/app-teacher-pilot-v1.js?v=7',
   '/app-home-data.js?v=3',
   '/app-topic-ui.js?v=4',
   '/app-topic-test-entry.js?v=1',
   '/app-ui-cleanup-v1.js?v=2',
-  '/app-home-links.js?v=18',
+  '/app-home-links.js?v=19',
   '/app-startup-polish.js?v=2',
-  '/app-personal-teacher-source-launch-v3.js?v=6'
+  '/app-personal-teacher-source-launch-v3.js?v=7'
 ];
 
 async function cacheOptionalExternal(cache) {

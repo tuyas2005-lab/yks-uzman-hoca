@@ -41,6 +41,12 @@ test('same daily plan uses a deterministic launch revision',()=>{
   assert.doesNotMatch(launch,/sessionId=.*Date\.now/);
 });
 
+test('source health card remains open across observer adaptation',()=>{
+  assert.match(launch,/current\?\.dataset\.pt3Signature===signature/);
+  assert.match(launch,/const wasOpen=!!current\?\.open/);
+  assert.match(launch,/card\.open=wasOpen/);
+});
+
 test('teacher and mini test preserve usable phone touch layout',()=>{
   assert.match(teacherUi,/\.pt2-task>div:last-child\{grid-column:1\/-1/);
   assert.match(teacherUi,/min-height:44px/);

@@ -105,7 +105,7 @@
     },
     ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
-    ()=>loadScript('/app-source-question-viewer.js?v=8'),
+    ()=>loadScript('/app-source-question-viewer.js?v=9'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),
     ()=>loadScript('/app-source-screen-nav-fix.js?v=1'),
     ()=>loadScript('/app-source-incomplete-policy.js?v=2'),
@@ -113,7 +113,8 @@
     ()=>loadScript('/app-question-index-homefix.js?v=1'),
     ()=>loadScript('/app-question-index-counter-fix.js?v=1'),
     ()=>loadScript('/app-official-question-pilot.js?v=4'),
-    ()=>loadScript('/app-mini-tests-source.js?v=13'),
+    ()=>loadScript('/app-mini-tests-source.js?v=14'),
+    ()=>loadScript('/app-teacher-source-nav.js?v=1'),
     ()=>loadScript('/app-mini-tests-prefill.js?v=1'),
     ()=>loadScript('/app-source-direct-open.js?v=2'),
     ()=>loadScript('/app-wrong-closure-v2.js?v=4'),
@@ -161,7 +162,7 @@
     ()=>loadScript('/app-low-cost.js?v=2'),
     ()=>loadScript('/app-low-cost-fix.js?v=2'),
     ()=>loadScript('/app-teacher-performance.js?v=2'),
-    ()=>loadScript('/app-personal-teacher-v2.js?v=6'),
+    ()=>loadScript('/app-personal-teacher-v2.js?v=7'),
     // Teacher policy v3 requires getStudentStrategy. Load the shared strategy
     // engine in the teacher path too, so opening Teacher before Coach cannot
     // leave the legacy v2 renderer active after the policy install timeout.
@@ -169,7 +170,7 @@
     ()=>loadScript('/app-source-set-tracking.js?v=1'),
     ()=>loadScript('/app-teacher-wrong-scope.js?v=5'),
     ()=>loadScript('/app-home-teacher-flow.js?v=1'),
-    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=13'),
+    ()=>loadScript('/app-personal-teacher-policy-v3.js?v=14'),
     ()=>loadScript('/app-personal-teacher-source-launch-v3.js?v=11'),
     ()=>loadScript('/app-home-teacher-count-fix.js?v=3')
   ],()=>{
@@ -188,12 +189,17 @@
     }
   });
 
+  groups.settings=makeGroup('settings',['profile'],[
+    ()=>loadScript('/app-field-track.js?v=2'),
+    ()=>loadScript('/app-profile-consistency.js?v=3')
+  ],()=>{});
+
   groups.coach=makeGroup('coach',['coach'],[
     ()=>loadScript('/app-yks-coach.js?v=3'),
     ()=>loadScript('/app-yks-coach-fix.js?v=2'),
     ()=>loadScript('/app-field-track.js?v=2'),
     ()=>loadScript('/app-strategy-engine.js?v=3'),
-    ()=>loadScript('/app-profile-consistency.js?v=2')
+    ()=>loadScript('/app-profile-consistency.js?v=3')
   ],()=>{
     if(typeof window.renderCoach==='function'){
       window.renderCoach();

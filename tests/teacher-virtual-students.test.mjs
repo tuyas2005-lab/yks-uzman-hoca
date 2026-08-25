@@ -39,6 +39,26 @@ test('completed session memory controls the next session and due review',()=>{
   assert.equal(P.resumeMode({previousMode:'challenge',nextMode:'challenge',nextReviewDate:'2026-09-08',today:'2026-08-26',closureComplete:false}),'repair');
 });
 
+test('virtual student progresses through repair, reinforcement, challenge and spaced review',()=>{
+  const P=engine();
+  const first=P.decideTeacherSession({total:5,score:40,recentWrong:2});
+  assert.equal(first.mode,'repair');
+  assert.equal(P.resumeMode({previousMode:'diagnostic',nextMode:first.mode,nextReviewDate:'2026-08-28',today:'2026-08-26',closureComplete:false}),'repair');
+
+  const repaired=P.transitionMode('repair',P.decideTeacherSession({total:5,score:100}).mode);
+  assert.equal(repaired,'reinforce','başarılı onarımın ardından zorluk bir basamak artmalı');
+  assert.equal(P.resumeMode({previousMode:'repair',nextMode:repaired,nextReviewDate:'2026-09-09',today:'2026-08-27',closureComplete:true}),'reinforce');
+
+  const reinforced=P.transitionMode('reinforce',P.decideTeacherSession({total:5,score:100}).mode);
+  assert.equal(reinforced,'maintain','tek güçlü pekiştirme doğrudan meydan okumaya geçmemeli');
+  assert.equal(P.resumeMode({previousMode:'reinforce',nextMode:reinforced,nextReviewDate:'2026-09-10',today:'2026-08-28',closureComplete:true}),'maintain');
+
+  const challenged=P.transitionMode('maintain',P.decideTeacherSession({total:8,score:95,staleDays:1}).mode);
+  assert.equal(challenged,'challenge');
+  assert.equal(P.resumeMode({previousMode:'maintain',nextMode:challenged,nextReviewDate:'2026-09-11',today:'2026-08-29',closureComplete:true}),'challenge','ayrı zamandaki ikinci güçlü kanıt meydan okumayı açmalı');
+  assert.equal(P.resumeMode({previousMode:'maintain',nextMode:challenged,nextReviewDate:'2026-09-11',today:'2026-09-11',closureComplete:true}),'spaced','planlı kontrol günü zorluk artışından önce gelmeli');
+});
+
 test('effort rewards do not punish mistakes and praise evidence',()=>{
   const P=engine();
   assert.deepEqual(JSON.parse(JSON.stringify(P.rewardFor({attempt:true}))),{points:2,awards:[{key:'attempt',points:2}],praiseId:'effort-noticed'});

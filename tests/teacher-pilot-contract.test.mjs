@@ -61,6 +61,17 @@ test('reviewed equations mapping rejects a broader source with another subtopic'
   assert.equal(P.resolveTopic('Denklemler ve Eşitsizlikler'),null,'reviewed mapping must require the audited source subtopic');
 });
 
+test('source health report exposes deficits before a topic is opened',()=>{
+  const h=harness(),P=h.YKSTeacherPilotV1;
+  const report=P.buildSourceHealthReport(pool.map(x=>({...x,asset:{status:'ready'}})));
+  const problems=report.find(x=>x.sourceKey==='problemler');
+  assert.equal(JSON.stringify(problems.counts),JSON.stringify({KOLAY:57,ORTA:67,ZOR:38}));
+  const equations=report.find(x=>x.sourceKey==='denklemler-ve-esitsizlikler');
+  assert.equal(equations.pending,1);
+  assert.equal(equations.canonicalTopicId,'tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler');
+  assert.equal(JSON.stringify(equations.deficits),JSON.stringify({KOLAY:0,ORTA:0,ZOR:0}));
+});
+
 test('new source coverage opens a canonical topic without a code allowlist after reaching green health',()=>{
   const h=harness(),P=h.YKSTeacherPilotV1,rows=[];
   for(const difficulty of ['KOLAY','ORTA','ZOR'])for(let i=0;i<15;i++)rows.push({id:`new-${difficulty}-${i}`,exam:'TYT',subject:'Matematik',provider:'MEB_OGM',manualCrop:true,answerVerified:true,status:'student-ready',asset:{status:'ready'},canonicalTopic:'olasilik',topic:'Olasılık',difficulty});

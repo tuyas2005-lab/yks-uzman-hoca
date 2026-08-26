@@ -37,8 +37,8 @@ test('Startup and service worker use the new loader cache key', () => {
   assert.match(startup, /\/app-home-links\.js\?v=41/);
   assert.doesNotMatch(startup, /\/app-home-links\.js\?v=40/);
   assert.match(serviceWorker, /\/app-home-links\.js\?v=41/);
-  assert.match(startup, /\/app-teacher-pilot-v1\.js\?v=14/);
-  assert.match(serviceWorker, /\/app-teacher-pilot-v1\.js\?v=14/);
+  assert.match(startup, /\/app-teacher-pilot-v1\.js\?v=15/);
+  assert.match(serviceWorker, /\/app-teacher-pilot-v1\.js\?v=15/);
   assert.match(serviceWorker, /\/app-personal-teacher-source-launch-v3\.js\?v=13/);
-  assert.match(serviceWorker, /r70-teacher-first-degree-equations/);
+  assert.match(serviceWorker, /r71-teacher-source-health/);
 });

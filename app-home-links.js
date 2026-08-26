@@ -93,7 +93,7 @@
     });
   }
 
-  const official=makeGroup('official',['tests','questionIndex','teacher','crop'],[
+  const official=makeGroup('official',['tests','questionIndex','teacher','crop-studio'],[
     ()=>loadScript('/data/question-catalog-v1.js?v=7',()=>{const C=window.YKSQuestionCatalogV1;if(!C||typeof C.all!=='function'||typeof C.register!=='function')throw new Error('Catalog bootstrap failed: YKSQuestionCatalogV1 missing')}),
     async()=>{
       await loadScript('/data/catalog/catalog-manifest.js?v=3');

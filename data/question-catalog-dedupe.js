@@ -2,8 +2,14 @@
   const C=window.YKSQuestionCatalogV1;if(!C||C.__dedupeInstalled)return;
   const rawAll=C.all.bind(C),rawRegister=C.register.bind(C);
   const norm=s=>String(s??'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g,'-').replace(/^-+|-+$/g,'');
+  const sourceScope=x=>{
+    const collection=norm(x?.collection||x?.sourceSeries);
+    if(x?.sourceKind!=='manual-crop')return collection;
+    const topic=norm(x?.canonicalTopic||x?.canonicalTopicId||x?.topic);
+    return [collection,topic].join('|');
+  };
   const sourceKey=x=>x?.sourceFingerprint||[
-    norm(x?.provider),String(x?.year||''),norm(x?.exam),norm(x?.subject),norm(x?.collection),norm(x?.questionNo)
+    norm(x?.provider),String(x?.year||''),norm(x?.exam),norm(x?.subject),sourceScope(x),norm(x?.questionNo)
   ].join('|');
   const canonicalKey=x=>String(x?.duplicateOf||x?.canonicalQuestionId||x?.contentFingerprint||sourceKey(x)||x?.id||'');
   const duplicateLog=[];

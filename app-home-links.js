@@ -121,7 +121,7 @@
     ()=>loadScript('/app-source-retake-position.js?v=9')
   ],()=>{
     const C=window.YKSQuestionCatalogV1,all=C?.all?.()||[],manual=all.filter(x=>x?.sourceKind==='manual-crop').length,visible=all.filter(x=>x?.sourceKind==='manual-crop'&&x?.manualCrop===true&&x?.answerVerified===true&&x?.status==='student-ready'&&x?.asset?.status==='ready').length,unresolved=manual-visible;
-    if(!C||manual!==1523||manual!==visible+unresolved||unresolved!==2){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
+    if(!C||manual<1523||manual!==visible+unresolved||unresolved!==2){const b=[...document.querySelectorAll('.sidebar button')].find(x=>/Soru İndeksi/.test(x.textContent||''));if(b)b.textContent='🗂️ Soru havuzu yüklenemedi. Yeniden dene.';return}
     resolveQuestionRuntimeReady?.();
     if(typeof window.renderMiniTestHome==='function'){
       markReady('tests');

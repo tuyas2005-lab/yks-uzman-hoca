@@ -26,6 +26,7 @@
     }
   ];
   const REVIEWED_SOURCE_TOPIC_MAP={
+    'uslu-ve-koklu-ifadeler-1':{topicId:'tyt.matematik.uslu-sayilar',confidence:'HIGH',reason:'MEB kaynağındaki Üslü ve Köklü İfadeler - 1 başlığı, öğretmen akışında Üslü Sayılar merkezi konusu altında işlenir.'},
     'temel-kavramlar-sayi-kumeleri':{topicId:'tyt.matematik.temel-kavramlar',confidence:'HIGH',reason:'Kaynak başlığı ve alt başlığı Sayı Kümeleri; merkezi konu Temel Kavramlar ve Sayı Kümeleri ile birebir örtüşür.'},
     'bolme-bolunebilme-kurallari':{topicId:'tyt.matematik.bolme-ve-bolunebilme',confidence:'HIGH',reason:'Kaynak başlığı Bölme-Bölünebilme Kuralları; merkezi Bölme ve Bölünebilme konusu ile birebir örtüşür.'},
     'denklemler-ve-esitsizlikler':{topicId:'tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler',confidence:'HIGH',requiredSourceSubtopic:'Birinci Dereceden Denklemler ve Eşitsizlikler',reason:'Exact audit ile KEEP bırakılan 110 kaydın kaynak alt başlığı Birinci Dereceden Denklemler ve Eşitsizlikler; geniş başlık Basit Eşitsizlikler olarak daraltılmaz.'}

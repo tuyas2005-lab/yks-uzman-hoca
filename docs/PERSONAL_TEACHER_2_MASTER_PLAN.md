@@ -666,16 +666,3 @@ taxonomy karşılığı birebir olan eşleştirmeler öğretmene açılır.
 Bu paketle güvenli öğretmen kapsamı 6 konudan 8 konuya çıkar. Geniş
 “Denklemler ve Eşitsizlikler” havuzu yalnız soru sayısı yüksek olduğu için
 `Basit Eşitsizlikler` konusuna zorla bağlanmaz.
-
-### 20.3 Birinci derece denklem ve eşitsizlik havuzu
-
-Önceki exact audit'te geniş kaynaktan ayrıştırılıp KEEP bırakılan 110 kaydın
-tamamı `Birinci Dereceden Denklemler ve Eşitsizlikler` kaynak alt başlığındadır.
-109 öğrenciye hazır sorunun dağılımı `44 kolay / 44 orta / 21 zor` olduğu için
-yeşil kaynak sağlığı eşiği sağlanır.
-
-Bu havuz `Basit Eşitsizlikler` olarak daraltılmaz. Merkezi taxonomy içinde
-`tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler` kimliğiyle,
-yalnız exact audit'te doğrulanan kaynak alt başlığı eşleştiğinde öğretmene açılır.
-Gelecekte aynı geniş başlık altında farklı bir alt konu eklenirse bu HIGH
-eşleştirmeye otomatik olarak dahil edilmez.

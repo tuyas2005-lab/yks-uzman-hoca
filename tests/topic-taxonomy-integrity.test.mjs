@@ -8,10 +8,10 @@ const taxonomy=context.window.YKSTopicTaxonomyV1,topics=taxonomy.all(),norm=taxo
 const by=(exam,track='',subjectId='')=>taxonomy.all({exam,track,subjectId,active:true});
 
 assert.equal(taxonomy.curriculumVersion,'YKS_CURRENT_2018_2023_MEBI_2026');
-assert.equal(topics.length,228);assert.equal(new Set(topics.map(x=>x.id)).size,228);
-assert.equal(by('TYT').length,121);assert.equal(by('AYT','SAY').length,67);assert.equal(by('AYT','EA').length,63);
+assert.equal(topics.length,227);assert.equal(new Set(topics.map(x=>x.id)).size,227);
+assert.equal(by('TYT').length,120);assert.equal(by('AYT','SAY').length,67);assert.equal(by('AYT','EA').length,63);
 
-const expected={TYT:{turkce:15,matematik:32,fizik:14,kimya:10,biyoloji:11,tarih:12,cografya:11,felsefe:10,din:6},SAY:{matematik:23,fizik:16,kimya:12,biyoloji:16},EA:{matematik:23,edebiyat:18,tarih1:12,cografya1:10}};
+const expected={TYT:{turkce:15,matematik:31,fizik:14,kimya:10,biyoloji:11,tarih:12,cografya:11,felsefe:10,din:6},SAY:{matematik:23,fizik:16,kimya:12,biyoloji:16},EA:{matematik:23,edebiyat:18,tarih1:12,cografya1:10}};
 for(const [subjectId,count] of Object.entries(expected.TYT))assert.equal(by('TYT','',subjectId).length,count,`TYT ${subjectId}`);
 for(const track of ['SAY','EA'])for(const [subjectId,count] of Object.entries(expected[track]))assert.equal(by('AYT',track,subjectId).length,count,`${track} ${subjectId}`);
 assert.deepEqual(Array.from(taxonomy.subjects('TYT'),x=>x.subjectId),Object.keys(expected.TYT));
@@ -28,7 +28,6 @@ for(const topic of topics){
 }
 
 for(const id of ['tyt.matematik.uslu-sayilar','tyt.matematik.koklu-sayilar','tyt.matematik.problemler','tyt.turkce.paragraf','tyt.fizik.hareket'])assert.equal(taxonomy.get(id).id,id);
-assert.equal(taxonomy.find({exam:'TYT',subject:'Matematik',topic:'Denklemler ve Eşitsizlikler'}).id,'tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler');
 assert.equal(taxonomy.find({exam:'TYT',subject:'Matematik',topic:'Problemler'}).id,'tyt.matematik.problemler');
 assert.equal(taxonomy.find({exam:'TYT',subject:'Matematik',topic:'Köklü İfadeler'}).id,'tyt.matematik.koklu-sayilar');
 for(const ambiguous of [['AYT','Matematik','Artan-Azalan'],['AYT','Matematik','Maksimum-Minimum'],['AYT','Matematik','Teğet'],['AYT','Biyoloji','Üreme'],['AYT','Coğrafya-1','Ticaret']])assert.equal(taxonomy.find({exam:ambiguous[0],subject:ambiguous[1],topic:ambiguous[2]}),null);

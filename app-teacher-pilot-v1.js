@@ -56,6 +56,20 @@
     const order=new Map((taxonomy?.all?.({exam:'TYT',subjectId:'matematik',active:true})||[]).map((topic,index)=>[topic.id,index]));
     return registry.sort((a,b)=>(order.get(a.id)??9999)-(order.get(b.id)??9999));
   }
+  function buildSourceHealthReport(items=[],raw={}){
+    const minimumPerDifficulty=Math.max(1,Number(raw.minimumPerDifficulty||15)),taxonomy=raw.taxonomy||window.YKSTopicTaxonomyV1,groups=new Map();
+    for(const item of Array.isArray(items)?items:[]){
+      if(String(item?.exam||'').toUpperCase()!=='TYT'||norm(item?.subject)!=='matematik'||item?.provider!=='MEB_OGM'||item?.manualCrop!==true||!sourceKey(item))continue;
+      const key=sourceKey(item),group=groups.get(key)||{sourceKey:key,sourceTitle:String(item.topic||key),sourceSubtopics:new Set(),ready:0,pending:0,counts:{KOLAY:0,ORTA:0,ZOR:0}};
+      if(item.sourceSubtopic)group.sourceSubtopics.add(String(item.sourceSubtopic));
+      if(sourceReady(item)){group.ready++;if(group.counts[item.difficulty]!==undefined)group.counts[item.difficulty]++;}else group.pending++;
+      groups.set(key,group);
+    }
+    return [...groups.values()].sort((a,b)=>a.sourceTitle.localeCompare(b.sourceTitle,'tr')).map(group=>{
+      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.sourceKey],canonical=reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.sourceTitle}),deficits=Object.fromEntries(Object.entries(group.counts).map(([difficulty,count])=>[difficulty,Math.max(0,minimumPerDifficulty-count)]));
+      return {sourceKey:group.sourceKey,sourceTitle:group.sourceTitle,sourceSubtopics:[...group.sourceSubtopics],canonicalTopicId:canonical?.id||null,mappingConfidence:reviewed?.confidence|| (canonical?'HIGH':null),ready:group.ready,pending:group.pending,counts:{...group.counts},deficits,healthy:!!canonical&&Object.values(deficits).every(value=>value===0)};
+    });
+  }
   function refreshTopics(items=[],raw={}){
     TOPICS=buildTopicRegistry(items,raw);
     if(window.YKSTeacherPilotV1)window.YKSTeacherPilotV1.topics=TOPICS.map(clone);
@@ -199,5 +213,5 @@
     return{event:dataApi.record(event,{persistNow:true}),duplicate:false};
   }
 
-  window.YKSTeacherPilotV1={version:3,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),reviewedSourceTopics:clone(REVIEWED_SOURCE_TOPIC_MAP),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),buildTopicRegistry,refreshTopics,resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
+  window.YKSTeacherPilotV1={version:3,pilotId:PILOT_ID,engineVersion:ENGINE_VERSION,topics:TOPICS.map(clone),reviewedSourceTopics:clone(REVIEWED_SOURCE_TOPIC_MAP),modeConfig:clone(MODE_CONFIG),rewardPoints:clone(REWARD_POINTS),buildTopicRegistry,buildSourceHealthReport,refreshTopics,resolveTopic,resolveItem,decideTeacherSession,decideAdaptiveStep,transitionMode,resumeMode,assessTopicProgress,decideTopicRoute,buildTopicProgressEvidence,nextReview,rewardFor,difficultySelection,selectByDifficulty,poolHealth,buildAuditTrail,buildRewardEvent,buildPoolWarningEvent,buildDecisionEvent,buildOutcomeEvent,recordOnce};
 })();

@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+test('crop studio merges duplicate topic variants',()=>{const s=fs.readFileSync('app-crop-studio.js','utf8');for(const x of ['veri-1','veri-2','uslu-ve-koklu-ifadeler-1','uslu-ve-koklu-ifadeler-2','sayi-kesir-yas-isci-problemleri-1','sayi-kesir-yas-isci-problemleri-2','temel-kavramlar-sayi-basamaklari-sayi-kumeleri-1','ucgende-eslik-ve-benzerlik'])assert.match(s,new RegExp(x));assert.match(s,/const grouped=new Map/);});

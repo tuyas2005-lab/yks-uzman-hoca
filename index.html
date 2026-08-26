@@ -34,6 +34,7 @@
       <button data-go="topics">📈 <span>Konu Takip</span></button>
       <button data-go="stats">📊 <span>İstatistikler</span></button>
       <button data-go="profile">⚙️ <span>Ayarlar</span></button>
+      <button data-go="crop-studio">✂️ <span>Kaynak Hazırla</span></button>
     </nav>
     <div class="side-note">V5.0.1 • Canlı AI<br>StudyEvent + kişisel öğretmen + YKS koçu.</div>
   </aside>
@@ -104,6 +105,8 @@
     <section id="topics" class="screen"><div class="screen-head"><button class="back" data-go="home">←</button><h1>Konu Takip</h1></div><div class="card"><div id="topicRows" class="weak-list"></div></div></section>
 
     <section id="topic-test-entry" class="screen"><div class="screen-head"><button class="back" data-go="topics">←</button><div><h1>Konu Testi Sonucu</h1><p class="muted">Dışarıda çözdüğün konu testini öğrenme modeline ekle.</p></div></div><div id="topicTestEntryRoot"></div></section>
+
+    <section id="crop-studio" class="screen"><div class="screen-head"><button class="back" data-go="home">←</button><div><h1>Kaynak Hazırlama</h1><p class="muted">Eksik konular için soru görseli kırp, cevabı işaretle, JSON paketi oluştur.</p></div></div><div id="cropStudioRoot"></div></section>
 
     <section id="stats" class="screen"><div class="screen-head"><button class="back" data-go="home">←</button><h1>İstatistikler</h1></div><div class="stats-grid"><div class="stat"><b id="statTotal">13</b><small>Toplam soru</small></div><div class="stat"><b id="statAcc">69%</b><small>Doğruluk</small></div><div class="stat"><b id="statStuck">5</b><small>Takılma</small></div><div class="stat"><b>4</b><small>Aktif gün</small></div></div><div class="dash-grid"><div class="card"><h2>Konu Performansı</h2><div id="statsTopics" class="weak-list"></div></div><div class="card"><h2>Hocanın Yorumu</h2><div id="statsComment" class="tip blue"></div></div></div></section>
 
@@ -182,5 +185,6 @@
 <script src="/app-core.js"></script>
 <script src="/app-cloud.js"></script>
 <script src="/app-counselor.js"></script>
+<script src="/app-crop-studio.js"></script>
 </body>
 </html>

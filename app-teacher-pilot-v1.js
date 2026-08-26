@@ -27,7 +27,8 @@
   ];
   const REVIEWED_SOURCE_TOPIC_MAP={
     'temel-kavramlar-sayi-kumeleri':{topicId:'tyt.matematik.temel-kavramlar',confidence:'HIGH',reason:'Kaynak başlığı ve alt başlığı Sayı Kümeleri; merkezi konu Temel Kavramlar ve Sayı Kümeleri ile birebir örtüşür.'},
-    'bolme-bolunebilme-kurallari':{topicId:'tyt.matematik.bolme-ve-bolunebilme',confidence:'HIGH',reason:'Kaynak başlığı Bölme-Bölünebilme Kuralları; merkezi Bölme ve Bölünebilme konusu ile birebir örtüşür.'}
+    'bolme-bolunebilme-kurallari':{topicId:'tyt.matematik.bolme-ve-bolunebilme',confidence:'HIGH',reason:'Kaynak başlığı Bölme-Bölünebilme Kuralları; merkezi Bölme ve Bölünebilme konusu ile birebir örtüşür.'},
+    'denklemler-ve-esitsizlikler':{topicId:'tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler',confidence:'HIGH',requiredSourceSubtopic:'Birinci Dereceden Denklemler ve Eşitsizlikler',reason:'Exact audit ile KEEP bırakılan 110 kaydın kaynak alt başlığı Birinci Dereceden Denklemler ve Eşitsizlikler; geniş başlık Basit Eşitsizlikler olarak daraltılmaz.'}
   };
   let TOPICS=BASE_TOPICS.map(clone);
 
@@ -38,7 +39,9 @@
     const minimumPerDifficulty=Math.max(1,Number(raw.minimumPerDifficulty||15)),taxonomy=raw.taxonomy||window.YKSTopicTaxonomyV1,groups=new Map();
     for(const item of Array.isArray(items)?items:[]){
       if(!sourceReady(item)||!sourceKey(item))continue;
-      const key=sourceKey(item),group=groups.get(key)||{key,displayTitle:String(item.topic||key),poolTopics:new Set(),counts:{KOLAY:0,ORTA:0,ZOR:0},total:0};
+      const key=sourceKey(item),reviewed=REVIEWED_SOURCE_TOPIC_MAP[key];
+      if(reviewed?.requiredSourceSubtopic&&norm(item?.sourceSubtopic)!==norm(reviewed.requiredSourceSubtopic))continue;
+      const group=groups.get(key)||{key,displayTitle:String(reviewed?.requiredSourceSubtopic||item.topic||key),poolTopics:new Set(),counts:{KOLAY:0,ORTA:0,ZOR:0},total:0};
       group.poolTopics.add(String(item.topic||group.displayTitle));group.total++;
       const difficulty=String(item.difficulty||'').toLocaleUpperCase('tr-TR').replace('İ','I');if(difficulty in group.counts)group.counts[difficulty]++;
       groups.set(key,group);

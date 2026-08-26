@@ -43,14 +43,22 @@ test('Pilot pool coverage and difficulty distribution stay exact',()=>{
 test('healthy TYT mathematics sources automatically expand teacher coverage',()=>{
   const h=harness(),P=h.YKSTeacherPilotV1,ready=pool.filter(x=>x.status==='student-ready'&&x.answerVerified===true&&x.manualCrop===true).map(x=>({...x,asset:{status:'ready'}}));
   const topics=P.refreshTopics(ready);
-  assert.equal(topics.length,8,'three protected pilot topics plus five taxonomy-safe healthy topics');
+  assert.equal(topics.length,9,'three protected pilot topics plus six taxonomy-safe healthy topics');
   assert.equal(P.resolveTopic('Kümeler').id,'tyt.matematik.kumeler');
   assert.equal(P.resolveTopic('Mantık').id,'tyt.matematik.mantik');
   assert.equal(P.resolveTopic('Temel Kavramlar / Sayı Kümeleri').id,'tyt.matematik.temel-kavramlar');
   assert.equal(P.resolveTopic('Bölme - Bölünebilme Kuralları').id,'tyt.matematik.bolme-ve-bolunebilme');
-  assert.equal(P.resolveTopic('Denklemler ve Eşitsizlikler'),null,'ambiguous source title must not invent a taxonomy identity');
+  assert.equal(P.resolveTopic('Denklemler ve Eşitsizlikler').id,'tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler');
   assert.equal(P.resolveTopic('Olasılık'),null,'a topic below the green threshold stays closed');
   assert.equal(topics.find(x=>x.id==='tyt.matematik.temel-kavramlar').mapping.kind,'reviewed-high');
+  assert.deepEqual(topics.find(x=>x.id==='tyt.matematik.birinci-dereceden-denklemler-ve-esitsizlikler').sourceHealth,{KOLAY:44,ORTA:44,ZOR:21,total:109,minimumPerDifficulty:15});
+});
+
+test('reviewed equations mapping rejects a broader source with another subtopic',()=>{
+  const h=harness(),P=h.YKSTeacherPilotV1,rows=[];
+  for(const difficulty of ['KOLAY','ORTA','ZOR'])for(let i=0;i<15;i++)rows.push({id:`mixed-${difficulty}-${i}`,exam:'TYT',subject:'Matematik',provider:'MEB_OGM',manualCrop:true,answerVerified:true,status:'student-ready',asset:{status:'ready'},canonicalTopic:'denklemler-ve-esitsizlikler',sourceSubtopic:'İkinci Dereceden Eşitsizlikler',topic:'Denklemler ve Eşitsizlikler',difficulty});
+  P.refreshTopics(rows);
+  assert.equal(P.resolveTopic('Denklemler ve Eşitsizlikler'),null,'reviewed mapping must require the audited source subtopic');
 });
 
 test('new source coverage opens a canonical topic without a code allowlist after reaching green health',()=>{

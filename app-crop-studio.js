@@ -11,5 +11,19 @@
   function exportJson(){const blob=new Blob([JSON.stringify({format:'yks-source-crop-pack-v1',createdAt:new Date().toISOString(),records:queue},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='yks-source-crop-pack.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
   render();
   const installPasteTarget=()=>{const input=document.getElementById('cropImage');if(!input||document.getElementById('cropPasteZone'))return;input.insertAdjacentHTML('afterend','<div id="cropPasteZone" tabindex="0" style="margin:10px 0;padding:16px;border:2px dashed #6849ed;border-radius:12px;text-align:center;color:#5942d1;font-weight:800;cursor:pointer">Buraya tıkla, sonra Windows Ekran Alıntısı’ndan Ctrl+V yap</div>');const z=document.getElementById('cropPasteZone');z.addEventListener('paste',e=>{const item=[...(e.clipboardData?.items||[])].find(x=>x.type.startsWith('image/'));if(item){e.preventDefault();const u=URL.createObjectURL(item.getAsFile());image=new Image();image.onload=()=>{URL.revokeObjectURL(u);rect={x:.04,y:.04,w:.92,h:.92};draw();z.textContent='✓ Görsel alındı; şimdi kırpma alanını ayarla.'};image.src=u}})};installPasteTarget();
-  let attempts=0;const waitForSources=()=>{const ready=window.YKSTeacherPilotV1?.buildSourceHealthReport&&window.YKSQuestionCatalogV1?.all?.()?.length;if(ready&&document.getElementById('cropTopic')?.dataset.cropFallback){render();installPasteTarget()}if(++attempts<240)setTimeout(waitForSources,250)};waitForSources();
+  let attempts=0,lastSourceSignature='',userStarted=false;
+  root.addEventListener('click',e=>{if(e.target.closest('#cropAdd,#cropExport'))userStarted=true});
+  const waitForSources=()=>{
+    const C=window.YKSQuestionCatalogV1,P=window.YKSTeacherPilotV1;
+    const report=P?.buildSourceHealthReport&&C?.all?.()?.length?P.buildSourceHealthReport(C.all()):[];
+    const signature=report.map(x=>[x.sourceKey,x.ready,x.pending,JSON.stringify(x.counts),JSON.stringify(x.deficits),x.healthy].join('|')).join('||');
+    if(signature&&signature!==lastSourceSignature&&!userStarted){
+      const hadTopic=document.getElementById('cropTopic');
+      lastSourceSignature=signature;
+      if(hadTopic)render();
+      installPasteTarget();
+    }
+    if(++attempts<240)setTimeout(waitForSources,250);
+  };
+  waitForSources();
 })();

@@ -103,7 +103,7 @@
       await loadScript(pool);
       await loadScript(register);
     },
-    ()=>loadScript('/data/question-catalog-dedupe.js?v=1'),
+    ()=>loadScript('/data/question-catalog-dedupe.js?v=2'),
     ()=>loadScript('/data/question-catalog-policy-v2.js?v=4'),
     ()=>loadScript('/app-source-question-viewer.js?v=10'),
     ()=>loadScript('/app-tablet-pen.js?v=5'),

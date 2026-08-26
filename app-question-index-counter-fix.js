@@ -5,8 +5,8 @@
     const rows=(C.all?.()||[]).filter(visible),stats=root.querySelector('.sq-ready-stat');
     if(stats){const b=stats.querySelector('b');if(b&&b.textContent!==String(rows.length))b.textContent=String(rows.length)}
     root.querySelectorAll('tbody tr[data-qi-row]').forEach(tr=>{
-      const cells=tr.children,exam=cells[0]?.textContent.trim(),subject=cells[1]?.textContent.trim(),topic=cells[2]?.textContent.trim();
-      const total=rows.filter(x=>x.exam===exam&&x.subject===subject&&x.topic===topic).length;
+      const cells=tr.children,exam=cells[0]?.textContent.trim(),subject=cells[1]?.textContent.trim(),topicKey=tr.dataset.qiTopicKey;
+      const total=rows.filter(x=>x.exam===exam&&x.subject===subject&&((window.getQuestionIndexTopicGroup&&window.getQuestionIndexTopicGroup(x)?.key)===topicKey||(!topicKey&&x.topic===cells[2]?.textContent.trim()))).length;
       const cell=tr.querySelector('.sq-status-cell');if(!cell)return;
       const label=`✓ ${total}/${total} hazır`;
       if(cell.textContent.trim()!==label)cell.innerHTML=`<span class="qi-badge sq-ready">${label}</span>`;

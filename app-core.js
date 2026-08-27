@@ -3,9 +3,69 @@ const seed={profile:{name:'Eda',goal:10,minutes:30,tone:'Destekleyici',targetNet
 let state;try{state=JSON.parse(localStorage.getItem(KEY))||structuredClone(seed)}catch{state=structuredClone(seed)}
 state.profile??=structuredClone(seed.profile);state.trials??=[];state.sessions??=[];state.activityLog??=[];state.studyEvents??=[];state.topicMastery??={};state.plan??=[];state.miniTests??={history:[]};state.favorites??=[];state.counselorMessages ??= structuredClone(seed.counselorMessages);state.meta ??= {};state.meta.localUpdatedAt ??= Date.now();
 let sb=null,cloudUser=null,cloudReady=false,cloudSyncTimer=null,cloudApplying=false;function save(touch=true){if(touch)state.meta.localUpdatedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(state));if(touch&&!cloudApplying)scheduleCloudSync()}
+function installModernHome(){const home=document.getElementById('home');if(!home)return;let style=document.getElementById('homeModernStyles');if(!style){style=document.createElement('link');style.id='homeModernStyles';style.rel='stylesheet';style.href='/home-modern-v1.css?v=1';document.head.appendChild(style)}home.classList.add('home-modern');home.innerHTML=`
+  <div class="home-topbar">
+    <div>
+      <div class="home-kicker">YKS Uzman Hoca</div>
+      <h1 id="hello">Merhaba Eda! 👋</h1>
+      <p class="home-subtitle">Bugün hedefimize biraz daha yaklaşalım.</p>
+    </div>
+    <div class="home-top-actions">
+      <div id="liveStrip" class="live-strip"><span class="live-dot"></span><span id="liveText">Demo modu • Skill yerel</span></div>
+      <button class="avatar" data-go="profile" aria-label="Profil">E</button>
+    </div>
+  </div>
+
+  <div class="home-hero">
+    <section class="home-goal home-3d" aria-labelledby="homeGoalTitle">
+      <div>
+        <div class="home-section-label" id="homeGoalTitle">Bugün ne yapmalısın?</div>
+        <div id="goalText">0 / 10 soru tamamlandı</div>
+        <div class="progress"><span id="goalBar" style="width:0%"></span></div>
+        <small id="goalMotivation">Bugünkü hedefin seni bekliyor.</small>
+        <button class="home-primary-action" data-go="upload">Devam Et&nbsp; →</button>
+      </div>
+      <div class="home-target-mark" aria-hidden="true"><span></span></div>
+    </section>
+
+    <section class="home-teacher-card home-3d" aria-labelledby="homeTeacherTitle">
+      <div>
+        <div class="home-section-label">Hocanın önerisi</div>
+        <h2 id="homeTeacherTopic">İlk ölçümünü yap</h2>
+        <p id="homeTeacherAdvice">İlk Mini Testten sonra kişisel önerin burada oluşacak.</p>
+      </div>
+      <button class="home-teacher-button" data-go="teacher">Öğretmenle Çalış&nbsp; →</button>
+    </section>
+  </div>
+
+  <div class="home-quick-grid" aria-label="Hızlı çalışma alanları">
+    <button class="home-action-card blue" data-go="upload"><span class="home-action-icon">↗</span><span><b>Soru Çöz</b><small>Fotoğrafla ya da yazarak çöz.</small></span><span class="home-action-arrow">›</span></button>
+    <button class="home-action-card mint" data-go="tests"><span class="home-action-icon">✓</span><span><b>Mini Test</b><small>Kendini dene, bilgini ölç.</small></span><span class="home-action-arrow">›</span></button>
+    <button class="home-action-card coral" data-go="wrong"><span class="home-action-icon">×</span><span><b>Yanlışlarım</b><small>Hatalarını gör, tekrar et.</small></span><span class="home-action-arrow">›</span></button>
+    <button class="home-action-card blue" data-go="topics"><span class="home-action-icon">▥</span><span><b>Konu Takip</b><small>Gelişimini konu konu izle.</small></span><span class="home-action-arrow">›</span></button>
+    <button class="home-action-card pink" data-go="counselor"><span class="home-action-icon">•••</span><span><b>Rehber Öğretmen</b><small>Plan, motivasyon ve çalışma desteği.</small></span><span class="home-action-arrow">›</span></button>
+  </div>
+
+  <div class="home-lower-grid">
+    <section class="home-panel mint-panel home-3d" aria-labelledby="homeProgressTitle">
+      <div class="home-panel-head"><h2 id="homeProgressTitle">Bugünkü ilerlemen</h2></div>
+      <div class="home-stat-grid">
+        <div class="home-stat"><strong id="homeGoalStat">0 / 10</strong><span>Bugünkü soru</span></div>
+        <div class="home-stat"><strong id="homeTopicStat">0</strong><span>Takip edilen konu</span></div>
+        <div class="home-stat"><strong id="homeWrongStat">0</strong><span>Yanlış tekrar bekliyor</span></div>
+        <div class="home-stat"><strong id="homeMasteryStat">—</strong><span>Ortalama konu başarısı</span></div>
+      </div>
+    </section>
+
+    <section class="home-panel home-3d" aria-labelledby="homeWeakTitle">
+      <div class="home-panel-head"><h2 id="homeWeakTitle">Geliştirmen gereken konular</h2><button data-go="topics">Tümünü Gör&nbsp; →</button></div>
+      <div class="home-topic-list" id="weakList"></div>
+    </section>
+  </div>`}
+installModernHome();
 const screens=[...document.querySelectorAll('.screen')];function go(id){if(id==='write')id='upload';screens.forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='stats')renderStats();if(id==='teacher')renderTeacher();if(id==='coach')renderCoach();if(id==='counselor')renderCounselor()}document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));function topicEntries(){return Object.entries(state.topicMastery||{}).sort((a,b)=>a[1]-b[1])}function applyTheme(mode){const theme=mode==='dark'?'dark':'light';document.documentElement.dataset.theme=theme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='dark'?'#0c1020':'#f6f7fb')}
-function renderHome(){const p=state.profile||seed.profile;document.getElementById('hello').textContent=`Merhaba ${p.name||'Öğrenci'}! 👋`;document.querySelector('.avatar').textContent=(p.name||'Ö')[0].toUpperCase();let done=Math.min(Number(state.todayCount||0),Number(p.goal||0)),left=Math.max(0,Number(p.goal||0)-done);goalText.textContent=`${done} / ${p.goal||0} soru tamamlandı`;goalBar.style.width=`${p.goal?Math.min(100,done/p.goal*100):0}%`;goalMotivation.textContent=left?`Sadece ${left} soru kaldı 💪`:'🎉 Bugünkü hedef tamam!';const entries=topicEntries();weakList.innerHTML=entries.length?entries.slice(0,4).map(([k,v])=>`<div class="weak-row"><span>${esc(k)}</span><div class="bar ${v<60?'warning':''}"><i style="width:${v}%"></i></div><b>%${v}</b></div>`).join(''):'<div class="muted" style="padding:12px">Henüz konu verisi yok. Mini Test ve soru geri bildirimleriyle otomatik oluşacak.</div>'}
+function renderHome(){const p=state.profile||seed.profile;const hello=document.getElementById('hello'),avatar=document.querySelector('#home .avatar'),goalTextEl=document.getElementById('goalText'),goalBarEl=document.getElementById('goalBar'),goalMotivationEl=document.getElementById('goalMotivation');if(hello)hello.textContent=`Merhaba ${p.name||'Öğrenci'}! 👋`;if(avatar)avatar.textContent=(p.name||'Ö')[0].toUpperCase();const goal=Math.max(0,Number(p.goal||0)),done=Math.min(Number(state.todayCount||0),goal),left=Math.max(0,goal-done),progress=goal?Math.min(100,done/goal*100):0;if(goalTextEl)goalTextEl.textContent=`${done} / ${goal} soru tamamlandı`;if(goalBarEl)goalBarEl.style.width=`${progress}%`;if(goalMotivationEl)goalMotivationEl.textContent=left?`Bugünkü hedefe ulaşmana sadece ${left} soru kaldı.`:'Bugünkü hedef tamamlandı. Güzel iş!';const entries=topicEntries(),sessions=state.sessions||[],wrongCount=sessions.filter(x=>x.correct===false).length,masteryAvg=entries.length?Math.round(entries.reduce((sum,[,v])=>sum+Number(v||0),0)/entries.length):null;const goalStat=document.getElementById('homeGoalStat'),topicStat=document.getElementById('homeTopicStat'),wrongStat=document.getElementById('homeWrongStat'),masteryStat=document.getElementById('homeMasteryStat');if(goalStat)goalStat.textContent=`${done} / ${goal}`;if(topicStat)topicStat.textContent=String(entries.length);if(wrongStat)wrongStat.textContent=String(wrongCount);if(masteryStat)masteryStat.textContent=masteryAvg==null?'—':`%${masteryAvg}`;const teacherTopic=document.getElementById('homeTeacherTopic'),teacherAdvice=document.getElementById('homeTeacherAdvice');if(entries.length){const [weakTopic,weakValue]=entries[0];if(teacherTopic)teacherTopic.textContent=weakTopic;if(teacherAdvice)teacherAdvice.textContent=`Bu konuda başarı düzeyin %${weakValue}. Kısa bir tekrarın ardından mini test iyi bir sonraki adım.`}else{if(teacherTopic)teacherTopic.textContent='İlk ölçümünü yap';if(teacherAdvice)teacherAdvice.textContent='İlk Mini Testten sonra gerçek performans verine göre kişisel önerin burada oluşacak.'}const weakListEl=document.getElementById('weakList');if(weakListEl)weakListEl.innerHTML=entries.length?entries.slice(0,4).map(([k,v])=>`<div class="home-topic-row"><span>${esc(k)}</span><div class="bar ${v<60?'warning':''}"><i style="width:${Math.max(0,Math.min(100,Number(v)||0))}%"></i></div><b>%${v}</b><span class="home-topic-status ${v<60?'warn':''}">${v<60?'Tekrar öneriliyor':'Gelişiyor'}</span></div>`).join(''):'<div class="home-empty">Henüz konu verisi yok. Mini Test ve soru geri bildirimleri geldikçe bu alan otomatik olarak kişiselleşecek.</div>'}
 function renderTopics(){const entries=topicEntries();topicRows.innerHTML=entries.length?entries.map(([k,v])=>`<div class="weak-row"><span>${esc(k)}</span><div class="bar ${v<60?'warning':''}"><i style="width:${v}%"></i></div><b>%${v}</b></div>`).join(''):'<div class="muted" style="padding:12px">Henüz konu ölçümü yok.</div>'}
 function renderWrong(){let rows=(state.sessions||[]).filter(x=>x.correct===false).slice().reverse();wrongTable.innerHTML=rows.map(x=>`<tr><td>${esc(x.subject)}</td><td>${esc(x.topic)}</td><td>${esc(x.topic)}</td><td><span class="pill orange">Orta</span></td><td>Tekrar et</td></tr>`).join('')||'<tr><td colspan="5">Henüz yanlış olarak kaydedilmiş soru yok.</td></tr>'}
 function renderStats(){const sessions=state.sessions||[],entries=topicEntries();let n=sessions.length,c=sessions.filter(x=>x.correct===true).length,w=sessions.filter(x=>x.correct===false).length,r=n?Math.round(c/n*100):0;statTotal.textContent=n;statAcc.textContent=n?r+'%':'—';statStuck.textContent=w;statsTopics.innerHTML=entries.length?entries.map(([k,v])=>`<div class="weak-row"><span>${esc(k)}</span><div class="bar ${v<60?'warning':''}"><i style="width:${v}%"></i></div><b>%${v}</b></div>`).join(''):'<div class="muted" style="padding:12px">İstatistikler Mini Test ve çalışma kayıtları geldikçe oluşacak.</div>';if(!entries.length){statsComment.innerHTML='Henüz yorum için yeterli ölçüm yok. İlk Mini Testten sonra burada kişisel analiz görünecek.';return}let weakest=entries[0],strong=entries.slice().sort((a,b)=>b[1]-a[1])[0];statsComment.innerHTML=`Genel başarın <b>%${r}</b>. En güçlü konun <b>${strong[0]}</b> (%${strong[1]}), en çok gelişim fırsatı olan konun <b>${weakest[0]}</b> (%${weakest[1]}).`}

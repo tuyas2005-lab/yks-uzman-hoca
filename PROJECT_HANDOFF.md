@@ -1004,6 +1004,49 @@ başlatılmamıştır:
 
 ---
 
+
+# 19.1 2023 TYT MATEMATİK TEACHER POOL PRODUCTION CLOSEOUT
+
+DURUM:
+
+TAMAMLANDI / PRODUCTION
+
+Production merge:
+
+- PR: #26 — Prepare 2023 TYT math teacher pool
+- Main SHA: af4d4cedcb1e023840bfa98fb4a57c93c442b99a
+- 2023 TYT Matematik: 30
+- 2023 TYT Geometri: 10
+- Toplam production-ready: 40
+- Source-map: 40/40
+- Canonical mapping: 40/40
+- Crop/readiness integrity: 40/40
+- Manual review: 0
+- Duplicate questionId/source-map identity: 0
+- Answer/source-map consistency: PASS
+- Geometry questions 31–40 domain: GEOMETRI
+
+Teacher Pool totals:
+
+- Before: raw student-ready 119, canonical mapped ready 117
+- Added: raw 40, canonical 40
+- After: raw student-ready 159, canonical mapped ready 157
+
+Production Vercel deployment:
+
+- Status: READY
+- Deployment commit matches main SHA
+- Production HTTP, /api/status, and /api/app-config: 200
+- Main application and critical navigation smoke: PASS
+
+Known backlog:
+
+- Source Viewer / Soru İndeksi loading issue is pre-existing and not caused by PR #26.
+- This backlog remains separate from Teacher Pool data preparation.
+- Mini Test PWA/cache issue remains separate.
+
+MEB/OGM/MEBİ expansion has not started. Critical zero-coverage topics remain EBOB–EKOK, Çarpanlara Ayırma, Polinomlar, İkinci Dereceden Denklemler ve Karmaşık Sayılar, and Çember ve Daire.
+
 # 20. ŞU ANDAKİ SONRAKİ İŞ
 
 Konu Bazlı Test Çalışması tamamlandı ve production'da kapatıldı.

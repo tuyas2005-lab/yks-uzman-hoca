@@ -3,12 +3,18 @@
   const html=document.documentElement;
   let finished=false;
 
+  function loadVisualIdentity(){
+    if(window.__yksVisualIdentityV1||document.querySelector('script[data-visual-identity-v1]'))return;
+    const s=document.createElement('script');s.src='/app-visual-identity-v1.js?v=1';s.async=true;s.dataset.visualIdentityV1='true';s.onerror=()=>console.warn('Yeni görsel kimlik yüklenemedi.');document.body.appendChild(s);
+  }
+
   function finish(reason='ready'){
     if(finished)return;finished=true;
     try{window.renderHome?.();window.renderTopics?.()}catch(e){console.warn('Başlangıç son render:',e)}
     html.classList.remove('yks-startup-error');
     html.classList.add('yks-ready');
     html.dataset.bootReason=reason;
+    loadVisualIdentity();
   }
 
   function fail(){

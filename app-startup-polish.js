@@ -6,7 +6,12 @@
   function loadVisualIdentity(){
     if(window.__yksVisualIdentityV1||document.querySelector('script[data-visual-identity-v1]'))return;
     const s=document.createElement('script');s.src='/app-visual-identity-v1.js?v=2';s.async=true;s.dataset.visualIdentityV1='true';
-    s.onload=()=>{if(!document.querySelector('script[data-visual-identity-v2]')){const x=document.createElement('script');x.src='/app-visual-identity-v2.js?v=1';x.async=true;x.dataset.visualIdentityV2='true';document.body.appendChild(x)}};
+    s.onload=()=>{
+      if(document.querySelector('script[data-visual-identity-v2]'))return;
+      const x=document.createElement('script');x.src='/app-visual-identity-v2.js?v=2';x.async=true;x.dataset.visualIdentityV2='true';
+      x.onload=()=>{if(!document.querySelector('script[data-visual-identity-v3]')){const y=document.createElement('script');y.src='/app-visual-identity-v3.js?v=1';y.async=true;y.dataset.visualIdentityV3='true';document.body.appendChild(y)}};
+      document.body.appendChild(x);
+    };
     s.onerror=()=>console.warn('Yeni görsel kimlik yüklenemedi.');document.body.appendChild(s);
   }
 

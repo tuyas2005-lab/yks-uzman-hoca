@@ -34,13 +34,16 @@
   let TOPICS=BASE_TOPICS.map(clone);
 
   const sourceReady=item=>String(item?.exam||'').toUpperCase()==='TYT'&&norm(item?.subject)==='matematik'&&item?.provider==='MEB_OGM'&&item?.manualCrop===true&&item?.answerVerified===true&&item?.status==='student-ready'&&item?.asset?.status==='ready';
+  // MEB kaynaklarında aynı ana konu bölüm numarasıyla ayrılabilir (ör. Veri - 1 / Veri - 2).
+  // Kaynak sağlığı ve öğretmen akışı bunları tek konu altında değerlendirir.
   const sourceKey=item=>String(item?.canonicalTopic||'').trim();
+  const mergedSourceKey=key=>String(key||'').trim().replace(/-(?:1|2)$/,'');
   const canonicalId=key=>`tyt.matematik.${String(key||'').trim()}`;
   function buildTopicRegistry(items=[],raw={}){
     const minimumPerDifficulty=Math.max(1,Number(raw.minimumPerDifficulty||15)),taxonomy=raw.taxonomy||window.YKSTopicTaxonomyV1,groups=new Map();
     for(const item of Array.isArray(items)?items:[]){
       if(!sourceReady(item)||!sourceKey(item))continue;
-      const key=sourceKey(item),reviewed=REVIEWED_SOURCE_TOPIC_MAP[key];
+      const rawKey=sourceKey(item),key=mergedSourceKey(rawKey),reviewed=REVIEWED_SOURCE_TOPIC_MAP[rawKey]||REVIEWED_SOURCE_TOPIC_MAP[key]||Object.entries(REVIEWED_SOURCE_TOPIC_MAP).find(([candidate])=>mergedSourceKey(candidate)===key)?.[1];
       if(reviewed?.requiredSourceSubtopic&&norm(item?.sourceSubtopic)!==norm(reviewed.requiredSourceSubtopic))continue;
       const group=groups.get(key)||{key,displayTitle:String(reviewed?.requiredSourceSubtopic||item.topic||key),poolTopics:new Set(),counts:{KOLAY:0,ORTA:0,ZOR:0},total:0};
       group.poolTopics.add(String(item.topic||group.displayTitle));group.total++;
@@ -50,7 +53,7 @@
     const registry=BASE_TOPICS.map(clone),known=new Set(registry.map(x=>x.id));
     for(const group of [...groups.values()].sort((a,b)=>a.displayTitle.localeCompare(b.displayTitle,'tr'))){
       const base=BASE_TOPICS.find(topic=>[topic.id,topic.displayTitle,...topic.poolTopics,...topic.aliases].some(label=>norm(label)===norm(group.key)||norm(label)===norm(group.displayTitle)));
-      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.key],canonical=base||taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.displayTitle})||(reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):null),id=canonical?.id||'',healthy=Object.values(group.counts).every(count=>count>=minimumPerDifficulty);
+      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.key]||Object.entries(REVIEWED_SOURCE_TOPIC_MAP).find(([candidate])=>mergedSourceKey(candidate)===group.key)?.[1],canonical=base||taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.displayTitle})||(reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):null),id=canonical?.id||'',healthy=Object.values(group.counts).every(count=>count>=minimumPerDifficulty);
       if(!healthy||!id||known.has(id))continue;
       known.add(id);registry.push({id,displayTitle:String(canonical.displayTitle||canonical.topic||group.displayTitle),poolTopics:[...group.poolTopics],aliases:[...(canonical.aliases||[]),group.key],mapping:{kind:reviewed?'reviewed-high':'taxonomy-exact',confidence:reviewed?.confidence||'HIGH',sourceKey:group.key},sourceHealth:{...group.counts,total:group.total,minimumPerDifficulty}});
     }
@@ -61,13 +64,13 @@
     const minimumPerDifficulty=Math.max(1,Number(raw.minimumPerDifficulty||15)),taxonomy=raw.taxonomy||window.YKSTopicTaxonomyV1,groups=new Map();
     for(const item of Array.isArray(items)?items:[]){
       if(String(item?.exam||'').toUpperCase()!=='TYT'||norm(item?.subject)!=='matematik'||item?.provider!=='MEB_OGM'||item?.manualCrop!==true||!sourceKey(item))continue;
-      const key=sourceKey(item),group=groups.get(key)||{sourceKey:key,sourceTitle:String(item.topic||key),sourceSubtopics:new Set(),ready:0,pending:0,counts:{KOLAY:0,ORTA:0,ZOR:0}};
+      const rawKey=sourceKey(item),key=mergedSourceKey(rawKey),group=groups.get(key)||{sourceKey:key,sourceTitle:String(item.topic||key),sourceSubtopics:new Set(),ready:0,pending:0,counts:{KOLAY:0,ORTA:0,ZOR:0}};
       if(item.sourceSubtopic)group.sourceSubtopics.add(String(item.sourceSubtopic));
       if(sourceReady(item)){group.ready++;if(group.counts[item.difficulty]!==undefined)group.counts[item.difficulty]++;}else group.pending++;
       groups.set(key,group);
     }
     return [...groups.values()].sort((a,b)=>a.sourceTitle.localeCompare(b.sourceTitle,'tr')).map(group=>{
-      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.sourceKey],canonical=reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.sourceTitle}),deficits=Object.fromEntries(Object.entries(group.counts).map(([difficulty,count])=>[difficulty,Math.max(0,minimumPerDifficulty-count)]));
+      const reviewed=REVIEWED_SOURCE_TOPIC_MAP[group.sourceKey]||Object.entries(REVIEWED_SOURCE_TOPIC_MAP).find(([candidate])=>mergedSourceKey(candidate)===group.sourceKey)?.[1],canonical=reviewed?.confidence==='HIGH'?taxonomy?.get?.(reviewed.topicId):taxonomy?.find?.({exam:'TYT',subject:'Matematik',topic:group.sourceTitle}),deficits=Object.fromEntries(Object.entries(group.counts).map(([difficulty,count])=>[difficulty,Math.max(0,minimumPerDifficulty-count)]));
       return {sourceKey:group.sourceKey,sourceTitle:group.sourceTitle,sourceSubtopics:[...group.sourceSubtopics],canonicalTopicId:canonical?.id||null,mappingConfidence:reviewed?.confidence|| (canonical?'HIGH':null),ready:group.ready,pending:group.pending,counts:{...group.counts},deficits,healthy:!!canonical&&Object.values(deficits).every(value=>value===0)};
     });
   }
